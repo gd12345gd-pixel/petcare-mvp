@@ -1,0 +1,73 @@
+<view class="page">
+  <image class="top-image" src="{{detail.imageUrl}}" mode="aspectFill"></image>
+
+  <view class="info-card">
+    <view class="top-row">
+      <view class="pet-title">{{detail.petName || '未命名'}}（{{detail.breed || '未知'}}）</view>
+      <view class="status-tag {{type === 'lost' ? 'lost-tag' : 'found-tag'}}">
+        {{detail.rewardText}}
+      </view>
+    </view>
+
+    <view class="info-line">📍 {{detail.location}}</view>
+    <view class="info-line">🕒 {{detail.timeText}}</view>
+    <view class="info-line">📋 {{detail.description || '暂无描述'}}</view>
+
+    <view class="info-line" wx:if="{{type === 'found' && detail.tempCare}}">🏠 可暂时收养</view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">{{type === 'lost' ? '丢失地点' : '发现地点'}}</view>
+    <view class="map-box" bindtap="openLocation">
+  <view class="fake-map">
+    点击查看地图位置
+  </view>
+</view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-title">联系方式</view>
+    <button class="phone-btn" bindtap="callPhone">
+      联系电话 {{detail.contact || '暂无'}}
+    </button>
+  </view>
+
+  <view class="service-card">
+    <view class="service-title">温馨提醒</view>
+    <view class="service-desc">
+      很多宠物走失，是因为无人照看。提前预约上门喂养服务，避免再次走失。
+    </view>
+    <button class="service-btn" bindtap="goService">预约上门喂养服务</button>
+  </view>
+
+  <view class="comment-section">
+    <view class="section-title">评论区</view>
+
+    <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+      <image
+        class="comment-avatar"
+        src="{{item.avatarUrl || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=300&auto=format&fit=crop'}}"
+        mode="aspectFill"
+      ></image>
+      <view class="comment-body">
+        <view class="comment-name">{{item.nickname || '微信用户'}}</view>
+        <view class="comment-content">{{item.content}}</view>
+        <view class="comment-time">{{item.createdAt}}</view>
+      </view>
+    </view>
+
+    <view class="empty-comment" wx:if="{{!comments.length}}">
+      暂无评论，快来留下第一条线索吧
+    </view>
+  </view>
+
+  <view class="comment-input-bar">
+    <input
+      class="comment-input"
+      placeholder="提供线索或留言..."
+      value="{{commentText}}"
+      bindinput="onInputComment"
+    />
+    <button class="send-btn" bindtap="sendComment">发送</button>
+  </view>
+</view>

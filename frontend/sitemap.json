@@ -1,0 +1,9 @@
+{
+  "desc": "petcare sitemap",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

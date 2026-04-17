@@ -1,0 +1,351 @@
+.page {
+  height: 100vh;
+  background: #fdf1f5;
+  box-sizing: border-box;
+}
+
+/* Hero */
+ 
+.service-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 18rpx;
+}
+
+.service-chip {
+  padding: 8rpx 16rpx;
+  background: #fff1f4;
+  color: #ff6b81;
+  border-radius: 999rpx;
+  font-size: 19rpx;
+  font-weight: 600;
+}
+
+.booking-main-btn {
+  margin-top: 24rpx;
+  width: 78%;
+  height: 74rpx;
+  line-height: 74rpx;
+  background: #ff6b81;
+  color: #fff;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+/* Hero */
+.hero-card {
+  margin: 24rpx 24rpx 20rpx;
+  padding: 22rpx 22rpx 24rpx;
+  background: linear-gradient(180deg, #fff6f8 0%, #ffffff 100%);
+  border-radius: 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+.hero-left {
+  width: 54%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.hero-location {
+  font-size: 20rpx;
+  color: #9a8a8f;
+  line-height: 1.4;
+}
+
+.hero-title-line1 {
+  margin-top: 10rpx;
+  font-size: 46rpx;
+  line-height: 1.2;
+  font-weight: 800;
+  color: #433035;
+  letter-spacing: 0.2rpx;
+}
+
+.hero-desc {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  line-height: 1.5;
+  color: #8e7d82;
+  letter-spacing: 0.1rpx;
+  white-space: nowrap;
+}
+
+.service-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 18rpx;
+}
+
+.service-chip {
+  padding: 8rpx 16rpx;
+  background: #fff1f4;
+  color: #ff6b81;
+  border-radius: 999rpx;
+  font-size: 19rpx;
+  font-weight: 600;
+}
+
+.hero-btn-wrap {
+  margin-top: auto;
+  padding-top: 24rpx;
+  display: flex;
+  align-items: center;
+}
+
+.booking-main-btn {
+  width: 84%;
+  height: 74rpx;
+  line-height: 74rpx;
+  background: #ff6b81;
+  color: #fff;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-image-wrap {
+  width: 250rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hero-main-image {
+  width: 250rpx;
+  height: 290rpx;
+  border-radius: 22rpx;
+  background: #f5f5f5;
+  display: block;
+}
+
+/* Sections */
+.section-card {
+  margin: 0 24rpx 20rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #4a3439;
+}
+
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.more-text {
+  font-size: 22rpx;
+  color: #b29aa2;
+  line-height: 1.4;
+}
+
+/* Guarantee */
+ 
+.guarantee-grid {
+  margin-top: 16rpx;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12rpx;
+}
+
+.guarantee-item {
+  background: #fff8fa;
+  border-radius: 16rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+  min-height: 116rpx;
+}
+
+.guarantee-icon {
+  font-size: 26rpx;
+}
+
+.guarantee-title {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #4a3439;
+}
+
+.guarantee-desc {
+  margin-top: 4rpx;
+  font-size: 20rpx;
+  color: #9a8a8f;
+  line-height: 1.45;
+}
+
+/* Sitters */
+ 
+
+ 
+.sitter-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+ 
+
+.sitter-distance {
+  font-size: 20rpx;
+  color: #b29aa2;
+}
+
+ 
+.sitter-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 10rpx;
+}
+
+.sitter-card {
+  margin-top: 14rpx;
+  display: flex;
+  background: #fff8fa;
+  border-radius: 16rpx;
+  padding: 14rpx;
+  box-sizing: border-box;
+}
+
+.sitter-avatar {
+  width: 78rpx;
+  height: 78rpx;
+  border-radius: 50%;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.sitter-main {
+  flex: 1;
+  margin-left: 14rpx;
+}
+
+.sitter-name {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #4a3439;
+  line-height: 1.3;
+}
+
+.sitter-meta {
+  margin-top: 6rpx;
+  font-size: 21rpx;
+  color: #7f6b71;
+  line-height: 1.45;
+}
+
+.sitter-tag {
+  font-size: 18rpx;
+  color: #ff6b81;
+  background: #fff1f4;
+  padding: 6rpx 10rpx;
+  border-radius: 999rpx;
+  font-weight: 600;
+}
+
+/* Community */
+.community-row {
+  margin-top: 18rpx;
+  display: flex;
+  gap: 14rpx;
+}
+
+.community-card {
+  flex: 1;
+  background: #fff8fa;
+  border-radius: 20rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+}
+
+.community-text {
+  min-height: 104rpx;
+}
+
+.community-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #4a3439;
+  margin-bottom: 8rpx;
+}
+
+.community-desc {
+  font-size: 21rpx;
+  color: #8f7f84;
+  line-height: 1.6;
+}
+
+.community-image {
+  width: 100%;
+  height: 140rpx;
+  border-radius: 18rpx;
+  background: #f5f5f5;
+  margin-top: 12rpx;
+}
+
+/* Feed */
+.feed-list {
+  margin-top: 18rpx;
+}
+
+.feed-item {
+  display: flex;
+  align-items: center;
+  background: #fff8fa;
+  border-radius: 18rpx;
+  padding: 14rpx;
+  box-sizing: border-box;
+  margin-bottom: 14rpx;
+}
+
+.feed-item:last-child {
+  margin-bottom: 0;
+}
+
+.feed-thumb {
+  width: 120rpx;
+  height: 90rpx;
+  border-radius: 14rpx;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.feed-main {
+  margin-left: 16rpx;
+  flex: 1;
+}
+
+.feed-title {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #4a3439;
+  line-height: 1.4;
+}
+
+.feed-subtitle {
+  margin-top: 6rpx;
+  font-size: 21rpx;
+  color: #9d8c91;
+  line-height: 1.5;
+}

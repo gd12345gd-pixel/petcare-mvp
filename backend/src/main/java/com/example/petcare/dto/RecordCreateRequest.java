@@ -1,0 +1,1 @@
+package com.example.petcare.dto; import com.example.petcare.enums.RecordType; import jakarta.validation.constraints.*; import lombok.Data; @Data public class RecordCreateRequest { @NotNull private Long orderId; @NotNull private RecordType recordType; @NotBlank private String mediaUrl; private String thumbnailUrl; private String content; }

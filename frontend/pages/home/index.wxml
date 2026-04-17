@@ -1,0 +1,110 @@
+<scroll-view class="page" scroll-y>
+  <!-- 主服务 Hero -->
+  <view class="hero-card">
+  <view class="hero-left">
+    <view class="hero-location">📍 {{hero.locationText}}</view>
+    <view class="hero-title-line1">{{hero.title1}}</view>
+    <view class="hero-desc">{{hero.desc}}</view>
+
+    <view class="service-tag-row">
+      <view class="service-chip" wx:for="{{serviceTags}}" wx:key="*this">{{item}}</view>
+    </view>
+
+    <view class="hero-btn-wrap">
+      <button class="booking-main-btn" bindtap="goBooking">立即预约</button>
+    </view>
+  </view>
+
+  <view class="hero-image-wrap">
+    <image
+      class="hero-main-image"
+      src="http://8.146.237.74:8080/img/home-hero-shiba-cat.png"
+      mode="aspectFill"
+    />
+  </view>
+</view>
+
+  <!-- 平台保障 -->
+  <view class="section-card">
+    <view class="section-title">平台保障</view>
+
+    <view class="guarantee-grid">
+      <view class="guarantee-item" wx:for="{{guarantees}}" wx:key="title">
+        <view class="guarantee-icon">{{item.icon}}</view>
+        <view class="guarantee-title">{{item.title}}</view>
+        <view class="guarantee-desc">{{item.desc}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 优选托托师 -->
+  <view class="section-card">
+    <view class="section-header-row">
+      <view class="section-title">优选托托师</view>
+      <view class="more-text" bindtap="goSitterList">查看更多</view>
+    </view>
+
+    <view class="sitter-card" wx:for="{{sitters}}" wx:key="id">
+      <image class="sitter-avatar" src="{{item.avatar}}" mode="aspectFill" />
+      <view class="sitter-main">
+        <view class="sitter-top-row">
+          <view class="sitter-name">{{item.name}}</view>
+          <view class="sitter-distance">{{item.distance}}</view>
+        </view>
+        <view class="sitter-meta">⭐ {{item.score}} · {{item.count}}</view>
+        <view class="sitter-tag-row">
+          <view class="sitter-tag" wx:for="{{item.tags}}" wx:key="*this">{{item}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 宠物走失互助社区 -->
+  <view class="section-card">
+    <view class="section-header-row">
+      <view class="section-title">宠物走失互助社区</view>
+      <view class="more-text" bindtap="goPetCommunity">查看更多</view>
+    </view>
+
+    <view class="community-row">
+      <view
+        class="community-card"
+        wx:for="{{communityCards}}"
+        wx:key="type"
+        data-type="{{item.type}}"
+        bindtap="goCommunityByType"
+      >
+        <view class="community-text">
+          <view class="community-title">{{item.title}}</view>
+          <view class="community-desc">{{item.desc1}}</view>
+          <view class="community-desc">{{item.desc2}}</view>
+        </view>
+        <image class="community-image" src="{{item.imageUrl}}" mode="aspectFill" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 附近最新动态 -->
+  <view class="section-card">
+    <view class="section-header-row">
+      <view class="section-title">附近最新动态</view>
+      <view class="more-text" bindtap="goPetCommunity">查看更多</view>
+    </view>
+
+    <view class="feed-list">
+      <view
+        class="feed-item"
+        wx:for="{{latestFeed}}"
+        wx:key="id"
+        data-item="{{item}}"
+        bindtap="goLatestDetail"
+      >
+        <image class="feed-thumb" src="{{item.imageUrl}}" mode="aspectFill" />
+        <view class="feed-main">
+          <view class="feed-title">{{item.title}}</view>
+          <view class="feed-subtitle">{{item.subtitle}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>

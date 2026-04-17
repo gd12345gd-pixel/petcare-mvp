@@ -1,0 +1,91 @@
+<view class="page">
+  <!-- 顶部切换 -->
+  <view class="top-tabs">
+    <view class="tab-item {{type === 'lost' ? 'active' : ''}}" data-type="lost" bindtap="switchType">
+      寻宠地图
+    </view>
+    <view class="tab-item {{type === 'found' ? 'active' : ''}}" data-type="found" bindtap="switchType">
+      寻主地图
+    </view>
+  </view>
+  <view class="radius-wrap">
+  <view class="radius-item {{radiusFilter === '3' ? 'active' : ''}}" data-radius="3" bindtap="switchRadius">
+    3km
+  </view>
+  <view class="radius-item {{radiusFilter === '5' ? 'active' : ''}}" data-radius="5" bindtap="switchRadius">
+    5km
+  </view>
+  <view class="radius-item {{radiusFilter === 'all' ? 'active' : ''}}" data-radius="all" bindtap="switchRadius">
+    全部
+  </view>
+</view>
+
+  <!-- 地图 -->
+  <map
+    class="map"
+    latitude="{{latitude}}"
+    longitude="{{longitude}}"
+    scale="{{scale}}"
+    markers="{{markers}}"
+    show-location
+    bindmarkertap="onMarkerTap"
+  ></map>
+
+  <!-- 地图提示 -->
+  <view class="tip-bar">
+    点击地图点位，或滑动下方列表查看附近信息
+  </view>
+
+  <!-- 半屏面板 -->
+  <view class="bottom-panel">
+    <view class="panel-header">
+      <view class="drag-line"></view>
+      <view class="panel-title">
+        {{type === 'lost' ? '附近寻宠' : '附近寻主'}}
+      </view>
+    </view>
+
+    <swiper
+      class="card-swiper"
+      circular="{{false}}"
+      current="{{currentIndex}}"
+      previous-margin="24rpx"
+      next-margin="80rpx"
+      bindchange="onSwiperChange"
+    >
+      <swiper-item wx:for="{{rawList}}" wx:key="id">
+        <view
+          class="card {{selectedId === item.id ? 'card-active' : ''}}"
+          data-index="{{index}}"
+          bindtap="selectCard"
+        >
+          <image class="card-image" src="{{item.imageUrl}}" mode="aspectFill"></image>
+
+          <view class="card-content">
+            <view class="card-top-row">
+              <view class="card-title">
+                {{item.petName || (type === 'lost' ? '寻宠信息' : '寻主信息')}}（{{item.breed || '未知'}}）
+              </view>
+              <view class="card-tag {{type === 'lost' ? 'lost-tag' : 'found-tag'}}">
+                {{item.rewardText}}
+              </view>
+            </view>
+
+            <view class="card-line">📍 {{item.location}}</view>
+            <view class="card-line">🕒 {{item.timeText}}</view>
+
+            <view class="distance-line" wx:if="{{item.distanceText}}">
+              距离你约 {{item.distanceText}}
+            </view>
+
+            <button class="detail-btn" bindtap="goDetail">查看详情</button>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+
+    <view class="empty-wrap" wx:if="{{!rawList.length}}">
+      暂无地图数据，请先发布带位置的信息
+    </view>
+  </view>
+</view>

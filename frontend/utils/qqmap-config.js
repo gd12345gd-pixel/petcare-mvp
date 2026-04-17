@@ -1,0 +1,5 @@
+const QQMAP_KEY = 'VULBZ-52A3A-YSDKM-CEGGO-3AS23-QKFOU'
+
+module.exports = {
+  QQMAP_KEY
+}

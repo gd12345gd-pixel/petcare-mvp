@@ -1,0 +1,77 @@
+<view class="page">
+  <view class="order-card">
+    <view class="title">上传服务记录</view>
+    <view class="info">订单号：{{orderNo || ('#' + orderId)}}</view>
+    <view class="info" wx:if="{{serviceDate}}">服务日期：{{serviceDate}} {{timeSlot}}</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">1 选择记录类型</view>
+    <view class="type-grid">
+      <view
+        wx:for="{{typeOptions}}"
+        wx:key="value"
+        class="type-item {{type === item.value ? 'active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="chooseType"
+      >
+        {{item.label}}
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">2 上传内容</view>
+
+    <view class="label">服务图片（可选）</view>
+    <view class="upload-box" wx:if="{{!imageUrl}}" bindtap="chooseImage">
+      <view class="upload-icon">📷</view>
+      <view class="upload-text">点击上传图片</view>
+    </view>
+
+    <view class="uploading-tip" wx:if="{{uploadingImage}}">
+      图片上传中，请稍候...
+    </view>
+
+    <view class="image-preview" wx:if="{{imageUrl}}">
+      <image class="preview-img" src="{{imageUrl}}" mode="aspectFill" bindtap="previewImage"></image>
+      <view class="img-actions">
+        <button size="mini" bindtap="previewImage">预览</button>
+        <button size="mini" bindtap="removeImage">删除</button>
+      </view>
+    </view>
+
+    <view class="label mt">服务视频（可选）</view>
+    <view class="upload-box video-box" wx:if="{{!videoUrl}}" bindtap="chooseVideo">
+      <view class="upload-icon">🎥</view>
+      <view class="upload-text">点击上传视频（建议30秒内）</view>
+    </view>
+
+    <view class="uploading-tip" wx:if="{{uploadingVideo}}">
+      视频上传中，请稍候...
+    </view>
+
+    <view class="video-preview" wx:if="{{videoUrl}}">
+      <video class="preview-video" src="{{videoUrl}}" controls></video>
+      <view class="img-actions">
+        <button size="mini" bindtap="removeVideo">删除视频</button>
+      </view>
+    </view>
+
+    <view class="label mt">服务描述</view>
+    <textarea
+      class="textarea"
+      placeholder="请输入本次服务情况，如：已喂食，精神状态良好"
+      maxlength="200"
+      data-field="description"
+      value="{{description}}"
+      bindinput="onInput"
+    />
+  </view>
+
+  <view class="card btn-card">
+    <button class="start-btn" bindtap="startService">开始服务</button>
+    <button class="submit-btn" bindtap="submitRecord">提交记录</button>
+    <button class="finish-btn" bindtap="completeService">结束服务</button>
+  </view>
+</view>

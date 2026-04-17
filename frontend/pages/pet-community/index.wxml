@@ -1,0 +1,127 @@
+<view class="page">
+  <view class="header">
+    <view class="city-wrap">
+      <text class="city-icon">📍</text>
+      <text class="city-text">{{city}}</text>
+    </view>
+    <view class="title">寻宠</view>
+    <view class="search-icon">⌕</view>
+  </view>
+
+  <view class="banner-card" wx:if="{{bannerVisible}}">
+    <view class="banner-left">
+      <view class="banner-title">外出前建议预约上门喂养服务，避免宠物走失</view>
+      <button class="banner-btn" bindtap="goService">立即预约</button>
+    </view>
+    <image
+      class="banner-image"
+      src="https://images.unsplash.com/photo-1517849845537-4d257902454a?q=80&w=800&auto=format&fit=crop"
+      mode="aspectFill"
+    />
+  </view>
+
+  <view class="tab-wrap">
+    <view class="tab-item {{activeTab === 'lost' ? 'active' : ''}}" data-tab="lost" bindtap="switchTab">
+      寻宠
+    </view>
+    <view class="tab-item {{activeTab === 'found' ? 'active' : ''}}" data-tab="found" bindtap="switchTab">
+      寻主
+    </view>
+  </view>
+
+  <view class="region-filter-wrap">
+    <picker mode="region" value="{{regionFilter}}" bindchange="onRegionChange">
+      <view class="region-picker-box">
+        <text class="region-picker-text">
+          {{provinceFilter || '全部省'}} / {{cityFilterValue || '全部市'}} / {{districtFilter || '全部区'}}
+        </text>
+      </view>
+    </picker>
+    <view class="region-reset-btn" bindtap="resetRegionFilter">重置</view>
+  </view>
+
+  <view class="sort-wrap">
+    <view class="sort-item {{sortMode === 'nearby' ? 'active' : ''}}" data-mode="nearby" bindtap="switchSort">
+      附近
+    </view>
+    <view class="sort-item {{sortMode === 'latest' ? 'active' : ''}}" data-mode="latest" bindtap="switchSort">
+      最新发布
+    </view>
+  </view>
+
+  <view class="radius-wrap" wx:if="{{sortMode === 'nearby'}}">
+    <view class="radius-item {{radiusFilter === '3' ? 'active' : ''}}" data-radius="3" bindtap="switchRadius">
+      3km
+    </view>
+    <view class="radius-item {{radiusFilter === '5' ? 'active' : ''}}" data-radius="5" bindtap="switchRadius">
+      5km
+    </view>
+    <view class="radius-item {{radiusFilter === 'all' ? 'active' : ''}}" data-radius="all" bindtap="switchRadius">
+      全部
+    </view>
+  </view>
+
+  <view class="map-entry-wrap">
+    <button class="map-entry-btn" bindtap="goMapPage">地图模式</button>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view class="list-wrap" wx:if="{{activeTab === 'lost' && !loading}}">
+    <view
+      class="pet-card"
+      wx:for="{{lostList}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      data-type="lost"
+      bindtap="goDetail"
+    >
+      <image class="pet-image" src="{{item.imageUrl}}" mode="aspectFill" />
+      <view class="pet-info">
+        <view class="pet-top-row">
+          <view class="pet-name">{{item.petName || '未命名'}}（{{item.breed || '未知'}}）</view>
+          <view class="tag reward">{{item.rewardText}}</view>
+        </view>
+        <view class="pet-line">📍 {{item.location}}</view>
+        <view class="pet-line">🧭 {{item.province}} {{item.city}} {{item.district}}</view>
+        <view class="pet-line">🕒 {{item.timeText}}</view>
+        <view class="distance-line" wx:if="{{sortMode === 'nearby' && item.distanceText}}">
+          距离你约 {{item.distanceText}}
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{!lostList.length}}">暂无寻宠信息</view>
+  </view>
+
+  <view class="list-wrap" wx:if="{{activeTab === 'found' && !loading}}">
+    <view
+      class="pet-card"
+      wx:for="{{foundList}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      data-type="found"
+      bindtap="goDetail"
+    >
+      <image class="pet-image" src="{{item.imageUrl}}" mode="aspectFill" />
+      <view class="pet-info">
+        <view class="pet-top-row">
+          <view class="pet-name">{{item.petName || '疑似走失宠物'}}（{{item.breed || '未知'}}）</view>
+          <view class="tag found-tag">{{item.rewardText}}</view>
+        </view>
+        <view class="pet-line">📍 {{item.location}}</view>
+        <view class="pet-line">🧭 {{item.province}} {{item.city}} {{item.district}}</view>
+        <view class="pet-line">🕒 {{item.timeText}}</view>
+        <view class="distance-line" wx:if="{{sortMode === 'nearby' && item.distanceText}}">
+          距离你约 {{item.distanceText}}
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{!foundList.length}}">暂无寻主信息</view>
+  </view>
+
+  <view class="float-publish" bindtap="goPublish">
+    <text class="plus">+</text>
+  </view>
+</view>

@@ -1,0 +1,53 @@
+{
+  "pages": [
+      "pages/home/index",
+      "pages/detail/index",
+      "pages/order-create/index",
+      "pages/orders/index",
+      "pages/service-record-upload/index",
+      "pages/service-record-detail/index",
+      "pages/pet-community/index",
+      "pages/pet-publish/index",
+      "pages/pet-detail/index",
+      "pages/pet-map/index",
+      "pages/profile/index"
+  ],
+  "requiredPrivateInfos": [
+    "chooseLocation",
+    "getLocation"
+  ],"permission": {
+    "scope.userLocation": {
+      "desc": "用于获取您的位置，以选择地图点位和展示附近寻宠信息"
+    }
+  },
+  "window": {
+      "navigationBarTitleText": "宠物上门照护",
+      "navigationBarBackgroundColor": "#FCE4EC",
+      "navigationBarTextStyle": "black",
+      "backgroundColor": "#FFF6F8"
+  },
+  "tabBar": {
+      "color": "#999999",
+      "selectedColor": "#FF5A7A",
+      "borderStyle": "white",
+      "list": [
+          {
+              "pagePath": "pages/home/index",
+              "text": "首页"
+          },{
+            "pagePath": "pages/pet-community/index",
+            "text": "寻宠"
+          },
+          {
+              "pagePath": "pages/orders/index",
+              "text": "订单"
+          },
+          {
+              "pagePath": "pages/profile/index",
+              "text": "我的"
+          }
+      ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

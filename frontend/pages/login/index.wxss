@@ -1,0 +1,46 @@
+.page {
+  min-height: 100vh;
+  background: #fdf1f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  width: 100%;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 38rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.desc {
+  font-size: 28rpx;
+  color: #777;
+  line-height: 1.7;
+  margin-bottom: 40rpx;
+}
+
+.login-btn {
+  background: #ff6b81;
+  color: #fff;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.guest-btn {
+  background: #fff2f5;
+  color: #ff6b81;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+}

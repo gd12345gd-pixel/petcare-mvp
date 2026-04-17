@@ -1,0 +1,67 @@
+<view class="page">
+  <view class="top-switch">
+    <view class="switch-item {{activeType === 'lost' ? 'active' : ''}}" data-type="lost" bindtap="switchType">
+      寻宠
+    </view>
+    <view class="switch-item {{activeType === 'found' ? 'active' : ''}}" data-type="found" bindtap="switchType">
+      寻主
+    </view>
+  </view>
+
+  <view class="form-card">
+    <view class="label">上传宠物照片 *</view>
+    <view class="upload-box" wx:if="{{!form.imageUrl}}" bindtap="chooseImage">
+      <view class="upload-icon">📷</view>
+      <view class="upload-text">点击上传照片</view>
+      <view class="upload-sub">请上传清晰的宠物正面照片</view>
+    </view>
+    <image wx:if="{{form.imageUrl}}" class="preview-img" src="{{form.imageUrl}}" mode="aspectFill"></image>
+
+    <view class="label mt">{{activeType === 'lost' ? '宠物名称' : '宠物名称（可选）'}}</view>
+    <input class="input" placeholder="例如：豆豆" data-field="petName" bindinput="onInput" value="{{form.petName}}" />
+
+    <view class="label mt">品种（可选）</view>
+    <input class="input" placeholder="例如：柯基 / 英短 / 橘猫" data-field="breed" bindinput="onInput" value="{{form.breed}}" />
+
+    <view class="label mt">{{activeType === 'lost' ? '丢失地点' : '发现地点'}} *</view>
+    <view class="location-box" bindtap="chooseLocation">
+      <text class="{{form.location ? 'location-text' : 'location-placeholder'}}">
+        {{form.location || '点击选择地图位置'}}
+      </text>
+    </view>
+
+    <view class="region-display" wx:if="{{form.province || form.city || form.district}}">
+      {{form.province}} {{form.city}} {{form.district}}
+    </view>
+
+    <view class="label mt">{{activeType === 'lost' ? '丢失时间' : '发现时间'}} *</view>
+    <input class="input" placeholder="格式：2026-03-30 18:20:00" data-field="time" bindinput="onInput" value="{{form.time}}" />
+
+    <view class="label mt">联系方式 *</view>
+    <input class="input" placeholder="请输入手机号" data-field="contact" bindinput="onInput" value="{{form.contact}}" />
+
+    <block wx:if="{{activeType === 'lost'}}">
+      <view class="label mt">悬赏金额（可选）</view>
+      <input class="input" placeholder="请输入悬赏金额，如 500" data-field="reward" bindinput="onInput" value="{{form.reward}}" />
+    </block>
+
+    <block wx:if="{{activeType === 'found'}}">
+      <view class="checkbox-row mt" bindtap="toggleTempCare">
+        <view class="checkbox {{form.tempCare ? 'checked' : ''}}"></view>
+        <text class="checkbox-text">可暂时收养</text>
+      </view>
+    </block>
+
+    <view class="label mt">详细描述（可选）</view>
+    <textarea class="textarea" placeholder="如：宠物特征、走失经过等..." data-field="desc" bindinput="onInput" value="{{form.desc}}" maxlength="200"></textarea>
+
+    <view class="agree-wrap">
+      <text class="agree-dot">✓</text>
+      <text class="agree-text">我已阅读并同意《寻宠信息发布规范》</text>
+    </view>
+
+    <button class="submit-btn" bindtap="submitPublish">
+      {{activeType === 'lost' ? '发布寻宠' : '发布寻主'}}
+    </button>
+  </view>
+</view>

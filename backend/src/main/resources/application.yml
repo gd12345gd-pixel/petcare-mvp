@@ -1,0 +1,42 @@
+server:
+  port: 8080
+file:
+  upload-dir: /opt/petcare/uploads
+  access-url-prefix: http://8.146.237.74:8080/uploads
+
+wechat:
+  miniapp:
+    appid: wx2edbda63a63d7e7d
+    secret: d6c245d2da3a3d5a0d75ed0e22c7cba5
+tencent:
+  map:
+    key: VULBZ-52A3A-YSDKM-CEGGO-3AS23-QKFOU
+auth:
+  token-secret: petcare-secret-key
+spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+  datasource:
+    # 账号默认与此前 DataSourceConfig 中一致；可 export DB_USER / DB_PASSWORD 覆盖
+    url: jdbc:mysql://${DB_HOST:8.146.237.74}:3306/petcare_mvp?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&connectTimeout=5000&socketTimeout=60000
+    username: ${DB_USER:petcare}
+    password: ${DB_PASSWORD:960925jing}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5
+      connection-timeout: 10000
+      validation-timeout: 5000
+      initialization-fail-timeout: 10000
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    open-in-view: false
+  jackson:
+    time-zone: Asia/Shanghai
+logging:
+  level:
+    org.hibernate.SQL: warn
