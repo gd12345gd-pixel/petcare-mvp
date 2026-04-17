@@ -1,0 +1,73 @@
+<view class="page">
+  <view class="nav-bar">
+    <view class="back-area" bindtap="navigateBack">←</view>
+    <view class="nav-title">{{isEdit ? '编辑地址' : '新增地址'}}</view>
+  </view>
+
+  <view class="content">
+    <view class="section-card">
+      <view class="field-block">
+        <view class="field-label">联系人</view>
+        <input
+          class="input"
+          placeholder="请输入联系人姓名"
+          value="{{form.contactName}}"
+          data-field="contactName"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="field-block">
+        <view class="field-label">联系电话</view>
+        <input
+          class="input"
+          type="number"
+          placeholder="请输入联系电话"
+          value="{{form.contactPhone}}"
+          data-field="contactPhone"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="field-block">
+        <view class="field-label">所在地区</view>
+        <view class="input like-input" bindtap="chooseRegionByMap">
+          <text class="{{form.regionText ? 'input-text' : 'input-placeholder'}}">
+            {{form.regionText || '点击地图选择省市区'}}
+          </text>
+        </view>
+      </view>
+
+      <view class="field-block">
+        <view class="field-label">详细地址</view>
+        <input
+          class="input"
+          placeholder="请输入门牌号等详细地址"
+          value="{{form.detailAddress}}"
+          data-field="detailAddress"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="field-block">
+        <view class="field-label">地址标签</view>
+        <input
+          class="input"
+          placeholder="例如：家 / 公司"
+          value="{{form.tagName}}"
+          data-field="tagName"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="switch-row">
+        <view class="switch-label">设为默认地址</view>
+        <switch checked="{{form.isDefault === 1}}" bindchange="switchDefault" color="#ff6b81" />
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <button class="save-btn" bindtap="saveAddress">{{isEdit ? '保存修改' : '保存地址'}}</button>
+  </view>
+</view>

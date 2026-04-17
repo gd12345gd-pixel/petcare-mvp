@@ -10,6 +10,8 @@
       "pages/pet-publish/index",
       "pages/pet-detail/index",
       "pages/pet-map/index",
+      "pages/address-list/index",
+      "pages/address-edit/index",
       "pages/profile/index"
   ],
   "requiredPrivateInfos": [

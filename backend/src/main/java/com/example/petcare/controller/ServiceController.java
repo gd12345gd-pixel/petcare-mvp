@@ -1,6 +1,6 @@
 package com.example.petcare.controller;
 
-import com.example.petcare.dto.ApiResponse;
+import com.example.petcare.common.ApiResponse;
 import com.example.petcare.service.ServiceCatalogService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

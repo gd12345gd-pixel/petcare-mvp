@@ -63,7 +63,11 @@
   line-height: 1.5;
 }
 
- 
+.arrow {
+  font-size: 36rpx;
+  color: #b6b6b6;
+  margin-left: 18rpx;
+}
 
 .block-row {
   display: flex;
@@ -161,9 +165,95 @@
   line-height: 1.4;
 }
 
- 
+.pet-empty-wrap {
+  margin-top: 24rpx;
+  background: #fafbfc;
+  border-radius: 20rpx;
+  padding: 32rpx 24rpx;
+  text-align: center;
+}
 
- 
+.pet-empty-text {
+  font-size: 24rpx;
+  color: #8c8c8c;
+  line-height: 1.6;
+}
+
+.pet-empty-btn {
+  margin-top: 18rpx;
+  width: 220rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-radius: 16rpx;
+  background: #ff7a00;
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.selector-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 92rpx;
+}
+
+.selector-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.selector-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #222;
+}
+
+.selector-right {
+  flex: 1;
+  min-width: 0;
+  height: 42rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.selector-value-wrap {
+  min-width: 0;
+  max-width: 390rpx;
+  height: 42rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.selector-value {
+  font-size: 26rpx;
+  color: #a0a0a0;
+  line-height: 42rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.selector-value.active {
+  color: #222;
+}
+
+.selector-arrow {
+  width: 24rpx;
+  height: 42rpx;
+  margin-left: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b6b6b6;
+  font-size: 30rpx;
+  line-height: 42rpx;
+  flex-shrink: 0;
+}
 
 .field-block {
   margin-top: 24rpx;
@@ -244,7 +334,6 @@
   box-shadow: 0 10rpx 20rpx rgba(255, 122, 0, 0.18);
 }
 
-/* 时间弹层 */
 .mask {
   position: fixed;
   inset: 0;
@@ -415,7 +504,6 @@
   color: #fff;
 }
 
-/* 新增宠物弹窗 */
 .pet-popup {
   position: fixed;
   left: 24rpx;
@@ -488,96 +576,3 @@
   border-radius: 18rpx;
   background: #f5f5f5;
 }
-
- 
- 
-.selector-value {
-  font-size: 26rpx;
-  color: #a0a0a0;
-  line-height: 1.4;
-  max-width: 420rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: right;
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
-
-.selector-value.active {
-  color: #222;
-}
- 
-
- 
- 
-
-.selector-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 92rpx;
-}
-
-.selector-left {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.selector-title {
-  font-size: 30rpx;
-  font-weight: 800;
-  color: #222;
-  line-height: 1.4;
-}
-
-.selector-right {
-  flex: 1;
-  min-width: 0;
-  height: 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.selector-value-wrap {
-  min-width: 0;
-  max-width: 390rpx;
-  height: 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
-.selector-value {
-  font-size: 26rpx;
-  color: #a0a0a0;
-  line-height: 40rpx;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: right;
-}
-
-.selector-value.active {
-  color: #222;
-}
-
-.selector-arrow {
-  width: 24rpx;
-  height: 40rpx;
-  margin-left: 8rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #b6b6b6;
-  font-size: 30rpx;
-  line-height: 40rpx;
-  flex-shrink: 0;
-}
- 
-
- 
- 

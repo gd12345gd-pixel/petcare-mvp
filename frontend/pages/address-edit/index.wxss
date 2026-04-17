@@ -1,0 +1,116 @@
+.page {
+  min-height: 100vh;
+  background: #f6f7fb;
+  padding-bottom: 120rpx;
+  box-sizing: border-box;
+}
+
+.nav-bar {
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 24rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.back-area {
+  width: 64rpx;
+  font-size: 36rpx;
+  color: #222;
+}
+
+.nav-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #111;
+}
+
+.content {
+  padding: 20rpx;
+}
+
+.section-card {
+  background: #fff;
+  border-radius: 22rpx;
+  padding: 26rpx 24rpx;
+  box-sizing: border-box;
+}
+
+.field-block {
+  margin-bottom: 24rpx;
+}
+
+.field-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 12rpx;
+}
+
+.input {
+  width: 100%;
+  height: 84rpx;
+  background: #f7f8fb;
+  border-radius: 18rpx;
+  padding: 0 22rpx;
+  box-sizing: border-box;
+  font-size: 26rpx;
+  color: #222;
+  border: 1rpx solid #edf0f4;
+}
+
+.like-input {
+  display: flex;
+  align-items: center;
+}
+
+.input-text {
+  font-size: 26rpx;
+  color: #222;
+}
+
+.input-placeholder {
+  font-size: 26rpx;
+  color: #b3b7c0;
+}
+
+.switch-row {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.switch-label {
+  font-size: 28rpx;
+  color: #222;
+  font-weight: 600;
+}
+
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0.96);
+  padding: 16rpx 20rpx 24rpx;
+  box-sizing: border-box;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.save-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(180deg, #ff9200 0%, #ff7a00 100%);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 800;
+}

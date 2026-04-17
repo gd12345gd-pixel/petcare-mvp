@@ -1,7 +1,7 @@
 package com.example.petcare.controller;
 
 import com.example.petcare.common.Result;
-import com.example.petcare.dto.ApiResponse;
+import com.example.petcare.common.ApiResponse;
 import com.example.petcare.dto.CreateOrderRequest;
 import com.example.petcare.dto.CreateOrderResponse;
 import com.example.petcare.dto.OrderStatusUpdateRequest;

@@ -1,25 +1,11 @@
 const { request, BASE_URL } = require('../../utils/request')
-const { QQMAP_KEY } = require('../../utils/qqmap-config')
 
 Page({
   data: {
-    pets: [
-      {
-        id: 1,
-        name: '豆豆',
-        type: '狗狗',
-        breed: '柴犬',
-        imageUrl: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=600&auto=format&fit=crop'
-      },
-      {
-        id: 2,
-        name: '咪咪',
-        type: '猫咪',
-        breed: '美短',
-        imageUrl: 'https://images.unsplash.com/photo-1511044568932-338cba0ad803?q=80&w=600&auto=format&fit=crop'
-      }
-    ],
-    selectedPetId: 1,
+    pets: [],
+    selectedPetId: null,
+
+    selectedAddress: null,
 
     showPetPopup: false,
     newPet: {
@@ -35,19 +21,11 @@ Page({
     submitting: false,
 
     form: {
-      province: '',
-      city: '',
-      district: '',
-      regionText: '',
-      latitude: null,
-      longitude: null,
-      detailAddress: '',
       serviceFee: '',
       description: '',
       specialRequirement: ''
     },
 
-    // 时间选择
     showTimePopup: false,
     calendarMonthText: '',
     calendarDays: [],
@@ -67,20 +45,60 @@ Page({
 
   onLoad() {
     this.buildCalendar()
+    this.loadPetList()
+  },
+
+  onShow() {
+    const selectedAddress = wx.getStorageSync('selectedServiceAddress')
+    if (selectedAddress) {
+      this.setData({
+        selectedAddress
+      })
+    }
   },
 
   navigateBack() {
     wx.navigateBack()
   },
 
+  noop() {},
+
+  onInput(e) {
+    const field = e.currentTarget.dataset.field
+    const value = e.detail.value
+    this.setData({
+      [`form.${field}`]: value
+    })
+  },
+
   getSelectedPet() {
     return this.data.pets.find(item => item.id === this.data.selectedPetId) || null
+  },
+
+  loadPetList() {
+    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
+
+    request(`/api/pet/list?userId=${currentUser.id}`, 'GET')
+      .then((list) => {
+        const pets = list || []
+        this.setData({
+          pets,
+          selectedPetId: pets.length ? pets[0].id : null
+        })
+      })
+      .catch(() => {})
   },
 
   selectPet(e) {
     const id = Number(e.currentTarget.dataset.id)
     this.setData({
       selectedPetId: id
+    })
+  },
+
+  goChooseAddress() {
+    wx.navigateTo({
+      url: '/pages/address-list/index?from=orderCreate'
     })
   },
 
@@ -100,14 +118,6 @@ Page({
   closeAddPetPopup() {
     this.setData({
       showPetPopup: false
-    })
-  },
-
-  onInput(e) {
-    const field = e.currentTarget.dataset.field
-    const value = e.detail.value
-    this.setData({
-      [`form.${field}`]: value
     })
   },
 
@@ -185,7 +195,8 @@ Page({
   },
 
   saveNewPet() {
-    const { newPet, pets } = this.data
+    const { newPet } = this.data
+    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
 
     if (!newPet.name) {
       wx.showToast({ title: '请输入宠物名字', icon: 'none' })
@@ -196,87 +207,32 @@ Page({
       return
     }
 
-    const newId = pets.length ? Math.max(...pets.map(item => item.id)) + 1 : 1
-    const pet = {
-      id: newId,
+    request('/api/pet/create', 'POST', {
+      userId: currentUser.id,
       name: newPet.name,
       type: newPet.type,
       breed: newPet.breed,
       imageUrl: newPet.imageUrl
-    }
+    }).then((data) => {
+      this.setData({
+        showPetPopup: false
+      })
 
-    this.setData({
-      pets: [...pets, pet],
-      selectedPetId: newId,
-      showPetPopup: false
-    })
+      wx.showToast({
+        title: '新增宠物成功',
+        icon: 'success'
+      })
 
-    wx.showToast({
-      title: '新增宠物成功',
-      icon: 'success'
-    })
-  },
+      this.loadPetList()
 
-  chooseRegionByMap() {
-    wx.chooseLocation({
-      success: (res) => {
-        const latitude = res.latitude
-        const longitude = res.longitude
+      if (data && data.id) {
         this.setData({
-          'form.latitude': latitude,
-          'form.longitude': longitude
-        })
-        this.reverseGeocode(latitude, longitude)
-      },
-      fail: () => {
-        wx.showToast({
-          title: '请选择地图位置',
-          icon: 'none'
+          selectedPetId: data.id
         })
       }
     })
   },
 
-  reverseGeocode(latitude, longitude) {
-    wx.showLoading({ title: '解析地区中' })
-
-    wx.request({
-      url: 'https://apis.map.qq.com/ws/geocoder/v1/',
-      method: 'GET',
-      data: {
-        location: `${latitude},${longitude}`,
-        key: QQMAP_KEY
-      },
-      success: (res) => {
-        const data = res.data
-        if (data && data.status === 0 && data.result) {
-          const ac = data.result.address_component || {}
-          this.setData({
-            'form.province': ac.province || '',
-            'form.city': ac.city || '',
-            'form.district': ac.district || '',
-            'form.regionText': `${ac.province || ''} ${ac.city || ''} ${ac.district || ''}`.trim()
-          })
-        } else {
-          wx.showToast({
-            title: (data && data.message) || '地区解析失败',
-            icon: 'none'
-          })
-        }
-      },
-      fail: () => {
-        wx.showToast({
-          title: '地区解析失败',
-          icon: 'none'
-        })
-      },
-      complete: () => {
-        wx.hideLoading()
-      }
-    })
-  },
-
-  // 时间相关
   buildCalendar() {
     const now = new Date()
     const year = now.getFullYear()
@@ -284,8 +240,6 @@ Page({
 
     const daysInMonth = new Date(year, month, 0).getDate()
     const firstDay = new Date(year, month - 1, 1).getDay()
-
-    const weekMap = ['日', '一', '二', '三', '四', '五', '六']
     const days = []
 
     for (let i = 0; i < firstDay; i++) {
@@ -300,7 +254,6 @@ Page({
       days.push({
         id: dateStr,
         day: d,
-        week: weekMap[new Date(year, month - 1, d).getDay()],
         date: dateStr,
         selected: this.data.selectedDates.includes(dateStr)
       })
@@ -355,15 +308,13 @@ Page({
   toggleTimeSlot(e) {
     const value = e.currentTarget.dataset.value
     let timeSlots = [...this.data.timeSlots]
-  
-    // 点的是“时间不限”
+
     if (value === '不限') {
       timeSlots = timeSlots.map(item => ({
         ...item,
         selected: item.value === '不限' ? !item.selected : false
       }))
     } else {
-      // 点的是具体时间段
       timeSlots = timeSlots.map(item => {
         if (item.value === '不限') {
           return {
@@ -380,49 +331,12 @@ Page({
         return item
       })
     }
-  
+
     this.setData({
       timeSlots
     })
   },
 
-  getSelectedTimeSummary() {
-    const { selectedDates, timeSlots } = this.data
-    const selectedSlots = timeSlots.filter(item => item.selected).map(item => item.label)
-
-    if (!selectedDates.length && !selectedSlots.length) return ''
-    if (selectedDates.length && !selectedSlots.length) return `${selectedDates.length}天`
-    if (!selectedDates.length && selectedSlots.length) return selectedSlots.join('、')
-    return `${selectedDates.length}天 · ${selectedSlots.join('、')}`
-  },
-
-  confirmTimeSelection() {
-    const selectedSlots = this.data.timeSlots.filter(item => item.selected)
-  
-    if (!this.data.selectedDates.length) {
-      wx.showToast({
-        title: '请至少选择一个日期',
-        icon: 'none'
-      })
-      return
-    }
-  
-    if (!selectedSlots.length) {
-      wx.showToast({
-        title: '请至少选择一个时间段',
-        icon: 'none'
-      })
-      return
-    }
-  
-    const dateText = this.formatSelectedDates(this.data.selectedDates)
-    const slotText = selectedSlots.map(item => item.label).join('、')
-  
-    this.setData({
-      showTimePopup: false,
-      selectedTimeSummary: `${dateText} · ${slotText}`
-    })
-  },
   formatSelectedDates(dates) {
     return [...dates]
       .sort()
@@ -432,24 +346,49 @@ Page({
       })
       .join('、')
   },
-  validateForm() {
-    const selectedPet = this.getSelectedPet()
-    const { form } = this.data
+
+  confirmTimeSelection() {
     const selectedSlots = this.data.timeSlots.filter(item => item.selected)
 
+    if (!this.data.selectedDates.length) {
+      wx.showToast({
+        title: '请至少选择一个日期',
+        icon: 'none'
+      })
+      return
+    }
+
+    if (!selectedSlots.length) {
+      wx.showToast({
+        title: '请至少选择一个时间段',
+        icon: 'none'
+      })
+      return
+    }
+
+    const dateText = this.formatSelectedDates(this.data.selectedDates)
+    const slotText = selectedSlots.map(item => item.label).join('、')
+
+    this.setData({
+      showTimePopup: false,
+      selectedTimeSummary: `${dateText} · ${slotText}`
+    })
+  },
+
+  validateForm() {
+    const selectedPet = this.getSelectedPet()
+    const { form, selectedAddress, selectedDates, timeSlots } = this.data
+    const selectedSlots = timeSlots.filter(item => item.selected)
+
+    if (!selectedAddress) {
+      wx.showToast({ title: '请选择服务地址', icon: 'none' })
+      return false
+    }
     if (!selectedPet) {
       wx.showToast({ title: '请选择宠物', icon: 'none' })
       return false
     }
-    if (!form.regionText) {
-      wx.showToast({ title: '请选择所在地区', icon: 'none' })
-      return false
-    }
-    if (!form.detailAddress) {
-      wx.showToast({ title: '请输入详细地址', icon: 'none' })
-      return false
-    }
-    if (!this.data.selectedDates.length) {
+    if (!selectedDates.length) {
       wx.showToast({ title: '请选择服务日期', icon: 'none' })
       return false
     }
@@ -468,25 +407,15 @@ Page({
 
     return true
   },
-  openTimePopup() {
-    this.buildCalendar()
-    this.setData({
-      showTimePopup: true
-    })
-  },
-  
-  closeTimePopup() {
-    this.setData({
-      showTimePopup: false
-    })
-  },
+
   submitOrder() {
     if (!this.validateForm()) return
     if (this.data.submitting) return
 
-    const selectedPet = this.getSelectedPet()
-    const { form, selectedDates, timeSlots } = this.data
     const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
+    const selectedPet = this.getSelectedPet()
+    const selectedAddress = this.data.selectedAddress
+    const { form, selectedDates, timeSlots } = this.data
     const selectedSlots = timeSlots.filter(item => item.selected).map(item => item.value)
 
     this.setData({ submitting: true })
@@ -501,12 +430,15 @@ Page({
       petBreed: selectedPet.breed,
       petImageUrl: selectedPet.imageUrl,
 
-      province: form.province,
-      city: form.city,
-      district: form.district,
-      latitude: form.latitude,
-      longitude: form.longitude,
-      detailAddress: form.detailAddress,
+      addressId: selectedAddress.id,
+      serviceContactName: selectedAddress.contactName,
+      serviceContactPhone: selectedAddress.contactPhone,
+      serviceProvince: selectedAddress.province,
+      serviceCity: selectedAddress.city,
+      serviceDistrict: selectedAddress.district,
+      serviceDetailAddress: selectedAddress.detailAddress,
+      serviceLatitude: selectedAddress.latitude,
+      serviceLongitude: selectedAddress.longitude,
 
       serviceDates: selectedDates,
       timeSlots: selectedSlots,
@@ -520,6 +452,7 @@ Page({
         title: '提交成功',
         icon: 'success'
       })
+      wx.removeStorageSync('selectedServiceAddress')
       setTimeout(() => {
         wx.navigateBack()
       }, 800)
