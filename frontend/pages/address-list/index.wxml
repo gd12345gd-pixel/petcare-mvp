@@ -1,50 +1,48 @@
-<view class="page">
+<view class="page-with-bottom-bar">
   <view class="nav-bar">
-    <view class="back-area" bindtap="navigateBack">←</view>
+    <view class="back-area" bindtap="navigateBack">
+      <view class="back-icon"></view>
+    </view>
     <view class="nav-title">服务地址</view>
   </view>
 
   <scroll-view class="content" scroll-y>
     <view class="address-list" wx:if="{{addressList.length}}">
-      <view
-        class="address-card {{selectedAddressId === item.id ? 'active' : ''}}"
-        wx:for="{{addressList}}"
-        wx:key="id"
-        data-item="{{item}}"
-        bindtap="chooseAddress"
-      >
+      <view class="address-card {{selectedAddressId === item.id ? 'active' : ''}}" wx:for="{{addressList}}" wx:key="id" data-item="{{item}}" bindtap="chooseAddress">
         <view class="address-top">
           <view class="name-phone">
-            <text class="contact-name">{{item.contactName}}</text>
-            <text class="contact-phone">{{item.contactPhone}}</text>
+            <text class="card-title contact-name">{{item.contactName}}</text>
+            <text class="desc-text contact-phone">{{item.contactPhone}}</text>
           </view>
 
           <view class="right-tags">
-            <view class="default-tag" wx:if="{{item.isDefault === 1}}">默认</view>
-            <view class="custom-tag" wx:if="{{item.tagName}}">{{item.tagName}}</view>
+            <view class="pill-tag pill-tag-pink" wx:if="{{item.isDefault === 1}}">默认</view>
+            <view class="pill-tag pill-tag-gray" wx:if="{{item.tagName}}">{{item.tagName}}</view>
           </view>
         </view>
 
-        <view class="address-text">{{item.fullAddress}}</view>
+        <view class="desc-text address-text">{{item.fullAddress}}</view>
 
-        <view class="address-actions" catchtap="noop">
+        <view class="address-actions">
           <view class="action-left">
-            <view class="small-btn" data-id="{{item.id}}" bindtap="setDefault">设为默认</view>
+            <view class="small-btn" data-id="{{item.id}}" catchtap="setDefault">设为默认</view>
           </view>
           <view class="action-right">
-            <view class="small-btn" data-id="{{item.id}}" bindtap="editAddress">编辑</view>
-            <view class="small-btn danger" data-id="{{item.id}}" bindtap="deleteAddress">删除</view>
+            <view class="small-btn" data-id="{{item.id}}" catchtap="editAddress">编辑</view>
+            <view class="small-btn danger" data-id="{{item.id}}" catchtap="deleteAddress">删除</view>
           </view>
         </view>
       </view>
     </view>
 
     <view class="empty-wrap" wx:else>
-      <view class="empty-text">还没有服务地址，先新增一个吧</view>
+      <view class="empty-title">还没有服务地址</view>
+      <view class="empty-desc">先新增一个常用地址，下单会更方便</view>
+      <button class="primary-btn empty-btn" bindtap="addAddress">新增地址</button>
     </view>
   </scroll-view>
 
   <view class="bottom-bar">
-    <button class="add-btn" bindtap="addAddress">新增地址</button>
+    <button class="primary-btn add-btn" bindtap="addAddress">新增地址</button>
   </view>
 </view>

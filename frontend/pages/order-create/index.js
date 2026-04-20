@@ -1,4 +1,4 @@
-const { request, BASE_URL } = require('../../utils/request')
+const { request } = require('../../utils/request')
 
 Page({
   data: {
@@ -7,17 +7,6 @@ Page({
 
     selectedAddress: null,
 
-    showPetPopup: false,
-    newPet: {
-      name: '',
-      type: '狗狗',
-      breed: '',
-      imageUrl: ''
-    },
-    newPetTypeOptions: ['狗狗', '猫咪', '其他'],
-    newPetTypeIndex: 0,
-
-    uploadingPetImage: false,
     submitting: false,
 
     form: {
@@ -55,13 +44,32 @@ Page({
         selectedAddress
       })
     }
+
+    const latestPetId = wx.getStorageSync('latestPetId')
+    this.loadPetList(latestPetId)
+    if (latestPetId) {
+      wx.removeStorageSync('latestPetId')
+    }
   },
 
   navigateBack() {
-    wx.navigateBack()
+    const pages = getCurrentPages()
+  
+    if (pages.length > 1) {
+      wx.navigateBack({
+        delta: 1,
+        fail: () => {
+          wx.switchTab({
+            url: '/pages/home/index'
+          })
+        }
+      })
+    } else {
+      wx.switchTab({
+        url: '/pages/home/index'
+      })
+    }
   },
-
-  noop() {},
 
   onInput(e) {
     const field = e.currentTarget.dataset.field
@@ -75,15 +83,25 @@ Page({
     return this.data.pets.find(item => item.id === this.data.selectedPetId) || null
   },
 
-  loadPetList() {
+  loadPetList(preferPetId) {
     const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
 
     request(`/api/pet/list?userId=${currentUser.id}`, 'GET')
       .then((list) => {
         const pets = list || []
+
+        let selectedPetId = null
+        if (preferPetId && pets.some(item => item.id === preferPetId)) {
+          selectedPetId = preferPetId
+        } else if (this.data.selectedPetId && pets.some(item => item.id === this.data.selectedPetId)) {
+          selectedPetId = this.data.selectedPetId
+        } else if (pets.length) {
+          selectedPetId = pets[0].id
+        }
+
         this.setData({
           pets,
-          selectedPetId: pets.length ? pets[0].id : null
+          selectedPetId
         })
       })
       .catch(() => {})
@@ -96,140 +114,15 @@ Page({
     })
   },
 
+  goAddPet() {
+    wx.navigateTo({
+      url: '/pages/pet-edit/index'
+    })
+  },
+
   goChooseAddress() {
     wx.navigateTo({
       url: '/pages/address-list/index?from=orderCreate'
-    })
-  },
-
-  openAddPetPopup() {
-    this.setData({
-      showPetPopup: true,
-      newPet: {
-        name: '',
-        type: '狗狗',
-        breed: '',
-        imageUrl: ''
-      },
-      newPetTypeIndex: 0
-    })
-  },
-
-  closeAddPetPopup() {
-    this.setData({
-      showPetPopup: false
-    })
-  },
-
-  onNewPetInput(e) {
-    const field = e.currentTarget.dataset.field
-    const value = e.detail.value
-    this.setData({
-      [`newPet.${field}`]: value
-    })
-  },
-
-  chooseNewPetType(e) {
-    const index = Number(e.currentTarget.dataset.index)
-    const type = this.data.newPetTypeOptions[index]
-    this.setData({
-      newPetTypeIndex: index,
-      'newPet.type': type
-    })
-  },
-
-  chooseNewPetImage() {
-    wx.chooseMedia({
-      count: 1,
-      mediaType: ['image'],
-      success: (res) => {
-        const tempPath = res.tempFiles[0].tempFilePath
-        this.uploadNewPetImage(tempPath)
-      }
-    })
-  },
-
-  uploadNewPetImage(filePath) {
-    this.setData({ uploadingPetImage: true })
-    wx.showLoading({ title: '上传图片中' })
-
-    wx.uploadFile({
-      url: `${BASE_URL}/api/files/upload-image`,
-      filePath,
-      name: 'file',
-      success: (res) => {
-        try {
-          const data = JSON.parse(res.data)
-          if (data.code === 0) {
-            this.setData({
-              'newPet.imageUrl': data.data.url
-            })
-            wx.showToast({
-              title: '上传成功',
-              icon: 'success'
-            })
-          } else {
-            wx.showToast({
-              title: data.message || '上传失败',
-              icon: 'none'
-            })
-          }
-        } catch (e) {
-          wx.showToast({
-            title: '图片解析失败',
-            icon: 'none'
-          })
-        }
-      },
-      fail: () => {
-        wx.showToast({
-          title: '图片上传失败',
-          icon: 'none'
-        })
-      },
-      complete: () => {
-        this.setData({ uploadingPetImage: false })
-        wx.hideLoading()
-      }
-    })
-  },
-
-  saveNewPet() {
-    const { newPet } = this.data
-    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
-
-    if (!newPet.name) {
-      wx.showToast({ title: '请输入宠物名字', icon: 'none' })
-      return
-    }
-    if (!newPet.imageUrl) {
-      wx.showToast({ title: '请上传宠物照片', icon: 'none' })
-      return
-    }
-
-    request('/api/pet/create', 'POST', {
-      userId: currentUser.id,
-      name: newPet.name,
-      type: newPet.type,
-      breed: newPet.breed,
-      imageUrl: newPet.imageUrl
-    }).then((data) => {
-      this.setData({
-        showPetPopup: false
-      })
-
-      wx.showToast({
-        title: '新增宠物成功',
-        icon: 'success'
-      })
-
-      this.loadPetList()
-
-      if (data && data.id) {
-        this.setData({
-          selectedPetId: data.id
-        })
-      }
     })
   },
 
@@ -379,7 +272,7 @@ Page({
     const selectedPet = this.getSelectedPet()
     const { form, selectedAddress, selectedDates, timeSlots } = this.data
     const selectedSlots = timeSlots.filter(item => item.selected)
-
+  
     if (!selectedAddress) {
       wx.showToast({ title: '请选择服务地址', icon: 'none' })
       return false
@@ -400,11 +293,7 @@ Page({
       wx.showToast({ title: '请输入服务费用', icon: 'none' })
       return false
     }
-    if (!form.description) {
-      wx.showToast({ title: '请填写详细描述', icon: 'none' })
-      return false
-    }
-
+  
     return true
   },
 
@@ -428,7 +317,7 @@ Page({
       petName: selectedPet.name,
       petType: selectedPet.type,
       petBreed: selectedPet.breed,
-      petImageUrl: selectedPet.imageUrl,
+      petImageUrl: selectedPet.avatarUrl || selectedPet.imageUrl,
 
       addressId: selectedAddress.id,
       serviceContactName: selectedAddress.contactName,
@@ -444,8 +333,8 @@ Page({
       timeSlots: selectedSlots,
       serviceFee: form.serviceFee,
 
-      description: form.description,
-      specialRequirement: form.specialRequirement
+      remark: form.specialRequirement,
+specialRequirement: form.specialRequirement
     }).then(() => {
       wx.hideLoading()
       wx.showToast({

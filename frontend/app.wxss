@@ -1,1 +1,268 @@
-page{background:#fff6f8;color:#333;font-family:Arial,Helvetica,sans-serif}.container{padding:24rpx}.card{background:#fff;border-radius:24rpx;box-shadow:0 8rpx 24rpx rgba(0,0,0,.04)}.section-title{font-size:34rpx;font-weight:700;margin-bottom:20rpx}.muted{color:#999}.tag{display:inline-block;padding:8rpx 16rpx;background:#ffe4ea;color:#ff5a7a;border-radius:999rpx;font-size:22rpx;margin-right:12rpx}
+/* ===== 全局基础 ===== */
+page {
+  background: #f7f8fb;
+  color: #222;
+  font-size: 26rpx;
+}
+
+view,
+text,
+image,
+scroll-view,
+button,
+input,
+textarea {
+  box-sizing: border-box;
+}
+
+button::after {
+  border: none;
+}
+
+/* ===== 页面与卡片 ===== */
+.page-bg {
+  min-height: 100vh;
+  background: #f7f8fb;
+}
+
+.page-with-bottom-bar {
+  min-height: 100vh;
+  background: #f7f8fb;
+  padding-bottom: 156rpx;
+  box-sizing: border-box;
+}
+
+.section-card {
+  margin: 16rpx 16rpx 0;
+  background: #fff;
+  padding: 28rpx 24rpx;
+  border-radius: 20rpx;
+  box-sizing: border-box;
+  box-shadow: 0 4rpx 14rpx rgba(31, 35, 41, 0.04);
+}
+
+.section-card-large-radius {
+  border-radius: 24rpx;
+}
+
+/* ===== 顶部导航 ===== */
+.nav-bar {
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 24rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.nav-bar-pink {
+  background: #f8dfe7;
+  border-bottom: 1rpx solid #f1d4dd;
+}
+
+.back-area {
+  width: 88rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+}
+
+.back-icon {
+  width: 18rpx;
+  height: 18rpx;
+  border-left: 4rpx solid #222;
+  border-bottom: 4rpx solid #222;
+  transform: rotate(45deg);
+  box-sizing: border-box;
+}
+
+.nav-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #111;
+}
+
+/* ===== 标题文字 ===== */
+.page-title {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #111;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #222;
+  line-height: 1.4;
+}
+
+.block-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #222;
+  line-height: 1.4;
+}
+
+.desc-text {
+  font-size: 24rpx;
+  color: #8c8c8c;
+  line-height: 1.5;
+}
+
+.muted-text {
+  font-size: 22rpx;
+  color: #b3b7c0;
+  line-height: 1.5;
+}
+
+/* ===== 输入框 ===== */
+.field-label {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 14rpx;
+  line-height: 1.4;
+}
+
+.input {
+  width: 100%;
+  height: 84rpx;
+  background: #f7f8fb;
+  border-radius: 18rpx;
+  padding: 0 22rpx;
+  box-sizing: border-box;
+  font-size: 26rpx;
+  color: #222;
+  border: 1rpx solid #edf0f4;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 180rpx;
+  background: #f7f8fb;
+  border-radius: 18rpx;
+  padding: 20rpx 22rpx;
+  box-sizing: border-box;
+  font-size: 26rpx;
+  color: #222;
+  border: 1rpx solid #edf0f4;
+  line-height: 1.6;
+}
+
+.input-placeholder {
+  color: #b3b7c0;
+  font-size: 26rpx;
+}
+
+/* ===== 按钮 ===== */
+.primary-btn {
+  height: 88rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(180deg, #ff9200 0%, #ff7a00 100%);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.pink-btn {
+  height: 88rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(180deg, #ff6b81 0%, #ff5f8d 100%);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.secondary-btn {
+  height: 84rpx;
+  border-radius: 18rpx;
+  background: #f3f4f6;
+  color: #666;
+  font-size: 28rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* ===== 底部固定操作栏 ===== */
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 16rpx 20rpx 34rpx;
+  padding-bottom: calc(34rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  border-top: 1rpx solid #f0f0f0;
+  backdrop-filter: blur(10rpx);
+}
+
+/* ===== 标签 ===== */
+.pill-tag {
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 20rpx;
+  line-height: 1.2;
+}
+
+.pill-tag-pink {
+  background: #fff1f5;
+  color: #ff5f8d;
+}
+
+.pill-tag-gray {
+  background: #f3f4f6;
+  color: #666;
+}
+
+/* ===== 右箭头 ===== */
+.arrow {
+  font-size: 34rpx;
+  color: #b6b6b6;
+  line-height: 1;
+}
+
+.arrow-wrap {
+  width: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== 空状态 ===== */
+.empty-wrap {
+  padding-top: 180rpx;
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #222;
+}
+
+.empty-desc {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.6;
+}

@@ -1,1 +1,133 @@
-<view class="container"><view class="card profile-card"><image class="profile-avatar" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300" mode="aspectFill" /><view class="profile-name">奶糕主人</view><view class="profile-sub">已开通视频记录提醒</view></view><view class="card menu-card"><view class="menu-item">我的订单</view><view class="menu-item">常见问题</view><view class="menu-item">联系客服</view><view class="menu-item">关于我们</view></view></view>
+<view class="page-bg">
+  <view class="container">
+    <view class="hero-card">
+      <view class="hero-bg hero-bg-1"></view>
+      <view class="hero-bg hero-bg-2"></view>
+
+      <view class="hero-top">
+        <image
+          class="profile-avatar"
+          src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300"
+          mode="aspectFill"
+        />
+        <view class="profile-info">
+          <view class="page-title">奶糕主人</view>
+          <view class="desc-text profile-sub">欢迎回来，今天也要照顾好毛孩子呀</view>
+        </view>
+      </view>
+
+      <view class="hero-stats">
+        <view class="stat-item">
+          <view class="stat-num">2</view>
+          <view class="muted-text stat-label">宠物档案</view>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <view class="stat-num">6</view>
+          <view class="muted-text stat-label">历史订单</view>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <view class="stat-num">1</view>
+          <view class="muted-text stat-label">常用地址</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-card quick-card">
+      <view class="menu-group-title">快捷入口</view>
+
+      <view class="quick-grid">
+        <view class="quick-item" bindtap="goMyPets">
+          <view class="quick-icon pet"></view>
+          <view class="quick-text">我的宠物</view>
+        </view>
+
+        <view class="quick-item" bindtap="goMyOrders">
+          <view class="quick-icon order"></view>
+          <view class="quick-text">我的订单</view>
+        </view>
+
+        <view class="quick-item" bindtap="goAddressList">
+          <view class="quick-icon address"></view>
+          <view class="quick-text">服务地址</view>
+        </view>
+
+        <view class="quick-item" bindtap="goContact">
+          <view class="quick-icon service"></view>
+          <view class="quick-text">联系客服</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-card menu-card">
+      <view class="menu-group-title">更多服务</view>
+
+      <view class="menu-item" bindtap="goMyPets">
+        <view class="menu-left">
+          <view class="menu-icon pet"></view>
+          <view class="menu-text-wrap">
+            <view class="block-title menu-text">我的宠物</view>
+            <view class="desc-text menu-desc">查看和管理宠物档案</view>
+          </view>
+        </view>
+        <view class="arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="goMyOrders">
+        <view class="menu-left">
+          <view class="menu-icon order"></view>
+          <view class="menu-text-wrap">
+            <view class="block-title menu-text">我的订单</view>
+            <view class="desc-text menu-desc">查看预约记录和服务状态</view>
+          </view>
+        </view>
+        <view class="arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="goAddressList">
+        <view class="menu-left">
+          <view class="menu-icon address"></view>
+          <view class="menu-text-wrap">
+            <view class="block-title menu-text">服务地址</view>
+            <view class="desc-text menu-desc">管理常用上门服务地址</view>
+          </view>
+        </view>
+        <view class="arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="goFaq">
+        <view class="menu-left">
+          <view class="menu-icon faq"></view>
+          <view class="menu-text-wrap">
+            <view class="block-title menu-text">常见问题</view>
+            <view class="desc-text menu-desc">下单、服务、退款相关说明</view>
+          </view>
+        </view>
+        <view class="arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="goContact">
+        <view class="menu-left">
+          <view class="menu-icon contact"></view>
+          <view class="menu-text-wrap">
+            <view class="block-title menu-text">联系客服</view>
+            <view class="desc-text menu-desc">服务咨询与问题反馈</view>
+          </view>
+        </view>
+        <view class="arrow">›</view>
+      </view>
+
+      <view class="menu-item no-border" bindtap="goAbout">
+        <view class="menu-left">
+          <view class="menu-icon about"></view>
+          <view class="menu-text-wrap">
+            <view class="block-title menu-text">关于我们</view>
+            <view class="desc-text menu-desc">了解平台与服务介绍</view>
+          </view>
+        </view>
+        <view class="arrow">›</view>
+      </view>
+    </view>
+  </view>
+</view>

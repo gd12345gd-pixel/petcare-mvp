@@ -1,0 +1,268 @@
+.content {
+  height: calc(100vh - 96rpx - 156rpx);
+}
+
+.hero-upload {
+  margin: 16rpx 20rpx 0;
+  height: 220rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  background: #f1f3f7;
+  position: relative;
+  box-shadow: 0 4rpx 14rpx rgba(31, 35, 41, 0.04);
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #f8e8ea 0%, #f3f4f7 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-circle {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+}
+
+.hero-upload-text {
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  color: #ffffff;
+  text-shadow: 0 2rpx 6rpx rgba(0,0,0,0.12);
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f1f2f5;
+}
+
+.field-row.column {
+  display: block;
+}
+
+.field-row.no-border {
+  border-bottom: none;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f1f2f5;
+}
+
+.field-label.required::before {
+  content: '*';
+  color: #ff5f8d;
+  margin-right: 4rpx;
+}
+
+.option-row {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.radio-dot {
+  width: 26rpx;
+  height: 26rpx;
+  border-radius: 50%;
+  border: 2rpx solid #cfd4dc;
+  margin-right: 8rpx;
+  box-sizing: border-box;
+}
+
+.radio-item.active {
+  color: #222;
+}
+
+.radio-item.active .radio-dot {
+  border-color: #7ac943;
+  background: #7ac943;
+  box-shadow: inset 0 0 0 6rpx #fff;
+}
+
+.line-input {
+  flex: 1;
+  min-width: 0;
+  height: 56rpx;
+  text-align: right;
+  font-size: 28rpx;
+  color: #222;
+}
+
+.suffix-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.suffix-text {
+  margin-left: 10rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 标签区域 */
+.pet-tag-wrap {
+  margin-top: 18rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.pet-tag-item {
+  min-width: 88rpx;
+  height: 56rpx;
+  padding: 0 22rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.pet-tag-item-normal {
+  background: #f5f6f8;
+  color: #7d7d86;
+  border: 2rpx solid transparent;
+  font-weight: 400;
+  box-shadow: none;
+}
+
+.pet-tag-item-active {
+  background: #fff1f5;
+  color: #ff5f8d;
+  border: 2rpx solid #ffb7cc;
+  font-weight: 700;
+  box-shadow: 0 4rpx 10rpx rgba(255, 95, 141, 0.12);
+}
+
+/* 自定义标签 */
+.custom-tag-row {
+  margin-top: 18rpx;
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.custom-tag-input {
+  flex: 1;
+  height: 72rpx;
+  background: #f7f8fb;
+  border-radius: 16rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  font-size: 24rpx;
+  color: #222;
+  border: 1rpx solid #edf0f4;
+}
+
+.custom-tag-add-btn {
+  width: 112rpx;
+  height: 72rpx;
+  border-radius: 16rpx;
+  background: #ffe8ef;
+  color: #ff5f8d;
+  font-size: 24rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.pet-section-title {
+  margin-bottom: 18rpx;
+}
+
+.intro-textarea {
+  min-height: 180rpx;
+}
+
+.count-text {
+  margin-top: 12rpx;
+  text-align: right;
+}
+
+.album-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.album-add,
+.album-item {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 18rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.album-add {
+  border: 2rpx dashed #d5dbe5;
+  background: #fafbfc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.album-add-plus {
+  font-size: 54rpx;
+  color: #c0c6d0;
+  line-height: 1;
+}
+
+.album-image {
+  width: 100%;
+  height: 100%;
+}
+
+.album-delete {
+  position: absolute;
+  top: 6rpx;
+  right: 6rpx;
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-size: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-btn {
+  width: 100%;
+}

@@ -1,122 +1,109 @@
-<scroll-view class="page" scroll-y>
-  <view class="nav-bar">
-    <view class="back-area" bindtap="navigateBack">←</view>
+<view class="page-with-bottom-bar">
+  <view class="nav-bar nav-bar-pink">
+    <view class="back-area" bindtap="navigateBack">
+      <view class="back-icon"></view>
+    </view>
     <view class="nav-title">下单</view>
   </view>
 
-  <view class="section-card address-section" bindtap="goChooseAddress">
-    <view class="address-main">
-      <view class="address-title">
-        {{selectedAddress ? (selectedAddress.contactName + ' ' + selectedAddress.contactPhone) : '点击添加服务地址'}}
-      </view>
-      <view class="address-sub" wx:if="{{selectedAddress}}">
-        {{selectedAddress.fullAddress}}
-      </view>
-    </view>
-    <view class="arrow">›</view>
-  </view>
-
-  <view class="section-card">
-    <view class="block-row">
-      <view class="block-title">服务宠物</view>
-      <view class="block-subtext">未添加的宠物宠托师将不提供服务哦～</view>
-    </view>
-
-    <scroll-view class="pet-scroll" scroll-x wx:if="{{pets.length}}">
-      <view class="pet-row">
-        <view
-          class="pet-card {{selectedPetId === item.id ? 'active' : ''}}"
-          wx:for="{{pets}}"
-          wx:key="id"
-          data-id="{{item.id}}"
-          bindtap="selectPet"
-        >
-          <image class="pet-card-image" src="{{item.imageUrl}}" mode="aspectFill" />
-          <view class="pet-card-name">{{item.name}}</view>
-          <view class="pet-card-meta">{{item.type}}{{item.breed ? ' · ' + item.breed : ''}}</view>
+  <scroll-view class="content" scroll-y>
+    <view class="section-card address-section" bindtap="goChooseAddress">
+      <view class="address-main">
+        <view class="card-title address-title">
+          {{selectedAddress ? (selectedAddress.contactName + ' ' + selectedAddress.contactPhone) : '点击添加服务地址'}}
         </view>
-
-        <view class="pet-card add-card" bindtap="openAddPetPopup">
-          <view class="add-circle">+</view>
-          <view class="add-text">添加宠物</view>
+        <view class="desc-text address-sub" wx:if="{{selectedAddress}}">
+          {{selectedAddress.fullAddress}}
         </view>
       </view>
-    </scroll-view>
-
-    <view class="pet-empty-wrap" wx:else>
-      <view class="pet-empty-text">还没有宠物，先新增一个吧</view>
-      <button class="pet-empty-btn" bindtap="openAddPetPopup">新增宠物</button>
-    </view>
-  </view>
-
-  <view class="section-card selector-row" bindtap="openTimePopup">
-    <view class="selector-left">
-      <view class="selector-title">服务时间</view>
+      <view class="arrow">›</view>
     </view>
 
-    <view class="selector-right">
-      <view class="selector-value-wrap">
-        <view class="{{selectedTimeSummary ? 'selector-value active' : 'selector-value'}}">
-          {{selectedTimeSummary || '请选择服务时间'}}
-        </view>
+    <view class="section-card">
+      <view class="pet-header">
+        <view class="card-title">服务宠物</view>
+        <view class="desc-text pet-header-desc">未添加的宠物宠托师将不提供服务哦～</view>
       </view>
-      <view class="selector-arrow">›</view>
+
+      <scroll-view class="pet-scroll" scroll-x wx:if="{{pets.length}}">
+        <view class="pet-row">
+          <view
+            class="pet-card {{selectedPetId === item.id ? 'active' : ''}}"
+            wx:for="{{pets}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="selectPet"
+          >
+            <image class="pet-card-image" src="{{item.avatarUrl || item.imageUrl}}" mode="aspectFill" />
+            <view class="block-title pet-card-name">{{item.name}}</view>
+            <view class="desc-text pet-card-meta">{{item.type}}{{item.breed ? ' · ' + item.breed : ''}}</view>
+          </view>
+
+          <view class="pet-card add-card" bindtap="goAddPet">
+            <view class="add-circle">+</view>
+            <view class="add-text">添加宠物</view>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="pet-empty-wrap" wx:else>
+        <view class="empty-desc">还没有宠物，先新增一个吧</view>
+        <button class="primary-btn pet-empty-btn" bindtap="goAddPet">新增宠物</button>
+      </view>
     </view>
-  </view>
 
-  <view class="section-card">
-    <view class="field-label">服务费用（元）</view>
-    <input
-      class="input"
-      placeholder="请输入服务费用"
-      placeholder-class="input-placeholder"
-      type="digit"
-      value="{{form.serviceFee}}"
-      data-field="serviceFee"
-      bindinput="onInput"
-    />
-  </view>
+    <view class="section-card selector-row" bindtap="openTimePopup">
+      <view class="selector-left">
+        <view class="card-title selector-title">服务时间</view>
+      </view>
 
-  <view class="section-card">
-    <view class="section-title">需求描述</view>
+      <view class="selector-right">
+        <view class="selector-value-wrap">
+          <view class="{{selectedTimeSummary ? 'selector-value active' : 'selector-value'}}">
+            {{selectedTimeSummary || '请选择服务时间'}}
+          </view>
+        </view>
+        <view class="arrow">›</view>
+      </view>
+    </view>
 
-    <view class="field-block">
-      <view class="field-label">详细描述</view>
-      <textarea
-        class="textarea"
-        placeholder="请详细描述您的喂养需求，如宠物习性、喂养注意事项等"
+    <view class="section-card">
+      <view class="field-label">服务费用（元）</view>
+      <input
+        class="input"
+        placeholder="请输入服务费用"
         placeholder-class="input-placeholder"
-        value="{{form.description}}"
-        data-field="description"
+        type="digit"
+        value="{{form.serviceFee}}"
+        data-field="serviceFee"
+        bindinput="onInput"
+      />
+    </view>
+
+    <view class="section-card">
+      <view class="field-label">照护备注</view>
+      <textarea
+        class="textarea note-textarea"
+        placeholder="可填写宠物习性、喂养方式、注意事项、是否怕生等"
+        placeholder-class="input-placeholder"
+        value="{{form.specialRequirement}}"
+        data-field="specialRequirement"
         bindinput="onInput"
         maxlength="300"
       />
     </view>
 
-    <view class="field-block">
-      <view class="field-label">特殊要求</view>
-      <textarea
-        class="textarea small"
-        placeholder="如有特殊要求请在此说明"
-        placeholder-class="input-placeholder"
-        value="{{form.specialRequirement}}"
-        data-field="specialRequirement"
-        bindinput="onInput"
-        maxlength="200"
-      />
-    </view>
-  </view>
-
-  <view class="bottom-tip">发布需求需先支付服务费用</view>
+    <view class="bottom-tip">提交订单前请确认地址、宠物和服务时间</view>
+  </scroll-view>
 
   <view class="bottom-bar">
-    <button class="submit-btn" bindtap="submitOrder">下一步：支付费用</button>
+    <button class="primary-btn submit-btn" bindtap="submitOrder">下一步：支付费用</button>
   </view>
 
   <view class="mask" wx:if="{{showTimePopup}}" bindtap="closeTimePopup"></view>
   <view class="time-popup" wx:if="{{showTimePopup}}">
     <view class="time-popup-header">
-      <view class="time-popup-title">{{calendarMonthText}}</view>
+      <view class="card-title time-popup-title">{{calendarMonthText}}</view>
       <view class="time-popup-close" bindtap="closeTimePopup">✕</view>
     </view>
 
@@ -144,7 +131,7 @@
       </view>
     </view>
 
-    <view class="time-section-title">选择期望上门服务时间段</view>
+    <view class="card-title time-section-title">选择期望上门服务时间段</view>
 
     <view class="slot-grid">
       <view
@@ -162,71 +149,8 @@
     <view class="time-tip">* 需要多个上门时间段可多选哦~</view>
 
     <view class="time-popup-btn-row">
-      <button class="popup-cancel-btn" bindtap="closeTimePopup">取消</button>
-      <button class="popup-confirm-btn" bindtap="confirmTimeSelection">下一步</button>
+      <button class="secondary-btn popup-cancel-btn" bindtap="closeTimePopup">取消</button>
+      <button class="pink-btn popup-confirm-btn" bindtap="confirmTimeSelection">下一步</button>
     </view>
   </view>
-
-  <view class="mask" wx:if="{{showPetPopup}}" bindtap="closeAddPetPopup"></view>
-  <view class="pet-popup" wx:if="{{showPetPopup}}">
-    <view class="popup-title">新增宠物</view>
-
-    <view class="field-block">
-      <view class="field-label">宠物名字</view>
-      <input
-        class="input"
-        placeholder="请输入宠物名字"
-        placeholder-class="input-placeholder"
-        value="{{newPet.name}}"
-        data-field="name"
-        bindinput="onNewPetInput"
-      />
-    </view>
-
-    <view class="field-block">
-      <view class="field-label">宠物类型</view>
-      <view class="pet-type-row">
-        <view
-          class="pet-type-item {{newPetTypeIndex === index ? 'active' : ''}}"
-          wx:for="{{newPetTypeOptions}}"
-          wx:key="*this"
-          data-index="{{index}}"
-          bindtap="chooseNewPetType"
-        >
-          {{item}}
-        </view>
-      </view>
-    </view>
-
-    <view class="field-block">
-      <view class="field-label">品种（可选）</view>
-      <input
-        class="input"
-        placeholder="例如：柴犬 / 英短"
-        placeholder-class="input-placeholder"
-        value="{{newPet.breed}}"
-        data-field="breed"
-        bindinput="onNewPetInput"
-      />
-    </view>
-
-    <view class="field-block">
-      <view class="field-label">宠物照片</view>
-      <view class="upload-box" wx:if="{{!newPet.imageUrl}}" bindtap="chooseNewPetImage">
-        <view class="upload-icon">+</view>
-        <view class="upload-text">点击上传照片</view>
-      </view>
-      <image
-        wx:if="{{newPet.imageUrl}}"
-        class="preview-img"
-        src="{{newPet.imageUrl}}"
-        mode="aspectFill"
-      />
-    </view>
-
-    <view class="popup-btn-row">
-      <button class="popup-cancel-btn" bindtap="closeAddPetPopup">取消</button>
-      <button class="popup-confirm-btn" bindtap="saveNewPet">保存</button>
-    </view>
-  </view>
-</scroll-view>
+</view>

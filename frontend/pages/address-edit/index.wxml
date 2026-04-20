@@ -1,6 +1,8 @@
-<view class="page">
+<view class="page-with-bottom-bar">
   <view class="nav-bar">
-    <view class="back-area" bindtap="navigateBack">←</view>
+    <view class="back-area" bindtap="navigateBack">
+      <view class="back-icon"></view>
+    </view>
     <view class="nav-title">{{isEdit ? '编辑地址' : '新增地址'}}</view>
   </view>
 
@@ -11,6 +13,7 @@
         <input
           class="input"
           placeholder="请输入联系人姓名"
+          placeholder-class="input-placeholder"
           value="{{form.contactName}}"
           data-field="contactName"
           bindinput="onInput"
@@ -23,6 +26,7 @@
           class="input"
           type="number"
           placeholder="请输入联系电话"
+          placeholder-class="input-placeholder"
           value="{{form.contactPhone}}"
           data-field="contactPhone"
           bindinput="onInput"
@@ -43,6 +47,7 @@
         <input
           class="input"
           placeholder="请输入门牌号等详细地址"
+          placeholder-class="input-placeholder"
           value="{{form.detailAddress}}"
           data-field="detailAddress"
           bindinput="onInput"
@@ -54,6 +59,7 @@
         <input
           class="input"
           placeholder="例如：家 / 公司"
+          placeholder-class="input-placeholder"
           value="{{form.tagName}}"
           data-field="tagName"
           bindinput="onInput"
@@ -61,13 +67,15 @@
       </view>
 
       <view class="switch-row">
-        <view class="switch-label">设为默认地址</view>
+        <view class="block-title switch-label">设为默认地址</view>
         <switch checked="{{form.isDefault === 1}}" bindchange="switchDefault" color="#ff6b81" />
       </view>
     </view>
   </view>
 
   <view class="bottom-bar">
-    <button class="save-btn" bindtap="saveAddress">{{isEdit ? '保存修改' : '保存地址'}}</button>
+    <button class="primary-btn save-btn" bindtap="saveAddress">
+      {{isEdit ? '保存修改' : '保存地址'}}
+    </button>
   </view>
 </view>

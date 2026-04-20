@@ -38,7 +38,22 @@ Page({
   },
 
   navigateBack() {
-    wx.navigateBack()
+    const pages = getCurrentPages()
+
+    if (pages.length > 1) {
+      wx.navigateBack({
+        delta: 1,
+        fail: () => {
+          wx.reLaunch({
+            url: '/pages/address-list/index'
+          })
+        }
+      })
+    } else {
+      wx.reLaunch({
+        url: '/pages/address-list/index'
+      })
+    }
   },
 
   loadDetail(id) {
@@ -192,7 +207,7 @@ Page({
           icon: 'success'
         })
         setTimeout(() => {
-          wx.navigateBack()
+          this.navigateBack()
         }, 500)
       })
       .catch(() => {})

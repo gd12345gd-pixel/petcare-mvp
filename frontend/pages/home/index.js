@@ -2,8 +2,8 @@ Page({
   data: {
     hero: {
       title1: '上门喂猫 / 遛狗',
-      desc: '全程视频记录 · 安全认证 · 可追溯',
-      locationText: '宝林四村'
+      desc: '全程记录 · 安全认证 · 服务可追溯',
+      locationText: '上海 · 宝山区'
     },
 
     serviceTags: ['喂猫', '遛狗', '临时照护'],
@@ -49,7 +49,7 @@ Page({
         title: '寻主',
         desc1: '捡到宠物找主人',
         desc2: '附近认领 / 互动留言',
-        imageUrl: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?q=80&w=800&auto=format&fit=crop'
+        imageUrl: 'https://images.unsplash.com/photo-1511044568932-338cba0ad803?q=80&w=800&auto=format&fit=crop'
       }
     ],
 
@@ -57,8 +57,8 @@ Page({
       {
         id: 1,
         type: 'lost',
-        title: '柯基走失',
-        subtitle: '徐汇区 · 2小时前',
+        title: '柴犬走失',
+        subtitle: '宝山区 · 2小时前',
         imageUrl: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=400&auto=format&fit=crop'
       },
       {

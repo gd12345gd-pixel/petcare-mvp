@@ -1,0 +1,49 @@
+<view class="page-with-bottom-bar">
+  <view class="nav-bar">
+    <view class="back-area" bindtap="navigateBack">
+      <view class="back-icon"></view>
+    </view>
+    <view class="nav-title">我的宠物</view>
+  </view>
+
+  <scroll-view class="content" scroll-y>
+    <view class="pet-list" wx:if="{{pets.length}}">
+      <view
+        class="pet-card"
+        wx:for="{{pets}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goEditPet"
+      >
+        <image class="pet-avatar" src="{{item.avatarUrl || item.imageUrl}}" mode="aspectFill" />
+
+        <view class="pet-main">
+          <view class="pet-top">
+            <view class="card-title pet-name">{{item.name}}</view>
+            <view class="pill-tag pill-tag-pink pet-type">{{item.type}}</view>
+          </view>
+
+          <view class="desc-text pet-meta">
+            {{item.breed || '未填写品种'}}<text wx:if="{{item.gender}}"> · {{item.gender}}</text><text wx:if="{{item.age}}"> · {{item.age}}岁</text>
+          </view>
+
+          <view class="tag-row" wx:if="{{item.tags && item.tags.length}}">
+            <view class="pill-tag pill-tag-gray tag-item" wx:for="{{item.tags}}" wx:key="*this">{{item}}</view>
+          </view>
+        </view>
+
+        <view class="arrow">›</view>
+      </view>
+    </view>
+
+    <view class="empty-wrap" wx:else>
+      <view class="empty-title">还没有宠物档案</view>
+      <view class="empty-desc">先添加一只宠物，后续下单会更方便</view>
+      <button class="primary-btn empty-btn" bindtap="goAddPet">新增宠物</button>
+    </view>
+  </scroll-view>
+
+  <view class="bottom-bar" wx:if="{{pets.length}}">
+    <button class="primary-btn add-btn" bindtap="goAddPet">新增宠物</button>
+  </view>
+</view>

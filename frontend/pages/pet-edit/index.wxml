@@ -1,0 +1,215 @@
+<view class="page-with-bottom-bar">
+  <view class="nav-bar">
+    <view class="back-area" bindtap="navigateBack">
+      <view class="back-icon"></view>
+    </view>
+    <view class="nav-title">{{isEdit ? '编辑宠物' : '添加宠物'}}</view>
+  </view>
+
+  <scroll-view class="content" scroll-y>
+    <view class="hero-upload" bindtap="chooseAvatar">
+      <image
+        wx:if="{{form.avatarUrl}}"
+        class="hero-image"
+        src="{{form.avatarUrl}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="hero-placeholder">
+        <view class="camera-circle">📷</view>
+        <view class="hero-upload-text">上传头像</view>
+      </view>
+    </view>
+
+    <view class="section-card section-card-large-radius">
+      <view class="field-row">
+        <view class="field-label required">类型</view>
+        <view class="option-row">
+          <view
+            class="radio-item {{petTypeIndex === index ? 'active' : ''}}"
+            wx:for="{{petTypeOptions}}"
+            wx:key="*this"
+            data-index="{{index}}"
+            bindtap="choosePetType"
+          >
+            <view class="radio-dot"></view>
+            <text>{{item}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="input-row">
+        <view class="field-label required">名字</view>
+        <input
+          class="line-input"
+          placeholder="请输入宠物名字"
+          placeholder-class="input-placeholder"
+          value="{{form.name}}"
+          data-field="name"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="input-row">
+        <view class="field-label required">年龄</view>
+        <view class="suffix-input-wrap">
+          <input
+            class="line-input"
+            placeholder="请输入宠物年龄"
+            placeholder-class="input-placeholder"
+            value="{{form.age}}"
+            data-field="age"
+            bindinput="onInput"
+          />
+          <text class="suffix-text">岁</text>
+        </view>
+      </view>
+
+      <view class="field-row">
+        <view class="field-label required">性别</view>
+        <view class="option-row">
+          <view
+            class="radio-item {{genderIndex === index ? 'active' : ''}}"
+            wx:for="{{genderOptions}}"
+            wx:key="*this"
+            data-index="{{index}}"
+            bindtap="chooseGender"
+          >
+            <view class="radio-dot"></view>
+            <text>{{item}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="input-row">
+        <view class="field-label required">体重</view>
+        <view class="suffix-input-wrap">
+          <input
+            class="line-input"
+            placeholder="请输入宠物体重"
+            placeholder-class="input-placeholder"
+            value="{{form.weight}}"
+            data-field="weight"
+            bindinput="onInput"
+          />
+          <text class="suffix-text">KG</text>
+        </view>
+      </view>
+
+      <view class="input-row">
+        <view class="field-label required">品种</view>
+        <input
+          class="line-input"
+          placeholder="请输入宠物品种"
+          placeholder-class="input-placeholder"
+          value="{{form.breed}}"
+          data-field="breed"
+          bindinput="onInput"
+        />
+      </view>
+
+      <view class="field-row column no-border">
+        <view class="field-label">标签</view>
+
+        <view class="pet-tag-wrap">
+          <block wx:for="{{tagOptions}}" wx:key="*this">
+            <view
+              wx:if="{{selectedTags.indexOf(item) !== -1}}"
+              class="pet-tag-item pet-tag-item-active"
+              data-tag="{{item}}"
+              bindtap="toggleTag"
+            >
+              {{item}}
+            </view>
+
+            <view
+              wx:else
+              class="pet-tag-item pet-tag-item-normal"
+              data-tag="{{item}}"
+              bindtap="toggleTag"
+            >
+              {{item}}
+            </view>
+          </block>
+        </view>
+
+        <view class="custom-tag-row">
+          <input
+            class="custom-tag-input"
+            placeholder="自定义标签，最多6个字"
+            placeholder-class="input-placeholder"
+            maxlength="6"
+            value="{{customTagInput}}"
+            bindinput="onCustomTagInput"
+          />
+          <view class="custom-tag-add-btn" bindtap="addCustomTag">添加</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-card section-card-large-radius">
+      <view class="field-row">
+        <view class="field-label required">是否具有攻击性</view>
+        <view class="option-row">
+          <view
+            class="radio-item {{attackIndex === index ? 'active' : ''}}"
+            wx:for="{{attackOptions}}"
+            wx:key="*this"
+            data-index="{{index}}"
+            bindtap="chooseAttack"
+          >
+            <view class="radio-dot"></view>
+            <text>{{item}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="field-row no-border">
+        <view class="field-label required">是否接种疫苗</view>
+        <view class="option-row">
+          <view
+            class="radio-item {{vaccineIndex === index ? 'active' : ''}}"
+            wx:for="{{vaccineOptions}}"
+            wx:key="*this"
+            data-index="{{index}}"
+            bindtap="chooseVaccine"
+          >
+            <view class="radio-dot"></view>
+            <text>{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-card section-card-large-radius">
+      <view class="card-title pet-section-title">宠物简介</view>
+      <textarea
+        class="textarea intro-textarea"
+        placeholder="描述一下您的爱宠吧~"
+        placeholder-class="input-placeholder"
+        maxlength="100"
+        value="{{form.intro}}"
+        data-field="intro"
+        bindinput="onInput"
+      />
+      <view class="muted-text count-text">{{form.intro.length || 0}}/100</view>
+    </view>
+
+    <view class="section-card section-card-large-radius">
+      <view class="card-title pet-section-title">宠物相册</view>
+      <view class="album-wrap">
+        <view class="album-add" bindtap="chooseAlbum">
+          <view class="album-add-plus">＋</view>
+        </view>
+
+        <view class="album-item" wx:for="{{form.albumList}}" wx:key="*this">
+          <image class="album-image" src="{{item}}" mode="aspectFill" />
+          <view class="album-delete" data-index="{{index}}" bindtap="removeAlbumImage">×</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <button class="pink-btn save-btn" bindtap="savePet">保存</button>
+  </view>
+</view>

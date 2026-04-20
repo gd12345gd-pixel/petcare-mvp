@@ -4,6 +4,8 @@
       "pages/detail/index",
       "pages/order-create/index",
       "pages/orders/index",
+      "pages/pet-edit/index",
+      "pages/pet-list/index",
       "pages/service-record-upload/index",
       "pages/service-record-detail/index",
       "pages/pet-community/index",

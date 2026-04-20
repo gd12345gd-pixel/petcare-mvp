@@ -24,7 +24,34 @@ Page({
   },
 
   navigateBack() {
-    wx.navigateBack()
+    const pages = getCurrentPages()
+
+    if (pages.length > 1) {
+      wx.navigateBack({
+        delta: 1,
+        fail: () => {
+          if (this.data.from === 'orderCreate') {
+            wx.reLaunch({
+              url: '/pages/order-create/index'
+            })
+          } else {
+            wx.switchTab({
+              url: '/pages/profile/index'
+            })
+          }
+        }
+      })
+    } else {
+      if (this.data.from === 'orderCreate') {
+        wx.reLaunch({
+          url: '/pages/order-create/index'
+        })
+      } else {
+        wx.switchTab({
+          url: '/pages/profile/index'
+        })
+      }
+    }
   },
 
   loadAddressList() {
@@ -49,7 +76,7 @@ Page({
     })
 
     setTimeout(() => {
-      wx.navigateBack()
+      this.navigateBack()
     }, 400)
   },
 
