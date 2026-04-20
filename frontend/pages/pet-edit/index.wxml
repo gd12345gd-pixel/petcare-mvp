@@ -108,42 +108,32 @@
       </view>
 
       <view class="field-row column no-border">
-        <view class="field-label">标签</view>
+  <view class="field-label">标签</view>
 
-        <view class="pet-tag-wrap">
-          <block wx:for="{{tagOptions}}" wx:key="*this">
-            <view
-              wx:if="{{selectedTags.indexOf(item) !== -1}}"
-              class="pet-tag-item pet-tag-item-active"
-              data-tag="{{item}}"
-              bindtap="toggleTag"
-            >
-              {{item}}
-            </view>
+  <view class="pet-tag-wrap">
+    <view
+      wx:for="{{tagOptions}}"
+      wx:key="name"
+      class="pet-tag-item {{item.active ? 'pet-tag-item-active' : 'pet-tag-item-normal'}}"
+      data-index="{{index}}"
+      bindtap="toggleTag"
+    >
+      {{item.name}}
+    </view>
+  </view>
 
-            <view
-              wx:else
-              class="pet-tag-item pet-tag-item-normal"
-              data-tag="{{item}}"
-              bindtap="toggleTag"
-            >
-              {{item}}
-            </view>
-          </block>
-        </view>
-
-        <view class="custom-tag-row">
-          <input
-            class="custom-tag-input"
-            placeholder="自定义标签，最多6个字"
-            placeholder-class="input-placeholder"
-            maxlength="6"
-            value="{{customTagInput}}"
-            bindinput="onCustomTagInput"
-          />
-          <view class="custom-tag-add-btn" bindtap="addCustomTag">添加</view>
-        </view>
-      </view>
+  <view class="custom-tag-row">
+    <input
+      class="custom-tag-input"
+      placeholder="自定义标签，最多6个字"
+      placeholder-class="input-placeholder"
+      maxlength="6"
+      value="{{customTagInput}}"
+      bindinput="onCustomTagInput"
+    />
+    <view class="custom-tag-add-btn" bindtap="addCustomTag">添加</view>
+  </view>
+</view>
     </view>
 
     <view class="section-card section-card-large-radius">

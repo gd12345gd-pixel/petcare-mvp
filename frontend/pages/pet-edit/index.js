@@ -10,16 +10,21 @@ Page({
     attackOptions: ['具有攻击性', '没有攻击性'],
     vaccineOptions: ['已接种', '未接种'],
 
-    // 预设标签
-    presetTagOptions: ['黏人', '活泼', '怕生', '亲人', '爱叫', '需陪玩', '胆小', '爱干净'],
+    // 预设标签名
+    presetTagNames: ['黏人', '活泼', '怕生', '亲人', '爱叫', '需陪玩', '胆小', '爱干净'],
 
-    // 实际展示标签 = 预设 + 用户自定义
-    tagOptions: ['黏人', '活泼', '怕生', '亲人', '爱叫', '需陪玩', '胆小', '爱干净'],
+    // 标签对象数组
+    tagOptions: [
+      { name: '黏人', active: false },
+      { name: '活泼', active: false },
+      { name: '怕生', active: false },
+      { name: '亲人', active: false },
+      { name: '爱叫', active: false },
+      { name: '需陪玩', active: false },
+      { name: '胆小', active: false },
+      { name: '爱干净', active: false }
+    ],
 
-    // 当前选中的标签
-    selectedTags: [],
-
-    // 自定义标签输入
     customTagInput: '',
 
     petTypeIndex: 0,
@@ -49,12 +54,8 @@ Page({
     this.setData({
       id,
       isEdit: !!id,
-
-      // 每次进入先重置，防止热更新残留状态
-      tagOptions: [...this.data.presetTagOptions],
-      selectedTags: [],
+      tagOptions: this.buildTagOptions(this.data.presetTagNames, []),
       customTagInput: '',
-
       form: {
         avatarUrl: '',
         type: '猫咪',
@@ -69,7 +70,6 @@ Page({
         intro: '',
         albumList: []
       },
-
       petTypeIndex: 0,
       genderIndex: 0,
       attackIndex: 1,
@@ -79,6 +79,23 @@ Page({
     if (id) {
       this.loadDetail(id)
     }
+  },
+
+  buildTagOptions(tagNames = [], selectedTags = []) {
+    return tagNames.map(name => ({
+      name,
+      active: selectedTags.indexOf(name) !== -1
+    }))
+  },
+
+  syncFormTags() {
+    const tags = this.data.tagOptions
+      .filter(item => item.active)
+      .map(item => item.name)
+
+    this.setData({
+      'form.tags': tags
+    })
   },
 
   navigateBack() {
@@ -109,10 +126,10 @@ Page({
         const vaccinated = Number(data.vaccinated || 1)
         const tags = Array.isArray(data.tags) ? data.tags : []
 
-        const mergedTagOptions = [...this.data.presetTagOptions]
+        const mergedTagNames = [...this.data.presetTagNames]
         tags.forEach(tag => {
-          if (tag && mergedTagOptions.indexOf(tag) === -1) {
-            mergedTagOptions.push(tag)
+          if (tag && mergedTagNames.indexOf(tag) === -1) {
+            mergedTagNames.push(tag)
           }
         })
 
@@ -121,8 +138,7 @@ Page({
           genderIndex: this.data.genderOptions.indexOf(gender) > -1 ? this.data.genderOptions.indexOf(gender) : 0,
           attackIndex: hasAggression === 1 ? 0 : 1,
           vaccineIndex: vaccinated === 1 ? 0 : 1,
-          tagOptions: mergedTagOptions,
-          selectedTags: tags,
+          tagOptions: this.buildTagOptions(mergedTagNames, tags),
           form: {
             avatarUrl: data.avatarUrl || '',
             type,
@@ -184,20 +200,19 @@ Page({
   },
 
   toggleTag(e) {
-    const tag = e.currentTarget.dataset.tag
-    let selectedTags = [...this.data.selectedTags]
+    const index = Number(e.currentTarget.dataset.index)
+    const tagOptions = [...this.data.tagOptions]
 
-    const index = selectedTags.indexOf(tag)
-    if (index > -1) {
-      selectedTags.splice(index, 1)
-    } else {
-      selectedTags.push(tag)
+    tagOptions[index] = {
+      ...tagOptions[index],
+      active: !tagOptions[index].active
     }
 
     this.setData({
-      selectedTags,
-      'form.tags': selectedTags
+      tagOptions
     })
+
+    this.syncFormTags()
   },
 
   onCustomTagInput(e) {
@@ -225,23 +240,27 @@ Page({
       return
     }
 
-    let tagOptions = [...this.data.tagOptions]
-    let selectedTags = [...this.data.selectedTags]
+    const tagOptions = [...this.data.tagOptions]
+    const existIndex = tagOptions.findIndex(item => item.name === value)
 
-    if (tagOptions.indexOf(value) === -1) {
-      tagOptions.push(value)
-    }
-
-    if (selectedTags.indexOf(value) === -1) {
-      selectedTags.push(value)
+    if (existIndex > -1) {
+      tagOptions[existIndex] = {
+        ...tagOptions[existIndex],
+        active: true
+      }
+    } else {
+      tagOptions.push({
+        name: value,
+        active: true
+      })
     }
 
     this.setData({
       tagOptions,
-      selectedTags,
-      customTagInput: '',
-      'form.tags': selectedTags
+      customTagInput: ''
     })
+
+    this.syncFormTags()
   },
 
   chooseAvatar() {

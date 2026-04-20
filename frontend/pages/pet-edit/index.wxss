@@ -167,6 +167,41 @@
   box-shadow: 0 4rpx 10rpx rgba(255, 95, 141, 0.12);
 }
 
+.custom-tag-row {
+  margin-top: 18rpx;
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.custom-tag-input {
+  flex: 1;
+  height: 72rpx;
+  background: #f7f8fb;
+  border-radius: 16rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  font-size: 24rpx;
+  color: #222;
+  border: 1rpx solid #edf0f4;
+}
+
+.custom-tag-add-btn {
+  width: 112rpx;
+  height: 72rpx;
+  border-radius: 16rpx;
+  background: #ffe8ef;
+  color: #ff5f8d;
+  font-size: 24rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+ 
+ 
+
 /* 自定义标签 */
 .custom-tag-row {
   margin-top: 18rpx;
