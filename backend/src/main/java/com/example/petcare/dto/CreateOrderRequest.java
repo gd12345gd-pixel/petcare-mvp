@@ -1,17 +1,39 @@
 package com.example.petcare.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+import java.math.BigDecimal;
+import java.util.List;
+
+@Setter
+@Getter
 public class CreateOrderRequest {
 
     private Long userId;
-    private Long sitterId;
-    private Long serviceItemId;
-    private String serviceDate;
-    private String timeSlot;
-    private String address;
-    private String contactName;
-    private String contactPhone;
-    private String note;
+
+    private Long addressId;
+    private String serviceContactName;
+    private String serviceContactPhone;
+    private String serviceProvince;
+    private String serviceCity;
+    private String serviceDistrict;
+    private String serviceDetailAddress;
+    private BigDecimal serviceLatitude;
+    private BigDecimal serviceLongitude;
+
+    private List<Long> petIds;
+    private Integer petCount;
+
+    private List<String> serviceDates;
+    private List<String> timeSlots;
+    private Integer serviceDurationMinutes;
+
+    private BigDecimal suggestedUnitPrice;
+    private BigDecimal serviceFee;
+    private BigDecimal totalPrice;
+
+    private String remark;
+    private String specialRequirement;
+
 }

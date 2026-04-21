@@ -13,7 +13,7 @@ Page({
   },
   goMyOrders() {
     wx.navigateTo({
-      url: '/pages/orders/index'
+      url: '/pages/order/list/index?from=profile'
     })
   }
 })

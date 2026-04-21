@@ -8,6 +8,10 @@ import java.util.Optional;
 
 public interface PetRepository extends JpaRepository<Pet, Long> {
 
+
+    List<Pet> findByIdInAndUserIdAndDeleted(List<Long> ids, Long userId, Integer deleted);
+
+
     List<Pet> findByUserIdAndDeletedOrderByIdDesc(Long userId, Integer deleted);
 
     Optional<Pet> findByIdAndDeleted(Long id, Integer deleted);

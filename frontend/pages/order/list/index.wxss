@@ -1,0 +1,262 @@
+.order-list-page {
+  min-height: 100vh;
+  background: #f7f8fb;
+}
+
+/* 顶部导航 */
+.custom-nav {
+  background: #fff7fa;
+  border-bottom: 1rpx solid #f2e6eb;
+  box-sizing: border-box;
+}
+
+.nav-inner {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+}
+
+.nav-side {
+  width: 72rpx;
+  height: 72rpx;
+  flex-shrink: 0;
+}
+
+.nav-title {
+  flex: 1;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #111;
+}
+
+/* 内容 */
+.content {
+  box-sizing: border-box;
+}
+
+.list-hero {
+  margin: 16rpx 16rpx 0;
+  padding: 22rpx 24rpx;
+  border-radius: 22rpx;
+  background: linear-gradient(180deg, #f8dfe7 0%, #fff4f7 100%);
+}
+
+.list-subtitle {
+  margin-top: 6rpx;
+  line-height: 1.5;
+}
+
+/* 顶部筛选栏 */
+.tab-scroll {
+  margin-top: 12rpx;
+  white-space: nowrap;
+}
+
+.tab-row {
+  display: inline-flex;
+  gap: 10rpx;
+  padding: 0 16rpx;
+}
+
+.tab-item {
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #777;
+  font-size: 22rpx;
+  line-height: 1.2;
+  border: 1rpx solid #eceff3;
+  flex-shrink: 0;
+}
+
+.tab-item.active {
+  background: #fff1f5;
+  color: #ff5f8d;
+  border-color: #ffd5e1;
+}
+
+.loading-wrap {
+  padding: 240rpx 0;
+  text-align: center;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 空状态 */
+.empty-wrap {
+  padding-top: 220rpx;
+  text-align: center;
+}
+
+.inner-empty {
+  padding-top: 120rpx;
+}
+
+.empty-illustration {
+  font-size: 72rpx;
+  line-height: 1;
+}
+
+.empty-title {
+  margin-top: 20rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #222;
+}
+
+.empty-desc {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.6;
+}
+
+.empty-btn {
+  width: 260rpx;
+  margin: 28rpx auto 0;
+}
+
+/* 订单卡片 */
+.order-card {
+  margin: 14rpx 16rpx 0;
+  padding: 22rpx 20rpx;
+  border-radius: 22rpx;
+  background: #fff;
+  box-shadow: 0 4rpx 14rpx rgba(31, 35, 41, 0.04);
+  box-sizing: border-box;
+}
+
+.status-wait-taking {
+  background: linear-gradient(180deg, #fff7fa 0%, #ffffff 100%);
+}
+
+.status-taken {
+  background: linear-gradient(180deg, #fffaf6 0%, #ffffff 100%);
+}
+
+.status-serving {
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.status-completed {
+  background: linear-gradient(180deg, #f8fdf9 0%, #ffffff 100%);
+}
+
+.status-cancelled {
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+}
+
+.order-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.order-status-badge {
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 20rpx;
+  line-height: 1.2;
+}
+
+.status-taken .order-status-badge {
+  background: #fff3e6;
+  color: #ff8a00;
+}
+
+.status-serving .order-status-badge {
+  background: #eef5ff;
+  color: #3a8bff;
+}
+
+.status-completed .order-status-badge {
+  background: #edf9f1;
+  color: #22a15f;
+}
+
+.status-cancelled .order-status-badge {
+  background: #f3f4f6;
+  color: #999;
+}
+
+.order-pay-text {
+  font-size: 20rpx;
+  color: #a0a4ad;
+  line-height: 1.2;
+}
+
+.order-main-row {
+  margin-top: 16rpx;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.order-date {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #222;
+  line-height: 1.4;
+}
+
+.order-total {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #ff5f8d;
+  flex-shrink: 0;
+}
+
+.order-summary {
+  margin-top: 14rpx;
+  font-size: 23rpx;
+  color: #666;
+  line-height: 1.7;
+}
+
+.order-address {
+  margin-top: 12rpx;
+  font-size: 23rpx;
+  color: #8b8f97;
+  line-height: 1.6;
+}
+
+.order-foot {
+  margin-top: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14rpx;
+}
+
+.order-no {
+  font-size: 21rpx;
+  color: #a0a4ad;
+  line-height: 1.4;
+  flex: 1;
+  min-width: 0;
+}
+
+.order-detail-chip {
+  flex-shrink: 0;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 20rpx;
+  line-height: 1.2;
+}
+
+.page-bottom-space {
+  height: 28rpx;
+}

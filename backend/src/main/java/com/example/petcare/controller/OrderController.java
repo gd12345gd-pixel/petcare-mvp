@@ -1,23 +1,15 @@
 package com.example.petcare.controller;
 
-import com.example.petcare.common.Result;
 import com.example.petcare.common.ApiResponse;
-import com.example.petcare.dto.CreateOrderRequest;
-import com.example.petcare.dto.CreateOrderResponse;
-import com.example.petcare.dto.OrderStatusUpdateRequest;
+import com.example.petcare.dto.*;
 import com.example.petcare.service.OrderService;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
+@CrossOrigin
 public class OrderController {
 
     private final OrderService orderService;
@@ -27,25 +19,23 @@ public class OrderController {
     }
 
     @PostMapping("/createOrder")
-    public Result<CreateOrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
-        return Result.success(orderService.createOrder(request));
+    public ApiResponse<CreateOrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
+        return ApiResponse.success("下单成功", orderService.createOrder(request));
     }
 
-    @GetMapping
-    public ApiResponse<?> listByUser(@RequestParam Long userId) {
-        return ApiResponse.success(orderService.listByUserId(userId));
+    @GetMapping("/detail")
+    public ApiResponse<OrderDetailResponse> detail(@RequestParam Long id, @RequestParam Long userId) {
+        return ApiResponse.success(orderService.detail(id, userId));
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<?> detail(@PathVariable Long id) {
-        return ApiResponse.success(orderService.detail(id));
+    @PostMapping("/cancel")
+    public ApiResponse<Void> cancel(@RequestBody CancelOrderRequest request) {
+        orderService.cancelOrder(request);
+        return ApiResponse.success("取消订单成功", null);
     }
 
-    @PutMapping("/{id}/status")
-    public ApiResponse<?> updateStatus(
-        @PathVariable Long id,
-        @Valid @RequestBody OrderStatusUpdateRequest request
-    ) {
-        return ApiResponse.success(orderService.updateStatus(id, request.getStatus()));
+    @GetMapping("/list")
+    public ApiResponse<List<OrderListItemResponse>> list(@RequestParam Long userId) {
+        return ApiResponse.success(orderService.list(userId));
     }
 }

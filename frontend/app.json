@@ -4,6 +4,7 @@
       "pages/detail/index",
       "pages/order/create/index",
       "pages/order/detail/index",
+      "pages/order/list/index",
       "pages/order-create/index",
       "pages/orders/index",
       "pages/pet-edit/index",
@@ -45,7 +46,7 @@
             "text": "寻宠"
           },
           {
-              "pagePath": "pages/orders/index",
+              "pagePath": "pages/order/list/index",
               "text": "订单"
           },
           {

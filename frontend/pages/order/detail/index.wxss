@@ -1,72 +1,427 @@
-page {
-  font-weight: 600;
-  color: #2e2a2b;
+.order-detail-page {
+  min-height: 100vh;
+  background: #f7f8fb;
+  padding-bottom: 190rpx;
+  box-sizing: border-box;
 }
 
-.pet-list {
+/* 顶部导航 */
+ 
+ 
+
+
+.custom-nav {
+  position: relative;
+  z-index: 20;
+  background: #fff7fa;
+  border-bottom: 1rpx solid #f2e6eb;
+  box-sizing: border-box;
+}
+
+.nav-inner {
+  height: 88rpx;
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  position: relative;
 }
 
-.pet-item {
+.nav-side {
+  width: 88rpx;
+  height: 88rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-left {
+  position: relative;
+  z-index: 21;
+}
+
+.nav-back-hit {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-back-icon {
+  font-size: 52rpx;
+  color: #111;
+  line-height: 1;
+  font-weight: 400;
+  margin-top: -6rpx;
+}
+
+.nav-title {
   flex: 1;
-  border: 1px solid #eee3e7;
-  border-radius: 16px;
-  padding: 12px;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #111;
 }
 
-.pet-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 19px;
-  background: #f0ecee;
-  margin-bottom: 8px;
+/* 内容区域 */
+.content {
+  box-sizing: border-box;
 }
 
-.pet-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #2e2a2b;
+.loading-wrap {
+  padding: 220rpx 0;
+  text-align: center;
 }
 
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 顶部状态卡 */
+.status-card {
+  margin: 18rpx 16rpx 0;
+  padding: 26rpx 24rpx;
+  border-radius: 24rpx;
+  box-sizing: border-box;
+}
+
+.status-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.status-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.status-title {
+  font-size: 38rpx;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.status-desc {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: #8b8f97;
+}
+
+.status-pay-tag {
+  flex-shrink: 0;
+  padding: 10rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 22rpx;
+  color: #ff5f8d;
+  line-height: 1.2;
+}
+
+.status-order-no {
+  margin-top: 18rpx;
+  font-size: 22rpx;
+  color: #9aa0aa;
+  line-height: 1.4;
+}
+
+.status-wait-taking {
+  background: linear-gradient(180deg, #ffe8ef 0%, #fff7fa 100%);
+}
+
+.status-wait-taking .status-title {
+  color: #ff5f8d;
+}
+
+.status-taken {
+  background: linear-gradient(180deg, #fff3e4 0%, #fffaf6 100%);
+}
+
+.status-taken .status-title {
+  color: #ff8a00;
+}
+
+.status-serving {
+  background: linear-gradient(180deg, #edf6ff 0%, #f8fbff 100%);
+}
+
+.status-serving .status-title {
+  color: #3a8bff;
+}
+
+.status-completed {
+  background: linear-gradient(180deg, #edf9f1 0%, #f8fdf9 100%);
+}
+
+.status-completed .status-title {
+  color: #22a15f;
+}
+
+.status-cancelled {
+  background: linear-gradient(180deg, #f4f4f4 0%, #fafafa 100%);
+}
+
+.status-cancelled .status-title {
+  color: #999;
+}
+
+/* 卡片公用 */
+.compact-card {
+  margin: 16rpx 16rpx 0;
+  padding: 24rpx 22rpx;
+  border-radius: 22rpx;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14rpx;
+  margin-bottom: 18rpx;
+}
+
+.section-tag {
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 22rpx;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+/* 概览 */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+}
+
+.overview-item {
+  background: #f8f9fc;
+  border-radius: 18rpx;
+  padding: 18rpx 18rpx;
+  min-height: 120rpx;
+  box-sizing: border-box;
+}
+
+.overview-label {
+  font-size: 22rpx;
+  color: #9aa0aa;
+  line-height: 1.3;
+}
+
+.overview-value {
+  margin-top: 12rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #222;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.overview-value--small {
+  font-size: 24rpx;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+/* 日期列表 */
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.schedule-item {
+  background: #f8f9fc;
+  border-radius: 18rpx;
+  padding: 18rpx 18rpx;
+}
+
+.schedule-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.schedule-date {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #222;
+  line-height: 1.3;
+}
+
+.schedule-status {
+  flex-shrink: 0;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 22rpx;
+  line-height: 1.2;
+}
+
+.schedule-bottom {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.schedule-slot {
+  font-size: 24rpx;
+  color: #8b8f97;
+  line-height: 1.5;
+  flex: 1;
+  min-width: 0;
+}
+
+.schedule-duration {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  color: #8b8f97;
+  line-height: 1.2;
+}
+
+/* 地址 */
+.detail-block-title {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #222;
+  line-height: 1.4;
+}
+
+.detail-block-desc {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #8b8f97;
+  line-height: 1.6;
+}
+
+/* 宠物 */
+.pet-scroll {
+  white-space: nowrap;
+}
+
+.pet-row {
+  display: inline-flex;
+  gap: 14rpx;
+  padding-right: 10rpx;
+}
+
+.pet-card {
+  width: 170rpx;
+  background: #f8f9fc;
+  border-radius: 20rpx;
+  padding: 14rpx;
+  box-sizing: border-box;
+}
+
+.pet-card-image {
+  width: 100%;
+  height: 110rpx;
+  border-radius: 14rpx;
+  background: #f0f0f0;
+}
+
+.pet-card-name {
+  margin-top: 10rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #222;
+  line-height: 1.3;
+}
+
+.pet-card-meta {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #8b8f97;
+  line-height: 1.4;
+}
+
+/* 备注 */
 .remark-box {
-  line-height: 1.7;
-  color: #5f5a5c;
+  background: #f8f9fc;
+  border-radius: 18rpx;
+  padding: 18rpx 20rpx;
+  font-size: 26rpx;
+  color: #222;
+  line-height: 1.8;
 }
 
-.page-bottom-space {
-  height: 90px;
+/* 价格 */
+.price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
 }
 
-.bottom-actions {
+.price-row + .price-row {
+  margin-top: 18rpx;
+}
+
+.price-label {
+  font-size: 24rpx;
+  color: #8b8f97;
+  line-height: 1.4;
+}
+
+.price-value {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #222;
+  line-height: 1.4;
+}
+
+.summary-total-box {
+  margin-top: 22rpx;
+  padding: 20rpx 18rpx;
+  border-radius: 18rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 30rpx;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* 底部操作栏 */
+.order-bottom-bar {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 10;
   display: flex;
-  gap: 12px;
-  padding: 12px 16px 24px;
-  background: #ffffff;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+  gap: 18rpx;
+  padding: 16rpx 20rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1rpx solid #f0f0f0;
+  backdrop-filter: blur(10rpx);
+  box-sizing: border-box;
 }
 
-.primary-btn,
-.secondary-btn {
+.order-action-btn {
   flex: 1;
-  height: 48px;
-  line-height: 48px;
-  border-radius: 24px;
-  font-size: 16px;
-  font-weight: 700;
+  height: 84rpx;
+  border-radius: 18rpx;
 }
 
-.primary-btn {
-  background: #ee6f95;
-  color: #ffffff;
+.cancel-btn {
+  background: #fff3f3;
+  color: #ff6b6b;
 }
 
-.secondary-btn {
-  background: #fff;
-  color: #2e2a2b;
-  border: 1px solid #eadde2;
+.page-bottom-space {
+  height: 32rpx;
 }

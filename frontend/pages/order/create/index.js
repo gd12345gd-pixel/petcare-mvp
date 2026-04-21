@@ -2,15 +2,25 @@ const { request } = require('../../../utils/request')
 
 Page({
   data: {
+    statusBarHeight: 20,
+    navBarHeight: 44,
+    navTotalHeight: 64,
+
     defaultPetImage: 'https://dummyimage.com/200x200/f3f4f6/b3b7c0.png&text=PET',
 
     pets: [],
-    selectedPetId: null,
+    selectedPetIds: [],
 
     selectedAddress: null,
 
     selectedDates: [],
-    dateOptions: [],
+    selectedDateSummary: '',
+
+    showDatePopup: false,
+    calendarMonthText: '',
+    calendarDays: [],
+    tempSelectedDates: [],
+    tempSelectedDateSummary: '',
 
     timeSlots: [
       { label: '时间不限', value: '不限', selected: false },
@@ -24,6 +34,7 @@ Page({
     ],
 
     durationMinutes: 40,
+    showCustomDuration: false,
     durationQuickOptions: [
       { value: 30, label: '30分钟', active: false },
       { value: 40, label: '40分钟', active: true },
@@ -33,139 +44,36 @@ Page({
     ],
 
     suggestedUnitPrice: '59.00',
+    lastSuggestedUnitPrice: '59.00',
     unitPrice: '59.00',
     unitPriceDisplay: '59.00',
+    unitPriceTouched: false,
+
     totalPriceDisplay: '0.00',
     serviceCount: 0,
-    showDatePopup: false,
-    calendarMonthText: '',
-    calendarDays: [],
-    tempSelectedDates: [],
-    selectedDateSummary: '',
-    tempSelectedDateSummary: '',
-    showCustomDuration: false,
+
     remark: '',
     submitting: false
   },
-  buildCalendar() {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = now.getMonth() + 1
-  
-    const daysInMonth = new Date(year, month, 0).getDate()
-    const firstDay = new Date(year, month - 1, 1).getDay()
-    const days = []
-  
-    for (let i = 0; i < firstDay; i++) {
-      days.push({
-        empty: true,
-        id: `empty-${i}`
-      })
-    }
-  
-    const tempSelectedDates = this.data.tempSelectedDates.length
-      ? this.data.tempSelectedDates
-      : this.data.selectedDates
-  
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-      days.push({
-        id: dateStr,
-        day: d,
-        date: dateStr,
-        selected: tempSelectedDates.includes(dateStr)
-      })
-    }
-  
-    this.setData({
-      calendarMonthText: `${month}月 ${year}`,
-      calendarDays: days
-    })
-  },
-  
-  openDatePopup() {
-    const tempSelectedDates = [...this.data.selectedDates]
-    this.setData({
-      showDatePopup: true,
-      tempSelectedDates,
-      tempSelectedDateSummary: this.formatSelectedDates(tempSelectedDates)
-    }, () => {
-      this.buildCalendar()
-    })
-  },
-  
-  closeDatePopup() {
-    this.setData({
-      showDatePopup: false
-    })
-  },
-  
-  toggleCalendarDate(e) {
-    const date = e.currentTarget.dataset.date
-    if (!date) return
-  
-    let tempSelectedDates = [...this.data.tempSelectedDates]
-  
-    if (tempSelectedDates.includes(date)) {
-      tempSelectedDates = tempSelectedDates.filter(item => item !== date)
-    } else {
-      tempSelectedDates.push(date)
-    }
-  
-    const calendarDays = this.data.calendarDays.map(item => {
-      if (item.date === date) {
-        return {
-          ...item,
-          selected: !item.selected
-        }
-      }
-      return item
-    })
-  
-    this.setData({
-      tempSelectedDates,
-      tempSelectedDateSummary: this.formatSelectedDates(tempSelectedDates),
-      calendarDays
-    })
-  },
-  
-  confirmDateSelection() {
-    if (!this.data.tempSelectedDates.length) {
-      wx.showToast({
-        title: '请至少选择一个日期',
-        icon: 'none'
-      })
-      return
-    }
-  
-    const selectedDates = [...this.data.tempSelectedDates].sort()
-  
-    this.setData({
-      selectedDates,
-      selectedDateSummary: this.formatSelectedDates(selectedDates),
-      showDatePopup: false
-    }, () => {
-      this.syncComputedData()
-    })
-  },
-  
-  formatSelectedDates(dates) {
-    if (!dates || !dates.length) return ''
-    return [...dates]
-      .sort()
-      .map(date => {
-        const [, month, day] = date.split('-')
-        return `${Number(month)}/${Number(day)}`
-      })
-      .join('、')
-  },
+
   onLoad() {
+    const systemInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
+    const statusBarHeight = systemInfo.statusBarHeight || 20
+    const navBarHeight = 44
+
+    this.setData({
+      statusBarHeight,
+      navBarHeight,
+      navTotalHeight: statusBarHeight + navBarHeight
+    })
+
     this.buildCalendar()
     this.loadPetList()
     this.syncDurationQuickOptions()
     this.calculateSuggestedPrice()
     this.syncComputedData()
   },
+
   onShow() {
     const selectedAddress = wx.getStorageSync('selectedServiceAddress')
     if (selectedAddress) {
@@ -186,16 +94,17 @@ Page({
       wx.navigateBack({
         delta: 1,
         fail: () => {
-          wx.switchTab({
-            url: '/pages/home/index'
+          wx.redirectTo({
+            url: '/pages/order/list/index'
           })
         }
       })
-    } else {
-      wx.switchTab({
-        url: '/pages/home/index'
-      })
+      return
     }
+
+    wx.redirectTo({
+      url: '/pages/order/list/index'
+    })
   },
 
   goChooseAddress() {
@@ -215,66 +124,156 @@ Page({
 
     request(`/api/pet/list?userId=${currentUser.id}`, 'GET')
       .then((list) => {
-        const pets = list || []
+        let pets = list || []
+        let selectedPetIds = [...(this.data.selectedPetIds || [])]
 
-        let selectedPetId = null
         if (preferPetId && pets.some(item => item.id === preferPetId)) {
-          selectedPetId = preferPetId
-        } else if (this.data.selectedPetId && pets.some(item => item.id === this.data.selectedPetId)) {
-          selectedPetId = this.data.selectedPetId
-        } else if (pets.length) {
-          selectedPetId = pets[0].id
+          if (!selectedPetIds.includes(preferPetId)) {
+            selectedPetIds.push(preferPetId)
+          }
         }
+
+        selectedPetIds = selectedPetIds.filter(id => pets.some(item => item.id === id))
+
+        if (!selectedPetIds.length && pets.length) {
+          selectedPetIds = [pets[0].id]
+        }
+
+        pets = pets.map(item => ({
+          ...item,
+          selected: selectedPetIds.includes(item.id)
+        }))
 
         this.setData({
           pets,
-          selectedPetId
+          selectedPetIds
+        }, () => {
+          this.calculateSuggestedPrice()
+          this.syncComputedData()
         })
       })
       .catch(() => {})
   },
 
+  syncPetSelectedState() {
+    const pets = (this.data.pets || []).map(item => ({
+      ...item,
+      selected: (this.data.selectedPetIds || []).includes(item.id)
+    }))
+    this.setData({ pets })
+  },
+
   selectPet(e) {
     const id = Number(e.currentTarget.dataset.id)
+    let selectedPetIds = [...this.data.selectedPetIds]
+
+    if (selectedPetIds.includes(id)) {
+      selectedPetIds = selectedPetIds.filter(item => item !== id)
+    } else {
+      selectedPetIds.push(id)
+    }
+
     this.setData({
-      selectedPetId: id
+      selectedPetIds
+    }, () => {
+      this.syncPetSelectedState()
+      this.calculateSuggestedPrice()
+      this.syncComputedData()
     })
   },
 
-  buildDateOptions() {
+  getSelectedPets() {
+    return this.data.pets.filter(item => this.data.selectedPetIds.includes(item.id))
+  },
+
+  getPrimaryPet() {
+    const selectedPets = this.getSelectedPets()
+    return selectedPets.length ? selectedPets[0] : null
+  },
+
+  formatSelectedDates(dates) {
+    if (!dates || !dates.length) return ''
+
+    const list = [...dates]
+      .sort()
+      .map(date => {
+        const [, month, day] = date.split('-')
+        return `${Number(month)}/${Number(day)}`
+      })
+
+    if (list.length <= 3) {
+      return list.join('、')
+    }
+
+    return `${list.slice(0, 3).join('、')} 等${list.length}天`
+  },
+
+  buildCalendar() {
     const now = new Date()
-    const options = []
+    const year = now.getFullYear()
+    const month = now.getMonth() + 1
 
-    for (let i = 0; i < 14; i++) {
-      const date = new Date(now)
-      date.setDate(now.getDate() + i)
+    const daysInMonth = new Date(year, month, 0).getDate()
+    const firstDay = new Date(year, month - 1, 1).getDay()
+    const days = []
 
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const day = String(date.getDate()).padStart(2, '0')
-      const weekdayMap = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-
-      options.push({
-        date: `${year}-${month}-${day}`,
-        label: `${month}/${day}`,
-        weekday: weekdayMap[date.getDay()],
-        selected: i < 3
+    for (let i = 0; i < firstDay; i++) {
+      days.push({
+        empty: true,
+        id: `empty-${i}`
       })
     }
 
-    const selectedDates = options.filter(item => item.selected).map(item => item.date)
+    const tempSelectedDates = this.data.tempSelectedDates.length
+      ? this.data.tempSelectedDates
+      : this.data.selectedDates
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+      days.push({
+        id: dateStr,
+        day: d,
+        date: dateStr,
+        selected: tempSelectedDates.includes(dateStr)
+      })
+    }
 
     this.setData({
-      dateOptions: options,
-      selectedDates
+      calendarMonthText: `${month}月 ${year}`,
+      calendarDays: days
     })
   },
 
-  toggleDate(e) {
+  openDatePopup() {
+    const tempSelectedDates = [...this.data.selectedDates]
+    this.setData({
+      showDatePopup: true,
+      tempSelectedDates,
+      tempSelectedDateSummary: this.formatSelectedDates(tempSelectedDates)
+    }, () => {
+      this.buildCalendar()
+    })
+  },
+
+  closeDatePopup() {
+    this.setData({
+      showDatePopup: false
+    })
+  },
+
+  toggleCalendarDate(e) {
     const date = e.currentTarget.dataset.date
     if (!date) return
 
-    const dateOptions = this.data.dateOptions.map(item => {
+    let tempSelectedDates = [...this.data.tempSelectedDates]
+
+    if (tempSelectedDates.includes(date)) {
+      tempSelectedDates = tempSelectedDates.filter(item => item !== date)
+    } else {
+      tempSelectedDates.push(date)
+    }
+
+    const calendarDays = this.data.calendarDays.map(item => {
       if (item.date === date) {
         return {
           ...item,
@@ -284,11 +283,28 @@ Page({
       return item
     })
 
-    const selectedDates = dateOptions.filter(item => item.selected).map(item => item.date)
+    this.setData({
+      tempSelectedDates,
+      tempSelectedDateSummary: this.formatSelectedDates(tempSelectedDates),
+      calendarDays
+    })
+  },
+
+  confirmDateSelection() {
+    if (!this.data.tempSelectedDates.length) {
+      wx.showToast({
+        title: '请至少选择一个日期',
+        icon: 'none'
+      })
+      return
+    }
+
+    const selectedDates = [...this.data.tempSelectedDates].sort()
 
     this.setData({
-      dateOptions,
-      selectedDates
+      selectedDates,
+      selectedDateSummary: this.formatSelectedDates(selectedDates),
+      showDatePopup: false
     }, () => {
       this.syncComputedData()
     })
@@ -333,6 +349,27 @@ Page({
     this.setData({ timeSlots })
   },
 
+  chooseDuration(e) {
+    const value = Number(e.currentTarget.dataset.value)
+
+    if (value === 999) {
+      this.setData({
+        showCustomDuration: true
+      }, () => {
+        this.syncDurationQuickOptions()
+      })
+      return
+    }
+
+    this.setData({
+      durationMinutes: value,
+      showCustomDuration: false
+    }, () => {
+      this.syncDurationQuickOptions()
+      this.calculateSuggestedPrice()
+    })
+  },
+
   decreaseDuration() {
     const next = Math.max(10, this.data.durationMinutes - 10)
     this.setData({
@@ -343,22 +380,12 @@ Page({
       this.calculateSuggestedPrice()
     })
   },
-  
+
   increaseDuration() {
     const next = this.data.durationMinutes + 10
     this.setData({
       durationMinutes: next,
       showCustomDuration: true
-    }, () => {
-      this.syncDurationQuickOptions()
-      this.calculateSuggestedPrice()
-    })
-  },
-
-  chooseDuration(e) {
-    const value = Number(e.currentTarget.dataset.value)
-    this.setData({
-      durationMinutes: value
     }, () => {
       this.syncDurationQuickOptions()
       this.calculateSuggestedPrice()
@@ -378,37 +405,58 @@ Page({
         active: !this.data.showCustomDuration && item.value === this.data.durationMinutes
       }
     })
-  
+
     this.setData({ durationQuickOptions })
   },
 
   calculateSuggestedPrice() {
-    const petCount = this.data.pets.length ? 1 : 0
+    const selectedPets = this.getSelectedPets()
+    const petCount = selectedPets.length
+
     let price = 49
 
     if (this.data.durationMinutes >= 40) price += 10
     if (this.data.durationMinutes >= 60) price += 10
     if (this.data.durationMinutes >= 90) price += 10
-    if (petCount > 1) price += 10
+
+    if (petCount > 1) {
+      price += (petCount - 1) * 10
+    }
 
     const suggestedUnitPrice = price.toFixed(2)
 
-    this.setData({
-      suggestedUnitPrice
-    }, () => {
-      if (!this.data.unitPrice || Number(this.data.unitPrice) === 0) {
-        this.setData({
-          unitPrice: suggestedUnitPrice
-        }, () => this.syncComputedData())
-      } else {
+    if (!this.data.unitPriceTouched) {
+      this.setData({
+        suggestedUnitPrice,
+        lastSuggestedUnitPrice: suggestedUnitPrice,
+        unitPrice: suggestedUnitPrice
+      }, () => {
         this.syncComputedData()
-      }
+      })
+      return
+    }
+
+    this.setData({
+      suggestedUnitPrice,
+      lastSuggestedUnitPrice: suggestedUnitPrice
+    }, () => {
+      this.syncComputedData()
     })
   },
 
   onUnitPriceInput(e) {
     this.setData({
-      unitPrice: e.detail.value
+      unitPrice: e.detail.value,
+      unitPriceTouched: true
+    }, () => {
+      this.syncComputedData()
+    })
+  },
+
+  syncUnitPriceToSuggested() {
+    this.setData({
+      unitPrice: this.data.suggestedUnitPrice,
+      unitPriceTouched: false
     }, () => {
       this.syncComputedData()
     })
@@ -424,7 +472,7 @@ Page({
     const serviceCount = this.data.selectedDates.length
     const unitPriceNum = Number(this.data.unitPrice || 0)
     const totalPrice = unitPriceNum * serviceCount
-  
+
     this.setData({
       serviceCount,
       unitPriceDisplay: unitPriceNum.toFixed(2),
@@ -433,12 +481,8 @@ Page({
     })
   },
 
-  getSelectedPet() {
-    return this.data.pets.find(item => item.id === this.data.selectedPetId) || null
-  },
-
   validateForm() {
-    const selectedPet = this.getSelectedPet()
+    const selectedPets = this.getSelectedPets()
     const { selectedAddress, selectedDates, timeSlots, unitPrice } = this.data
     const selectedSlots = timeSlots.filter(item => item.selected)
 
@@ -447,8 +491,8 @@ Page({
       return false
     }
 
-    if (!selectedPet) {
-      wx.showToast({ title: '请选择宠物', icon: 'none' })
+    if (!selectedPets.length) {
+      wx.showToast({ title: '请至少选择一只宠物', icon: 'none' })
       return false
     }
 
@@ -475,7 +519,8 @@ Page({
     if (this.data.submitting) return
 
     const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
-    const selectedPet = this.getSelectedPet()
+    const selectedPets = this.getSelectedPets()
+    const primaryPet = this.getPrimaryPet()
     const selectedAddress = this.data.selectedAddress
     const selectedSlots = this.data.timeSlots.filter(item => item.selected).map(item => item.value)
 
@@ -497,11 +542,13 @@ Page({
         request('/api/orders/createOrder', 'POST', {
           userId: currentUser.id,
 
-          petId: selectedPet.id,
-          petName: selectedPet.name,
-          petType: selectedPet.type,
-          petBreed: selectedPet.breed,
-          petImageUrl: selectedPet.avatarUrl || selectedPet.imageUrl,
+          petId: primaryPet ? primaryPet.id : null,
+          petIds: selectedPets.map(item => item.id),
+          petName: primaryPet ? primaryPet.name : '',
+          petType: primaryPet ? primaryPet.type : '',
+          petBreed: primaryPet ? primaryPet.breed : '',
+          petImageUrl: primaryPet ? (primaryPet.avatarUrl || primaryPet.imageUrl) : '',
+          petCount: selectedPets.length,
 
           addressId: selectedAddress.id,
           serviceContactName: selectedAddress.contactName,
@@ -526,17 +573,27 @@ Page({
 
           orderStatus: 'WAIT_TAKING',
           payStatus: 'UNPAID'
-        }).then(() => {
+        }).then((res) => {
           wx.hideLoading()
           wx.showToast({
             title: '下单成功',
             icon: 'success'
           })
+
+          const orderId = res && (res.id || (res.data && res.data.id))
+
           wx.removeStorageSync('selectedServiceAddress')
+
           setTimeout(() => {
-            wx.navigateTo({
-              url: '/pages/order/detail/index'
-            })
+            if (orderId) {
+              wx.navigateTo({
+                url: `/pages/order/detail/index?id=${orderId}`
+              })
+            } else {
+              wx.redirectTo({
+                url: '/pages/order/list/index'
+              })
+            }
           }, 800)
         }).catch(() => {
           wx.hideLoading()

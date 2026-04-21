@@ -1,0 +1,85 @@
+<view class="order-list-page">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-inner">
+      <view class="nav-side"></view>
+      <view class="nav-title">我的订单</view>
+      <view class="nav-side"></view>
+    </view>
+  </view>
+
+  <scroll-view
+    class="content"
+    scroll-y
+    style="height: calc(100vh - {{navTotalHeight}}px);"
+  >
+    <view class="loading-wrap" wx:if="{{loading}}">
+      <view class="loading-text">加载中...</view>
+    </view>
+
+    <view class="empty-wrap" wx:elif="{{!orders.length}}">
+      <view class="empty-illustration">📦</view>
+      <view class="empty-title">还没有订单</view>
+      <view class="empty-desc">去预约一次上门喂养吧</view>
+      <button class="primary-btn empty-btn" bindtap="goCreateOrder">立即下单</button>
+    </view>
+
+    <block wx:else>
+      <view class="list-hero">
+        <view class="page-title">我的订单</view>
+        <view class="desc-text list-subtitle">查看预约进度、服务安排与订单详情</view>
+      </view>
+
+      <scroll-view class="tab-scroll" scroll-x>
+        <view class="tab-row">
+          <view
+            class="tab-item {{currentTab === item.key ? 'active' : ''}}"
+            wx:for="{{tabs}}"
+            wx:key="key"
+            data-key="{{item.key}}"
+            bindtap="switchTab"
+          >
+            {{item.label}}
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="empty-wrap inner-empty" wx:if="{{!filteredOrders.length}}">
+        <view class="empty-title">当前状态下没有订单</view>
+        <view class="empty-desc">你可以切换其他状态看看</view>
+      </view>
+
+      <view
+        class="order-card {{item.orderStatusClass}}"
+        wx:for="{{filteredOrders}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goDetail"
+      >
+        <view class="order-card-top">
+          <view class="order-status-badge">{{item.orderStatusText}}</view>
+          <view class="order-pay-text">{{item.payStatusText}}</view>
+        </view>
+
+        <view class="order-main-row">
+          <view class="order-date">{{item.firstServiceDateText}}</view>
+          <view class="order-total">¥{{item.totalPriceText}}</view>
+        </view>
+
+        <view class="order-summary">
+          {{item.petCount}}只宠物 · {{item.serviceDateCount}}次服务 · {{item.serviceDurationMinutes}}分钟/次 · 单次¥{{item.unitPriceText}}
+        </view>
+
+        <view class="order-address">
+          {{item.serviceFullAddress}}
+        </view>
+
+        <view class="order-foot">
+          <view class="order-no">订单号：{{item.orderNo}}</view>
+          <view class="order-detail-chip">查看详情</view>
+        </view>
+      </view>
+
+      <view class="page-bottom-space"></view>
+    </block>
+  </scroll-view>
+</view>
