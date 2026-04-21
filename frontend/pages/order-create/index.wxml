@@ -96,6 +96,11 @@
     <view class="bottom-tip">提交订单前请确认地址、宠物和服务时间</view>
   </scroll-view>
 
+  <view class="submit-bar">
+  <button class="submit-btn" bindtap="">
+    下一步：支付费用
+  </button>
+</view>
   <view class="bottom-bar">
     <button class="primary-btn submit-btn" bindtap="submitOrder">下一步：支付费用</button>
   </view>

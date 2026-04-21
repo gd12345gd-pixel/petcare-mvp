@@ -310,7 +310,7 @@ Page({
     this.setData({ submitting: true })
     wx.showLoading({ title: '提交中' })
 
-    request('/api/order-create/submit', 'POST', {
+    request('/api/orders/createOrder', 'POST', {
       userId: currentUser.id,
 
       petId: selectedPet.id,

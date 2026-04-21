@@ -1,0 +1,255 @@
+<view class="page-with-bottom-bar order-create-page">
+  <view class="nav-bar nav-bar-pink">
+    <view class="back-area" bindtap="navigateBack">
+      <view class="back-icon"></view>
+    </view>
+    <view class="nav-title">下单</view>
+  </view>
+
+  <scroll-view class="content" scroll-y>
+    <view class="hero-card">
+      <view class="page-title">下单预约</view>
+      <view class="desc-text hero-desc">填写毛孩子的照护信息，我们会尽快为你确认服务</view>
+    </view>
+
+    <view class="section-card address-section" bindtap="goChooseAddress">
+      <view class="address-main">
+        <view class="card-title address-title">
+          {{selectedAddress ? (selectedAddress.contactName + ' ' + selectedAddress.contactPhone) : '请选择服务地址'}}
+        </view>
+        <view class="desc-text address-sub" wx:if="{{selectedAddress}}">
+          {{selectedAddress.fullAddress || selectedAddress.province + selectedAddress.city + selectedAddress.district + selectedAddress.detailAddress}}
+        </view>
+        <view class="desc-text address-sub" wx:else>用于安排上门服务地点</view>
+      </view>
+      <view class="arrow">›</view>
+    </view>
+
+    <view class="section-card">
+      <view class="section-head">
+        <view class="card-title">服务宠物</view>
+        <view class="desc-text section-head-desc">请选择本次需要照护的毛孩子</view>
+      </view>
+
+      <scroll-view class="pet-scroll" scroll-x wx:if="{{pets.length}}">
+        <view class="pet-row">
+          <view
+            class="pet-card {{selectedPetId === item.id ? 'active' : ''}}"
+            wx:for="{{pets}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="selectPet"
+          >
+            <image
+              class="pet-card-image"
+              src="{{item.avatarUrl || item.imageUrl || defaultPetImage}}"
+              mode="aspectFill"
+            />
+            <view class="block-title pet-card-name">{{item.name}}</view>
+            <view class="desc-text pet-card-meta">
+              {{item.type}}{{item.breed ? ' · ' + item.breed : ''}}
+            </view>
+          </view>
+
+          <view class="pet-card add-card" bindtap="goAddPet">
+            <view class="add-circle">+</view>
+            <view class="add-text">添加宠物</view>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="pet-empty-wrap" wx:else>
+        <view class="empty-title">请选择服务宠物</view>
+        <view class="empty-desc">还没有添加宠物，先新增一个吧</view>
+        <button class="primary-btn pet-empty-btn" bindtap="goAddPet">新增宠物</button>
+      </view>
+    </view>
+
+   <!-- 服务日期 -->
+<view class="section-card selector-row" bindtap="openDatePopup">
+  <view class="selector-left">
+    <view class="card-title selector-title">服务日期</view>
+  </view>
+
+  <view class="selector-right">
+    <view class="selector-value-wrap">
+      <view class="{{selectedDates.length ? 'selector-value active' : 'selector-value'}}">
+        {{selectedDateSummary || '请选择服务日期'}}
+      </view>
+    </view>
+    <view class="arrow">›</view>
+  </view>
+</view>
+
+<!-- 上门时间段 -->
+<view class="section-card">
+  <view class="section-head">
+    <view class="card-title">上门时间段</view>
+    <view class="desc-text section-head-desc">可多选</view>
+  </view>
+
+  <view class="slot-grid">
+    <view
+      class="slot-item {{item.selected ? 'active' : ''}}"
+      wx:for="{{timeSlots}}"
+      wx:key="value"
+      data-value="{{item.value}}"
+      bindtap="toggleTimeSlot"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <view class="desc-text field-tip">“时间不限”放宽接单限制；若选中“时间不限”，则只能单选</view>
+</view>
+
+<!-- 服务时长 -->
+<view class="section-card">
+  <view class="section-head">
+    <view class="card-title">服务时长</view>
+    <view class="desc-text section-head-desc">分钟</view>
+  </view>
+
+  <view class="slot-grid duration-grid">
+    <view
+      class="slot-item duration-item {{item.active ? 'active' : ''}}"
+      wx:for="{{durationQuickOptions}}"
+      wx:key="value"
+      data-value="{{item.value}}"
+      bindtap="chooseDuration"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <view class="custom-duration-panel" wx:if="{{showCustomDuration}}">
+    <view class="custom-duration-header">
+      <view class="desc-text">自定义时长</view>
+      <view class="custom-duration-value">{{durationMinutes}} 分钟</view>
+    </view>
+
+    <view class="duration-main">
+      <view class="stepper">
+        <view class="step-btn" bindtap="decreaseDuration">-</view>
+        <view class="step-value">{{durationMinutes}}</view>
+        <view class="step-btn" bindtap="increaseDuration">+</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 日期选择弹层 -->
+<view class="mask" wx:if="{{showDatePopup}}" bindtap="closeDatePopup"></view>
+<view class="date-popup" wx:if="{{showDatePopup}}">
+  <view class="date-popup-header">
+    <view class="card-title">{{calendarMonthText}}</view>
+    <view class="date-popup-close" bindtap="closeDatePopup">✕</view>
+  </view>
+
+  <view class="week-row">
+    <view class="week-item">日</view>
+    <view class="week-item">一</view>
+    <view class="week-item">二</view>
+    <view class="week-item">三</view>
+    <view class="week-item">四</view>
+    <view class="week-item">五</view>
+    <view class="week-item weekend">六</view>
+  </view>
+
+  <view class="calendar-grid">
+    <view
+      wx:for="{{calendarDays}}"
+      wx:key="id"
+      class="day-cell {{item.empty ? 'empty' : ''}} {{item.selected ? 'selected' : ''}}"
+      data-date="{{item.date}}"
+      bindtap="toggleCalendarDate"
+    >
+      <block wx:if="{{!item.empty}}">
+        <view class="day-num">{{item.day}}</view>
+      </block>
+    </view>
+  </view>
+
+  <view class="date-selected-summary" wx:if="{{tempSelectedDates.length}}">
+    已选：{{tempSelectedDateSummary}}
+  </view>
+
+  <view class="date-popup-btn-row">
+    <button class="secondary-btn popup-cancel-btn" bindtap="closeDatePopup">取消</button>
+    <button class="pink-btn popup-confirm-btn" bindtap="confirmDateSelection">确定</button>
+  </view>
+</view>
+
+    <view class="section-card">
+      <view class="section-head">
+        <view class="card-title">单次服务价格</view>
+        <view class="desc-text section-head-desc">支持调整</view>
+      </view>
+
+      <view class="price-panel">
+        <view class="price-row">
+          <view class="desc-text">平台建议价</view>
+          <view class="price-value">¥{{suggestedUnitPrice}}</view>
+        </view>
+
+        <view class="price-row editable-price-row">
+          <view class="desc-text">你确认的单次价</view>
+          <view class="price-input-wrap">
+            <text class="price-symbol">¥</text>
+            <input
+              class="price-input"
+              type="digit"
+              value="{{unitPrice}}"
+              bindinput="onUnitPriceInput"
+            />
+          </view>
+        </view>
+      </view>
+
+      <view class="desc-text field-tip">平台已根据服务信息给出建议价，可根据实际需求调整</view>
+    </view>
+
+    <view class="section-card">
+      <view class="field-label">照护备注</view>
+      <textarea
+        class="textarea note-textarea"
+        placeholder="可填写宠物习性、喂养方式、注意事项、是否怕生等"
+        placeholder-class="input-placeholder"
+        value="{{remark}}"
+        bindinput="onRemarkInput"
+        maxlength="300"
+      ></textarea>
+      <view class="desc-text remark-count">{{remark.length}}/300</view>
+    </view>
+
+    <view class="section-card">
+      <view class="section-head">
+        <view class="card-title">费用明细</view>
+        <view class="desc-text section-head-desc">自动计算</view>
+      </view>
+
+      <view class="summary-row">
+        <text class="desc-text">单次价格</text>
+        <text class="summary-value">¥{{unitPriceDisplay}}</text>
+      </view>
+      <view class="summary-row">
+        <text class="desc-text">服务次数</text>
+        <text class="summary-value">{{serviceCount}}次</text>
+      </view>
+
+      <view class="summary-total-box">
+        ¥{{unitPriceDisplay}} × {{serviceCount}}次 = ¥{{totalPriceDisplay}}
+      </view>
+
+      <view class="desc-text field-tip">当前为预约确认模式，提交后订单将进入待接单状态</view>
+    </view>
+  </scroll-view>
+
+  <view class="bottom-bar order-bottom-bar">
+    <view class="bottom-info">
+      <view class="bottom-price">总价 ¥{{totalPriceDisplay}}</view>
+      <view class="desc-text bottom-desc">提交后进入待接单</view>
+    </view>
+    <button class="primary-btn order-submit-btn" bindtap="submitOrder">确认下单</button>
+  </view>
+</view>

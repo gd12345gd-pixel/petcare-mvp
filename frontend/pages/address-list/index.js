@@ -32,7 +32,7 @@ Page({
         fail: () => {
           if (this.data.from === 'orderCreate') {
             wx.reLaunch({
-              url: '/pages/order-create/index'
+              url: '/pages/order/create/index'
             })
           } else {
             wx.switchTab({

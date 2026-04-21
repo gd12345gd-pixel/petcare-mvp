@@ -2,6 +2,8 @@
   "pages": [
       "pages/home/index",
       "pages/detail/index",
+      "pages/order/create/index",
+      "pages/order/detail/index",
       "pages/order-create/index",
       "pages/orders/index",
       "pages/pet-edit/index",

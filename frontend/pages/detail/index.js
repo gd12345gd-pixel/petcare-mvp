@@ -24,7 +24,7 @@ Page({
   },
   goOrder() {
     wx.navigateTo({
-      url: `/pages/order-create/index?serviceId=${this.data.id}`
+      url: `/pages/order/create/index?serviceId=${this.data.id}`
     });
   },
   goTestUpload() {

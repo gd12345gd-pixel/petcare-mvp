@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class CreateOrderRequest {
+
     private Long userId;
     private Long sitterId;
     private Long serviceItemId;

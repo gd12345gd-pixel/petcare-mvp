@@ -1,0 +1,83 @@
+<view class="page">
+  <view class="nav custom-nav">
+    <view class="nav-left" bindtap="goBack">←</view>
+    <view class="nav-title">订单详情</view>
+    <view class="nav-right">...</view>
+  </view>
+
+  <scroll-view class="content" scroll-y="true">
+    <view class="status-card">
+      <view class="status-icon">🕒</view>
+      <view class="status-main">
+        <view class="status-title">待接单</view>
+        <view class="status-subtitle">我们已收到你的预约需求，正在为你安排服务人员</view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="detail-title">预约信息</view>
+      <view class="detail-row"><text>订单编号</text><text>{{order.orderNo}}</text></view>
+      <view class="detail-row"><text>服务类型</text><text>上门喂养</text></view>
+      <view class="detail-row"><text>单次价格</text><text>¥{{order.unitPrice}}</text></view>
+      <view class="detail-row"><text>服务次数</text><text>{{order.serviceCount}}次</text></view>
+      <view class="detail-row highlight-row"><text>总价</text><text>¥{{order.unitPrice}} × {{order.serviceCount}}次 = ¥{{order.totalPrice}}</text></view>
+      <view class="detail-row"><text>上门时间段</text><text>{{order.timeSlotText}}</text></view>
+      <view class="detail-row"><text>服务时长</text><text>{{order.durationMinutes}}分钟</text></view>
+      <view class="field-tip">以上为您选择的偏好时间段，实际上门会尽量安排在该时段内。</view>
+    </view>
+
+    <view class="card">
+      <view class="detail-title">服务日程</view>
+      <block wx:for="{{order.scheduleList}}" wx:key="date">
+        <view class="schedule-item">
+          <view class="schedule-left">
+            <view class="schedule-date">{{item.displayDate}}</view>
+            <view class="schedule-slot">{{item.timeSlotText}}</view>
+          </view>
+          <view class="schedule-status">{{item.statusText}}</view>
+        </view>
+      </block>
+    </view>
+
+    <view class="card">
+      <view class="detail-title">服务地址</view>
+      <view class="address-name">{{order.address.contactName}} {{order.address.phone}}</view>
+      <view class="address-contact">{{order.address.fullText}}</view>
+    </view>
+
+    <view class="card">
+      <view class="detail-title">服务宠物</view>
+      <view class="pet-list">
+        <block wx:for="{{order.pets}}" wx:key="id">
+          <view class="pet-item">
+            <view class="pet-avatar"></view>
+            <view class="pet-name">{{item.name}}</view>
+            <view class="pet-meta">{{item.typeText}}｜{{item.ageText}}｜{{item.weightText}}</view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="detail-title">照护备注</view>
+      <view class="remark-box">{{order.remark}}</view>
+    </view>
+
+    <view class="card">
+      <view class="detail-title">价格信息</view>
+      <view class="detail-row"><text>平台建议单次价</text><text>¥{{order.suggestedUnitPrice}}</text></view>
+      <view class="detail-row"><text>最终单次价</text><text>¥{{order.unitPrice}}</text></view>
+      <view class="detail-row"><text>服务次数</text><text>{{order.serviceCount}}次</text></view>
+      <view class="detail-row highlight-row"><text>总价</text><text>¥{{order.totalPrice}}</text></view>
+      <view class="detail-row"><text>支付状态</text><text>未支付</text></view>
+      <view class="field-tip">当前订单为预约确认模式，后续可由平台与您确认服务安排</view>
+    </view>
+
+    <view class="page-bottom-space"></view>
+  </scroll-view>
+
+  <view class="bottom-actions">
+    <button class="primary-btn">再约一次</button>
+    <button class="secondary-btn">联系客服</button>
+  </view>
+</view>

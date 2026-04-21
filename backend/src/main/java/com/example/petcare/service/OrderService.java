@@ -33,7 +33,7 @@ public class OrderService {
             throw new RuntimeException("userId不能为空");
         }
         if (request.getServiceItemId() == null) {
-            throw new RuntimeException("serviceItemId不能为空");
+            throw new RuntimeException("serviceItemIgd不能为空");
         }
         if (request.getServiceDate() == null || request.getServiceDate().isEmpty()) {
             throw new RuntimeException("服务日期不能为空");

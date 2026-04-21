@@ -73,7 +73,7 @@ Page({
 
   goBooking() {
     wx.navigateTo({
-      url: '/pages/order-create/index'
+      url: '/pages/order/create/index'
     })
   },
 

@@ -163,7 +163,7 @@ button::after {
 }
 
 /* ===== 按钮 ===== */
-.primary-btn {
+.orange-btn {
   height: 88rpx;
   border-radius: 18rpx;
   background: linear-gradient(180deg, #ff9200 0%, #ff7a00 100%);
@@ -174,6 +174,20 @@ button::after {
   align-items: center;
   justify-content: center;
   padding: 0;
+  box-shadow: 0 10rpx 20rpx rgba(255, 122, 0, 0.18);
+}
+.primary-btn {
+  height: 88rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(180deg, #ff6b81 0%, #ff5f8d 100%);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 8rpx 16rpx rgba(255, 95, 141, 0.18);
 }
 
 .pink-btn {
@@ -187,6 +201,7 @@ button::after {
   align-items: center;
   justify-content: center;
   padding: 0;
+  box-shadow: 0 8rpx 16rpx rgba(255, 95, 141, 0.18);
 }
 
 .secondary-btn {
@@ -266,3 +281,4 @@ button::after {
   color: #999;
   line-height: 1.6;
 }
+
