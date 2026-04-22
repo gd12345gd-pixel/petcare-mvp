@@ -1,114 +1,217 @@
 package com.example.petcare.service;
 
-import com.example.petcare.dto.CreateServiceRecordRequest;
-import com.example.petcare.dto.ServiceRecordVO;
-import com.example.petcare.entity.Orders;
+import com.example.petcare.dto.ServiceRecordCreateRequest;
+import com.example.petcare.dto.ServiceRecordDetailResponse;
+import com.example.petcare.dto.ServiceRecordListItemResponse;
+import com.example.petcare.entity.PetOrder;
+import com.example.petcare.entity.PetOrderLog;
+import com.example.petcare.entity.PetOrderSchedule;
 import com.example.petcare.entity.ServiceRecord;
-import com.example.petcare.enums.OrderStatus;
-import com.example.petcare.repository.OrdersRepository;
+import com.example.petcare.entity.ServiceRecordImage;
+import com.example.petcare.repository.PetOrderLogRepository;
+import com.example.petcare.repository.PetOrderRepository;
+import com.example.petcare.repository.PetOrderScheduleRepository;
+import com.example.petcare.repository.ServiceRecordImageRepository;
 import com.example.petcare.repository.ServiceRecordRepository;
-
-import jakarta.transaction.Transactional;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-public class  ServiceRecordService {
+public class ServiceRecordService {
 
-    private final OrdersRepository orderRepository;
     private final ServiceRecordRepository serviceRecordRepository;
+    private final ServiceRecordImageRepository serviceRecordImageRepository;
+    private final PetOrderRepository petOrderRepository;
+    private final PetOrderScheduleRepository petOrderScheduleRepository;
+    private final PetOrderLogRepository petOrderLogRepository;
 
-    public ServiceRecordService(OrdersRepository orderRepository,
-        ServiceRecordRepository serviceRecordRepository) {
-        this.orderRepository = orderRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public ServiceRecordService(ServiceRecordRepository serviceRecordRepository,
+        ServiceRecordImageRepository serviceRecordImageRepository,
+        PetOrderRepository petOrderRepository,
+        PetOrderScheduleRepository petOrderScheduleRepository,
+        PetOrderLogRepository petOrderLogRepository) {
         this.serviceRecordRepository = serviceRecordRepository;
+        this.serviceRecordImageRepository = serviceRecordImageRepository;
+        this.petOrderRepository = petOrderRepository;
+        this.petOrderScheduleRepository = petOrderScheduleRepository;
+        this.petOrderLogRepository = petOrderLogRepository;
     }
 
-
     @Transactional
-    public void startService(Long orderId) {
-        Orders order = getOrder(orderId);
+    public Long create(ServiceRecordCreateRequest request) {
+        validateCreateRequest(request);
 
-        if (OrderStatus.COMPLETED.name().equals(order.getStatus())) {
-            throw new RuntimeException("订单已完成，不能再次开始服务");
+        PetOrder order = petOrderRepository.findByIdAndDeleted(request.getOrderId(), 0)
+            .orElseThrow(() -> new RuntimeException("订单不存在"));
+
+        if (!Objects.equals(order.getSitterId(), request.getSitterId())) {
+            throw new RuntimeException("当前服务者无权提交该订单服务记录");
         }
 
-        order.setStatus(OrderStatus.IN_SERVICE );
-        order.setStartTime(LocalDateTime.now());
-        order.setUpdatedAt(LocalDateTime.now());
-        orderRepository.save(order);
-    }
-
-
-    @Transactional
-    public void createRecord(CreateServiceRecordRequest request) {
-        if (request.getOrderId() == null) {
-            throw new RuntimeException("orderId不能为空");
-        }
-        if (request.getType() == null || request.getType().isBlank()) {
-            throw new RuntimeException("type不能为空");
-        }
-        if ((request.getImageUrl() == null || request.getImageUrl().isBlank())
-            && (request.getVideoUrl() == null || request.getVideoUrl().isBlank())) {
-            throw new RuntimeException("图片或视频至少上传一个");
+        if (!"SERVING".equals(order.getOrderStatus()) && !"TAKEN".equals(order.getOrderStatus())) {
+            throw new RuntimeException("当前订单状态不可提交服务记录");
         }
 
-        Orders order = getOrder(request.getOrderId());
-
-        if (!OrderStatus.IN_SERVICE.equals(order.getStatus())) {
-            throw new RuntimeException("当前订单不处于服务中，不能上传记录");
+        if (request.getScheduleId() != null && serviceRecordRepository.existsByOrderIdAndScheduleId(request.getOrderId(), request.getScheduleId())) {
+            throw new RuntimeException("该服务日程已提交过服务记录");
         }
 
         ServiceRecord record = new ServiceRecord();
         record.setOrderId(request.getOrderId());
-        record.setType(request.getType());
-        record.setImageUrl(request.getImageUrl());
-        record.setVideoUrl(request.getVideoUrl());
-        record.setDescription(request.getDescription());
-        record.setCreatedAt(LocalDateTime.now());
-        record.setUpdatedAt(LocalDateTime.now());
+        record.setScheduleId(request.getScheduleId());
+        record.setSitterId(request.getSitterId());
+        record.setUserId(request.getUserId());
+        record.setRecordStatus("SUBMITTED");
+        record.setPetStatus(emptyToDefault(request.getPetStatus(), "NORMAL"));
+        record.setCompletedItemsJson(toJson(request.getCompletedItems()));
+        record.setRemark(request.getRemark());
+        record.setArrivedAt(parseDateTime(request.getArrivedAt()));
+        record.setSubmittedAt(LocalDateTime.now());
 
         serviceRecordRepository.save(record);
-    }
 
+        List<String> imageUrls = request.getImageUrls() == null ? new ArrayList<>() : request.getImageUrls();
+        for (int i = 0; i < imageUrls.size(); i++) {
+            String url = imageUrls.get(i);
+            if (url == null || url.trim().isEmpty()) continue;
 
-    @Transactional
-    public void completeService(Long orderId) {
-        Orders order = getOrder(orderId);
-
-        if (!OrderStatus.IN_SERVICE.equals(order.getStatus())) {
-            throw new RuntimeException("当前订单不处于服务中，不能结束服务");
+            ServiceRecordImage image = new ServiceRecordImage();
+            image.setRecordId(record.getId());
+            image.setImageUrl(url.trim());
+            image.setSortNo(i + 1);
+            serviceRecordImageRepository.save(image);
         }
 
-        order.setStatus(OrderStatus.COMPLETED );
-        order.setEndTime(LocalDateTime.now());
-        order.setUpdatedAt(LocalDateTime.now());
-        orderRepository.save(order);
+        if (request.getScheduleId() != null) {
+            Optional<PetOrderSchedule> scheduleOpt = petOrderScheduleRepository.findById(request.getScheduleId());
+            if (scheduleOpt.isPresent()) {
+                PetOrderSchedule schedule = scheduleOpt.get();
+                if (!"CANCELLED".equals(schedule.getScheduleStatus())) {
+                    schedule.setScheduleStatus("DONE");
+                    petOrderScheduleRepository.save(schedule);
+                }
+            }
+        }
+
+        writeLog(order.getId(), "SUBMIT_SERVICE_RECORD", "SITTER", request.getSitterId(), "服务者提交服务记录");
+
+        return record.getId();
     }
 
+    public List<ServiceRecordListItemResponse> listByOrder(Long orderId) {
+        List<ServiceRecord> list = serviceRecordRepository.findByOrderIdOrderByIdDesc(orderId);
+        if (list.isEmpty()) {
+            return new ArrayList<>();
+        }
 
-    public List<ServiceRecordVO> listByOrderId(Long orderId) {
-        List<ServiceRecord> list = serviceRecordRepository.findByOrderIdOrderByCreatedAtAsc(orderId);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        List<Long> recordIds = list.stream().map(ServiceRecord::getId).collect(Collectors.toList());
+        Map<Long, Integer> imageCountMap = serviceRecordImageRepository.findAll().stream()
+            .filter(item -> recordIds.contains(item.getRecordId()))
+            .collect(Collectors.groupingBy(ServiceRecordImage::getRecordId, Collectors.collectingAndThen(Collectors.counting(), Long::intValue)));
 
-        return list.stream()
-            .map(item -> new ServiceRecordVO(
-                item.getId(),
-                item.getOrderId(),
-                item.getType(),
-                item.getImageUrl(),
-                item.getVideoUrl(),
-                item.getDescription(),
-                item.getCreatedAt() == null ? null : item.getCreatedAt().format(formatter)
-            ))
-            .toList();
+        List<ServiceRecordListItemResponse> result = new ArrayList<>();
+        for (ServiceRecord item : list) {
+            ServiceRecordListItemResponse response = new ServiceRecordListItemResponse();
+            response.setId(item.getId());
+            response.setOrderId(item.getOrderId());
+            response.setScheduleId(item.getScheduleId());
+            response.setPetStatus(item.getPetStatus());
+            response.setRecordStatus(item.getRecordStatus());
+            response.setSubmittedAt(formatDateTime(item.getSubmittedAt()));
+            response.setImageCount(imageCountMap.getOrDefault(item.getId(), 0));
+            result.add(response);
+        }
+        return result;
     }
 
-    private Orders getOrder(Long orderId) {
-        return orderRepository.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("订单不存在"));
+    public ServiceRecordDetailResponse detail(Long id) {
+        ServiceRecord record = serviceRecordRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("服务记录不存在"));
+
+        List<ServiceRecordImage> images = serviceRecordImageRepository.findByRecordIdOrderBySortNoAscIdAsc(record.getId());
+
+        ServiceRecordDetailResponse response = new ServiceRecordDetailResponse();
+        response.setId(record.getId());
+        response.setOrderId(record.getOrderId());
+        response.setScheduleId(record.getScheduleId());
+        response.setSitterId(record.getSitterId());
+        response.setUserId(record.getUserId());
+        response.setRecordStatus(record.getRecordStatus());
+        response.setPetStatus(record.getPetStatus());
+        response.setCompletedItems(parseJsonList(record.getCompletedItemsJson()));
+        response.setRemark(record.getRemark());
+        response.setArrivedAt(formatDateTime(record.getArrivedAt()));
+        response.setSubmittedAt(formatDateTime(record.getSubmittedAt()));
+        response.setImageUrls(images.stream().map(ServiceRecordImage::getImageUrl).collect(Collectors.toList()));
+        return response;
+    }
+
+    private void validateCreateRequest(ServiceRecordCreateRequest request) {
+        if (request.getOrderId() == null) {
+            throw new RuntimeException("订单ID不能为空");
+        }
+        if (request.getSitterId() == null) {
+            throw new RuntimeException("服务者ID不能为空");
+        }
+        if (request.getUserId() == null) {
+            throw new RuntimeException("用户ID不能为空");
+        }
+    }
+
+    private String emptyToDefault(String value, String defaultValue) {
+        return value == null || value.trim().isEmpty() ? defaultValue : value.trim();
+    }
+
+    private LocalDateTime parseDateTime(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return LocalDateTime.parse(value.trim(), dateTimeFormatter);
+    }
+
+    private String formatDateTime(LocalDateTime value) {
+        if (value == null) {
+            return "";
+        }
+        return value.format(dateTimeFormatter);
+    }
+
+    private String toJson(List<String> list) {
+        try {
+            return objectMapper.writeValueAsString(list == null ? new ArrayList<>() : list);
+        } catch (Exception e) {
+            throw new RuntimeException("完成事项JSON转换失败");
+        }
+    }
+
+    private List<String> parseJsonList(String json) {
+        try {
+            if (json == null || json.trim().isEmpty()) {
+                return new ArrayList<>();
+            }
+            return objectMapper.readValue(json, new TypeReference<List<String>>() {});
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    private void writeLog(Long orderId, String action, String operatorType, Long operatorId, String remark) {
+        PetOrderLog log = new PetOrderLog();
+        log.setOrderId(orderId);
+        log.setAction(action);
+        log.setOperatorType(operatorType);
+        log.setOperatorId(operatorId);
+        log.setRemark(remark);
+        petOrderLogRepository.save(log);
     }
 }

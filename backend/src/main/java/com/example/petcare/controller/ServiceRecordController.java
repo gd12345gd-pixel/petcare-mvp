@@ -1,17 +1,17 @@
 package com.example.petcare.controller;
 
-import com.example.petcare.common.Result;
-import com.example.petcare.dto.CompleteServiceRequest;
-import com.example.petcare.dto.CreateServiceRecordRequest;
-import com.example.petcare.dto.ServiceRecordVO;
-import com.example.petcare.dto.StartServiceRequest;
+import com.example.petcare.common.ApiResponse;
+import com.example.petcare.dto.ServiceRecordCreateRequest;
+import com.example.petcare.dto.ServiceRecordDetailResponse;
+import com.example.petcare.dto.ServiceRecordListItemResponse;
 import com.example.petcare.service.ServiceRecordService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/service-records")
+@RequestMapping("/api/service-record")
+@CrossOrigin
 public class ServiceRecordController {
 
     private final ServiceRecordService serviceRecordService;
@@ -20,26 +20,18 @@ public class ServiceRecordController {
         this.serviceRecordService = serviceRecordService;
     }
 
-    @PostMapping("/start")
-    public Result<Void> startService(@RequestBody StartServiceRequest request) {
-        serviceRecordService.startService(request.getOrderId());
-        return Result.success(null);
+    @PostMapping("/create")
+    public ApiResponse<Long> create(@RequestBody ServiceRecordCreateRequest request) {
+        return ApiResponse.success("提交服务记录成功", serviceRecordService.create(request));
     }
 
-    @PostMapping
-    public Result<Void> createRecord(@RequestBody CreateServiceRecordRequest request) {
-        serviceRecordService.createRecord(request);
-        return Result.success(null);
+    @GetMapping("/listByOrder")
+    public ApiResponse<List<ServiceRecordListItemResponse>> listByOrder(@RequestParam Long orderId) {
+        return ApiResponse.success(serviceRecordService.listByOrder(orderId));
     }
 
-    @PostMapping("/complete")
-    public Result<Void> completeService(@RequestBody CompleteServiceRequest request) {
-        serviceRecordService.completeService(request.getOrderId());
-        return Result.success(null);
-    }
-
-    @GetMapping
-    public Result<List<ServiceRecordVO>> list(@RequestParam Long orderId) {
-        return Result.success(serviceRecordService.listByOrderId(orderId));
+    @GetMapping("/detail")
+    public ApiResponse<ServiceRecordDetailResponse> detail(@RequestParam Long id) {
+        return ApiResponse.success(serviceRecordService.detail(id));
     }
 }

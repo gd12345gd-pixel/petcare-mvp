@@ -2,25 +2,18 @@ package com.example.petcare.dto;
 
 import java.util.List;
 
-public class ServiceRecordDetailResponse {
+public class ServiceRecordCreateRequest {
 
-    private Long id;
     private Long orderId;
     private Long scheduleId;
     private Long sitterId;
     private Long userId;
 
-    private String recordStatus;
     private String petStatus;
     private List<String> completedItems;
     private String remark;
     private String arrivedAt;
-    private String submittedAt;
-
     private List<String> imageUrls;
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public Long getOrderId() { return orderId; }
     public void setOrderId(Long orderId) { this.orderId = orderId; }
@@ -34,9 +27,6 @@ public class ServiceRecordDetailResponse {
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
 
-    public String getRecordStatus() { return recordStatus; }
-    public void setRecordStatus(String recordStatus) { this.recordStatus = recordStatus; }
-
     public String getPetStatus() { return petStatus; }
     public void setPetStatus(String petStatus) { this.petStatus = petStatus; }
 
@@ -48,9 +38,6 @@ public class ServiceRecordDetailResponse {
 
     public String getArrivedAt() { return arrivedAt; }
     public void setArrivedAt(String arrivedAt) { this.arrivedAt = arrivedAt; }
-
-    public String getSubmittedAt() { return submittedAt; }
-    public void setSubmittedAt(String submittedAt) { this.submittedAt = submittedAt; }
 
     public List<String> getImageUrls() { return imageUrls; }
     public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }

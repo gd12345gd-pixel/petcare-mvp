@@ -1,23 +1,8 @@
 package com.example.petcare.entity;
 
-import com.example.petcare.enums.RecordType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-
-
-@Data
 @Entity
 @Table(name = "service_record")
 public class ServiceRecord {
@@ -26,18 +11,75 @@ public class ServiceRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "order_id", nullable = false)
     private Long orderId;
 
-    private String type;
+    @Column(name = "schedule_id")
+    private Long scheduleId;
 
-    private String imageUrl;
+    @Column(name = "sitter_id", nullable = false)
+    private Long sitterId;
 
-    private String videoUrl;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
+    @Column(name = "record_status", nullable = false, length = 32)
+    private String recordStatus;
 
-    private String description;
+    @Column(name = "pet_status", nullable = false, length = 32)
+    private String petStatus;
 
+    @Column(name = "completed_items_json", columnDefinition = "TEXT")
+    private String completedItemsJson;
+
+    @Column(length = 500)
+    private String remark;
+
+    @Column(name = "arrived_at")
+    private LocalDateTime arrivedAt;
+
+    @Column(name = "submitted_at")
+    private LocalDateTime submittedAt;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
+
+    public Long getId() { return id; }
+
+    public Long getOrderId() { return orderId; }
+    public void setOrderId(Long orderId) { this.orderId = orderId; }
+
+    public Long getScheduleId() { return scheduleId; }
+    public void setScheduleId(Long scheduleId) { this.scheduleId = scheduleId; }
+
+    public Long getSitterId() { return sitterId; }
+    public void setSitterId(Long sitterId) { this.sitterId = sitterId; }
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+
+    public String getRecordStatus() { return recordStatus; }
+    public void setRecordStatus(String recordStatus) { this.recordStatus = recordStatus; }
+
+    public String getPetStatus() { return petStatus; }
+    public void setPetStatus(String petStatus) { this.petStatus = petStatus; }
+
+    public String getCompletedItemsJson() { return completedItemsJson; }
+    public void setCompletedItemsJson(String completedItemsJson) { this.completedItemsJson = completedItemsJson; }
+
+    public String getRemark() { return remark; }
+    public void setRemark(String remark) { this.remark = remark; }
+
+    public LocalDateTime getArrivedAt() { return arrivedAt; }
+    public void setArrivedAt(LocalDateTime arrivedAt) { this.arrivedAt = arrivedAt; }
+
+    public LocalDateTime getSubmittedAt() { return submittedAt; }
+    public void setSubmittedAt(LocalDateTime submittedAt) { this.submittedAt = submittedAt; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

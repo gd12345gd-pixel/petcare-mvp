@@ -9,4 +9,6 @@ public interface PetOrderScheduleRepository extends JpaRepository<PetOrderSchedu
     List<PetOrderSchedule> findByOrderIdInOrderByServiceDateAsc(List<Long> orderIds);
 
     List<PetOrderSchedule> findByOrderIdOrderByServiceDateAsc(Long orderId);
+
+
 }
