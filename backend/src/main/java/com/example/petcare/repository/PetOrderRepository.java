@@ -13,4 +13,10 @@ public interface PetOrderRepository extends JpaRepository<PetOrder, Long> {
     List<PetOrder> findByUserIdAndDeletedOrderByIdDesc(Long userId, Integer deleted);
 
     Optional<PetOrder> findByIdAndUserIdAndDeleted(Long id, Long userId, Integer deleted);
+
+    List<PetOrder> findByOrderStatusAndDeletedOrderByIdDesc(String orderStatus, Integer deleted);
+
+    List<PetOrder> findBySitterIdAndDeletedOrderByIdDesc(Long sitterId, Integer deleted);
+
+    Optional<PetOrder> findByIdAndSitterIdAndDeleted(Long id, Long sitterId, Integer deleted);
 }

@@ -1,0 +1,387 @@
+.sitter-page {
+  min-height: 100vh;
+  background: #f7f8fb;
+}
+
+.custom-nav {
+  background: #fff7fa;
+  border-bottom: 1rpx solid #f2e6eb;
+  box-sizing: border-box;
+}
+
+.nav-inner {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+}
+
+.nav-side {
+  width: 72rpx;
+  height: 72rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-title {
+  flex: 1;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #111;
+}
+
+.nav-right-icon {
+  font-size: 34rpx;
+  color: #333;
+}
+
+.content {
+  box-sizing: border-box;
+}
+
+.hero-card {
+  margin: 20rpx 16rpx 0;
+  padding: 26rpx 24rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(180deg, #f8dfe7 0%, #fff4f7 100%);
+}
+
+.hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.hero-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #7f2f43;
+  line-height: 1.2;
+}
+
+.hero-desc {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #8c8c8c;
+  line-height: 1.5;
+}
+
+.switch-wrap {
+  width: 96rpx;
+  height: 56rpx;
+  border-radius: 999rpx;
+  background: #e5e7eb;
+  padding: 4rpx;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.switch-wrap.active {
+  background: #ff6b81;
+  justify-content: flex-end;
+}
+
+.switch-dot {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.stats-row {
+  margin-top: 22rpx;
+  display: flex;
+  gap: 16rpx;
+}
+
+.stat-card {
+  flex: 1;
+  background: rgba(255,255,255,0.78);
+  border-radius: 18rpx;
+  padding: 18rpx 18rpx;
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: #8b8f97;
+}
+
+.stat-value {
+  margin-top: 8rpx;
+  font-size: 38rpx;
+  font-weight: 800;
+  color: #222;
+}
+
+.main-tabs {
+  margin: 16rpx 16rpx 0;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 8rpx;
+  display: flex;
+}
+
+.main-tab-item {
+  flex: 1;
+  height: 72rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: #777;
+  font-weight: 600;
+}
+
+.main-tab-item.active {
+  background: #fff1f5;
+  color: #ff5f8d;
+}
+
+.filter-scroll {
+  margin-top: 14rpx;
+  white-space: nowrap;
+}
+
+.filter-row {
+  display: inline-flex;
+  gap: 12rpx;
+  padding: 0 16rpx;
+}
+
+.filter-chip {
+  padding: 12rpx 20rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #666;
+  font-size: 22rpx;
+  border: 1rpx solid #eceef2;
+  flex-shrink: 0;
+}
+
+.filter-chip.active {
+  background: #fff1f5;
+  color: #ff5f8d;
+  border-color: #ffd5e1;
+}
+
+.loading-wrap,
+.empty-wrap {
+  padding: 220rpx 0;
+  text-align: center;
+}
+
+.loading-text,
+.empty-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.empty-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 12rpx;
+}
+
+.order-card {
+  margin: 16rpx 16rpx 0;
+  padding: 22rpx 20rpx;
+  border-radius: 24rpx;
+  background: #fff;
+  box-shadow: 0 4rpx 14rpx rgba(31, 35, 41, 0.04);
+  box-sizing: border-box;
+}
+
+.status-wait-taking {
+  background: linear-gradient(180deg, #fff7fa 0%, #ffffff 100%);
+}
+
+.status-taken {
+  background: linear-gradient(180deg, #fffaf6 0%, #ffffff 100%);
+}
+
+.status-serving {
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.status-completed {
+  background: linear-gradient(180deg, #f8fdf9 0%, #ffffff 100%);
+}
+
+.status-cancelled {
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+}
+
+.order-top-row,
+.order-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.order-date-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.order-date {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #222;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.multi-day-tag {
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  font-size: 20rpx;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.multi-day-tag.multi {
+  background: #fff1f5;
+  color: #ff5f8d;
+}
+
+.multi-day-tag.single {
+  background: #f5f6f8;
+  color: #8b8f97;
+}
+
+.order-status-badge {
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 20rpx;
+  line-height: 1.2;
+}
+
+.status-taken .order-status-badge {
+  background: #fff3e6;
+  color: #ff8a00;
+}
+
+.status-serving .order-status-badge {
+  background: #eef5ff;
+  color: #3a8bff;
+}
+
+.status-completed .order-status-badge {
+  background: #edf9f1;
+  color: #22a15f;
+}
+
+.status-cancelled .order-status-badge {
+  background: #f3f4f6;
+  color: #999;
+}
+
+.order-price-row {
+  margin-top: 14rpx;
+}
+
+.order-time {
+  font-size: 28rpx;
+  color: #444;
+  line-height: 1.4;
+}
+
+.order-price {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #ff5f8d;
+  line-height: 1.2;
+}
+
+.price-unit {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.order-summary,
+.order-address,
+.order-remark,
+.order-total-hint {
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.order-summary {
+  color: #666;
+}
+
+.order-location-row {
+  margin-top: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.order-address {
+  margin-top: 0;
+  color: #8b8f97;
+  flex: 1;
+  min-width: 0;
+}
+
+.distance-chip {
+  flex-shrink: 0;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #f5f6f8;
+  color: #8b8f97;
+  font-size: 20rpx;
+  line-height: 1.2;
+}
+
+.order-total-hint {
+  color: #ff8a00;
+  font-weight: 600;
+}
+
+.order-remark {
+  color: #8b8f97;
+}
+
+.order-actions {
+  margin-top: 18rpx;
+  display: flex;
+  justify-content: flex-end;
+  gap: 14rpx;
+}
+
+.mini-btn {
+  min-width: 170rpx;
+  height: 68rpx;
+  border-radius: 16rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  padding: 0 20rpx;
+}
+
+.ghost-btn {
+  background: #fff;
+  color: #666;
+  border: 1rpx solid #eceef2;
+}
+
+.page-bottom-space {
+  height: 28rpx;
+}

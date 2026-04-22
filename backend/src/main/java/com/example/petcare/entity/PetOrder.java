@@ -1,12 +1,14 @@
 package com.example.petcare.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "pet_order")
+@Data
 public class PetOrder {
 
     @Id
@@ -93,6 +95,18 @@ public class PetOrder {
 
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "sitter_id")
+    private Long sitterId;
+
+    @Column(name = "taken_at")
+    private LocalDateTime takenAt;
+
+    @Column(name = "service_started_at")
+    private LocalDateTime serviceStartedAt;
+
+    @Column(name = "service_completed_at")
+    private LocalDateTime serviceCompletedAt;
 
     public Long getId() { return id; }
 

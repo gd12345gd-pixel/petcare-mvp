@@ -1,9 +1,12 @@
+com\example\petcare\dto\SitterMyOrderItemResponse.class
 com\example\petcare\repository\SitterRepository.class
 com\example\petcare\repository\UserRepository.class
 com\example\petcare\dto\UserLoginVO$UserLoginVOBuilder.class
 com\example\petcare\entity\Orders.class
+com\example\petcare\dto\SitterOrderListRequest.class
 com\example\petcare\entity\PetComment.class
 com\example\petcare\service\HomeService.class
+com\example\petcare\controller\SitterOrderController.class
 com\example\petcare\dto\WechatLoginResponse.class
 com\example\petcare\entity\PetOrderLog.class
 com\example\petcare\dto\CreateOrderRequest.class
@@ -49,12 +52,14 @@ com\example\petcare\dto\StartServiceRequest.class
 com\example\petcare\repository\PetOrderPetRepository.class
 com\example\petcare\dto\CreatePetCommentRequest.class
 com\example\petcare\entity\Review.class
+com\example\petcare\dto\SitterAvailableOrderItemResponse.class
 com\example\petcare\service\AuthService.class
 com\example\petcare\util\GeoUtil.class
 com\example\petcare\entity\FoundPet.class
 com\example\petcare\dto\TencentReverseGeocodeResponse$AddressComponent.class
 com\example\petcare\config\DataSourceConfig.class
 com\example\petcare\dto\PetPostVO$PetPostVOBuilder.class
+com\example\petcare\service\SitterOrderService$1.class
 com\example\petcare\entity\ServiceRecord.class
 com\example\petcare\config\CorsConfig.class
 com\example\petcare\config\WebConfig.class
@@ -69,6 +74,7 @@ com\example\petcare\entity\PetOrder.class
 com\example\petcare\repository\FoundPetRepository.class
 com\example\petcare\dto\UserLoginVO.class
 com\example\petcare\dto\LocationRegionResult.class
+com\example\petcare\dto\TakeOrderRequest.class
 com\example\petcare\controller\PetCommunityController.class
 com\example\petcare\enums\ServiceRecordTypeEnum.class
 com\example\petcare\dto\PetCreateRequest.class
@@ -77,6 +83,7 @@ com\example\petcare\controller\RegionController.class
 com\example\petcare\repository\AppUserRepository.class
 com\example\petcare\enums\RoleType.class
 com\example\petcare\repository\PetOrderScheduleRepository.class
+com\example\petcare\service\SitterOrderService.class
 com\example\petcare\entity\ServiceItem.class
 com\example\petcare\controller\ServiceRecordController.class
 com\example\petcare\dto\AddressDeleteRequest.class
@@ -88,6 +95,7 @@ com\example\petcare\common\Result.class
 com\example\petcare\dto\OrderPetItemResponse.class
 com\example\petcare\dto\ServiceRecordDetailResponse.class
 com\example\petcare\enums\PetTargetTypeEnum.class
+com\example\petcare\dto\CancelOrderRequest.class
 com\example\petcare\repository\PetOrderRepository.class
 com\example\petcare\dto\TencentReverseGeocodeResponse.class
 com\example\petcare\enums\PaymentStatus.class
@@ -102,6 +110,7 @@ com\example\petcare\PetcareApplication.class
 com\example\petcare\common\GlobalExceptionHandler.class
 com\example\petcare\dto\TencentReverseGeocodeResponse$ResultData.class
 com\example\petcare\config\WebMvcConfig.class
+com\example\petcare\dto\SitterOrderDetailResponse.class
 com\example\petcare\repository\LostPetRepository.class
 com\example\petcare\repository\OrdersRepository.class
 com\example\petcare\repository\PetOrderLogRepository.class

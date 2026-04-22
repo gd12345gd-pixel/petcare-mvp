@@ -5,6 +5,8 @@
       "pages/order/create/index",
       "pages/order/detail/index",
       "pages/order/list/index",
+      "pages/sitter/index",
+      "pages/sitter/order-detail/index",
       "pages/order-create/index",
       "pages/orders/index",
       "pages/pet-edit/index",
@@ -22,9 +24,11 @@
   "requiredPrivateInfos": [
     "chooseLocation",
     "getLocation"
-  ],"permission": {
+  ],
+
+  "permission": {
     "scope.userLocation": {
-      "desc": "用于获取您的位置，以选择地图点位和展示附近寻宠信息"
+      "desc": "用于地图选点和计算订单距离"
     }
   },
   "window": {
@@ -42,8 +46,9 @@
               "pagePath": "pages/home/index",
               "text": "首页"
           },{
-            "pagePath": "pages/pet-community/index",
-            "text": "寻宠"
+            "pagePath": "pages/sitter/index",
+            "text": "接单" 
+             
           },
           {
               "pagePath": "pages/order/list/index",

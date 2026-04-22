@@ -1,0 +1,144 @@
+<view class="sitter-page">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-inner">
+      <view class="nav-side"></view>
+      <view class="nav-title">接单大厅</view>
+      <view class="nav-side nav-right-icon">◌</view>
+    </view>
+  </view>
+
+  <scroll-view class="content" scroll-y style="height: calc(100vh - {{navTotalHeight}}px);">
+    <view class="hero-card">
+      <view class="hero-top">
+        <view>
+          <view class="hero-title">{{sitterOnline ? '在线接单中' : '暂停接单中'}}</view>
+          <view class="hero-desc">选择适合你的服务订单</view>
+        </view>
+
+        <view class="switch-wrap {{sitterOnline ? 'active' : ''}}" bindtap="toggleOnlineStatus">
+          <view class="switch-dot"></view>
+        </view>
+      </view>
+
+      <view class="stats-row">
+        <view class="stat-card">
+          <view class="stat-label">今日可接</view>
+          <view class="stat-value">{{stats.todayAvailableCount}}</view>
+        </view>
+        <view class="stat-card">
+          <view class="stat-label">待处理</view>
+          <view class="stat-value">{{stats.pendingMineCount}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="main-tabs">
+      <view
+        class="main-tab-item {{currentMainTab === item.key ? 'active' : ''}}"
+        wx:for="{{mainTabs}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="switchMainTab"
+      >
+        {{item.label}}
+      </view>
+    </view>
+
+    <scroll-view class="filter-scroll" scroll-x>
+      <view class="filter-row">
+        <block wx:if="{{currentMainTab === 'AVAILABLE'}}">
+          <view
+            class="filter-chip {{currentFilter === item.key ? 'active' : ''}}"
+            wx:for="{{availableFilters}}"
+            wx:key="key"
+            data-key="{{item.key}}"
+            bindtap="switchFilter"
+          >
+            {{item.label}}
+          </view>
+        </block>
+
+        <block wx:else>
+          <view
+            class="filter-chip {{currentFilter === item.key ? 'active' : ''}}"
+            wx:for="{{mineFilters}}"
+            wx:key="key"
+            data-key="{{item.key}}"
+            bindtap="switchFilter"
+          >
+            {{item.label}}
+          </view>
+        </block>
+      </view>
+    </scroll-view>
+
+    <view class="loading-wrap" wx:if="{{loading}}">
+      <view class="loading-text">加载中...</view>
+    </view>
+
+    <view class="empty-wrap" wx:elif="{{!displayedOrders.length}}">
+      <view class="empty-title">当前暂无订单</view>
+      <view class="empty-desc">
+        {{currentMainTab === 'AVAILABLE' ? '可以稍后再来看看新的可接订单' : '你还没有服务单'}}
+      </view>
+    </view>
+
+    <block wx:else>
+      <view
+        class="order-card {{item.orderStatusClass}}"
+        wx:for="{{displayedOrders}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+      >
+        <view class="order-top-row">
+          <view class="order-date-wrap">
+            <view class="order-date">{{item.fullDateText}}</view>
+            <view class="multi-day-tag {{item.isMultiDay ? 'multi' : 'single'}}">{{item.multiDayTagText}}</view>
+          </view>
+          <view class="order-status-badge">{{item.orderStatusText}}</view>
+        </view>
+
+        <view class="order-price-row">
+          <view class="order-time">{{item.timeSlotsText}}</view>
+          <view class="order-price" wx:if="{{currentMainTab === 'AVAILABLE'}}">¥{{item.unitPriceText}}<text class="price-unit">/次</text></view>
+          <view class="order-price" wx:else>¥{{item.totalPriceText}}</view>
+        </view>
+
+        <view class="order-summary">{{item.petSummary}} · 共{{item.serviceDateCount}}次服务</view>
+
+        <view class="order-location-row">
+          <view class="order-address">{{item.addressSummary}}</view>
+          <view class="distance-chip">{{item.distanceText}}</view>
+        </view>
+
+        <view class="order-total-hint" wx:if="{{currentMainTab === 'AVAILABLE' && item.isMultiDay}}">
+          合计约 ¥{{item.totalPriceText}}
+        </view>
+
+        <view class="order-remark">{{item.remarkSummary}}</view>
+
+        <view class="order-actions">
+          <button class="ghost-btn mini-btn" data-id="{{item.id}}" bindtap="goOrderDetail">查看详情</button>
+          <button
+            class="primary-btn mini-btn"
+            wx:if="{{currentMainTab === 'AVAILABLE'}}"
+            data-id="{{item.id}}"
+            bindtap="takeOrderDirect"
+          >
+            立即接单
+          </button>
+          <button
+            class="primary-btn mini-btn"
+            wx:else
+            data-id="{{item.id}}"
+            bindtap="goOrderDetail"
+          >
+            查看服务单
+          </button>
+        </view>
+      </view>
+    </block>
+
+    <view class="page-bottom-space"></view>
+  </scroll-view>
+</view>
