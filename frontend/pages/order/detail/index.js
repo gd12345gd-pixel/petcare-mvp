@@ -1,4 +1,5 @@
 const { request } = require('../../../utils/request')
+const { normalizePetSnapshot } = require('../../../utils/pet-display')
 
 Page({
   data: {
@@ -10,7 +11,15 @@ Page({
 
     statusBarHeight: 20,
     navBarHeight: 44,
-    navTotalHeight: 64
+    navTotalHeight: 64,
+
+    serviceRecordList: [],
+    serviceRecordLoading: false,
+
+    showScheduleDetail: false,
+
+    showPetPopup: false,
+    activePet: null
   },
 
   onLoad(options) {
@@ -51,13 +60,11 @@ Page({
 
   navigateBack() {
     const pages = getCurrentPages()
-    console.log('pages stack:', pages.map(item => item.route))
-  
+
     if (pages.length > 1) {
       wx.navigateBack({
         delta: 1,
-        fail: (err) => {
-          console.error('navigateBack fail', err)
+        fail: () => {
           wx.switchTab({
             url: '/pages/order/list/index'
           })
@@ -65,7 +72,7 @@ Page({
       })
       return
     }
-  
+
     wx.switchTab({
       url: '/pages/order/list/index'
     })
@@ -74,7 +81,12 @@ Page({
   loadOrderDetail() {
     const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
 
-    this.setData({ loading: true })
+    this.setData({
+      loading: true,
+      showScheduleDetail: false,
+      showPetPopup: false,
+      activePet: null
+    })
 
     request(`/api/orders/detail?id=${this.data.orderId}&userId=${currentUser.id}`, 'GET')
       .then((res) => {
@@ -85,6 +97,8 @@ Page({
           order,
           loading: false
         })
+
+        this.loadServiceRecordList()
       })
       .catch((err) => {
         console.error('加载订单详情失败', err)
@@ -101,13 +115,31 @@ Page({
     const serviceDates = raw.serviceDates || []
     const pets = raw.pets || []
 
+
+    const formattedServiceDates = serviceDates.map(item => ({
+      ...item,
+      serviceDateText: this.formatServiceDate(item.serviceDate),
+      scheduleStatusText: this.getScheduleStatusText(item.scheduleStatus),
+      timeSlotsText: this.formatTimeSlots(item.timeSlots || []),
+      serviceDurationMinutes: item.serviceDurationMinutes || raw.serviceDurationMinutes || 0
+    }))
+
+    const formattedPets = (raw.pets || []).map(item =>
+      normalizePetSnapshot(item, this.data.defaultPetImage)
+    )
+
     const orderStatusText = this.getOrderStatusText(raw.orderStatus)
     const payStatusText = this.getPayStatusText(raw.payStatus)
     const statusClass = this.getOrderStatusClass(raw.orderStatus)
     const statusHintText = this.getOrderStatusHint(raw.orderStatus)
 
+    const serviceDateSummaryText = this.buildServiceDateSummary(formattedServiceDates)
+    const serviceDateDetailCountText = `共${formattedServiceDates.length}次服务`
+    const showScheduleToggle = formattedServiceDates.length > 1
+
     return {
       id: raw.id,
+      userId: raw.userId || null,
       orderNo: raw.orderNo || '',
       orderStatus: raw.orderStatus || '',
       orderStatusText,
@@ -121,25 +153,18 @@ Page({
       serviceContactPhone: raw.serviceContactPhone || '',
       serviceFullAddress: raw.serviceFullAddress || '',
 
-      petCount: raw.petCount || pets.length || 0,
-      serviceDateCount: raw.serviceDateCount || serviceDates.length || 0,
+      petCount: raw.petCount || formattedPets.length || 0,
+      serviceDateCount: raw.serviceDateCount || formattedServiceDates.length || 0,
       serviceDurationMinutes: raw.serviceDurationMinutes || 0,
 
       timeSlots,
       timeSlotsText: this.formatTimeSlots(timeSlots),
+      serviceDateSummaryText,
+      serviceDateDetailCountText,
+      showScheduleToggle,
 
-      pets: pets.map(item => ({
-        ...item,
-        petImageUrl: item.petImageUrl || this.data.defaultPetImage
-      })),
-
-      serviceDates: serviceDates.map(item => ({
-        ...item,
-        serviceDateText: this.formatServiceDate(item.serviceDate),
-        scheduleStatusText: this.getScheduleStatusText(item.scheduleStatus),
-        timeSlotsText: this.formatTimeSlots(item.timeSlots || []),
-        serviceDurationMinutes: item.serviceDurationMinutes || raw.serviceDurationMinutes || 0
-      })),
+      pets: formattedPets,
+      serviceDates: formattedServiceDates,
 
       suggestedUnitPrice: this.formatMoney(raw.suggestedUnitPrice),
       unitPrice: this.formatMoney(raw.unitPrice),
@@ -147,6 +172,15 @@ Page({
 
       remark: raw.remark || '暂无备注'
     }
+  },
+
+  buildServiceDateSummary(serviceDates) {
+    if (!serviceDates || !serviceDates.length) return '未安排'
+    const texts = serviceDates.map(item => item.serviceDateText)
+    if (texts.length <= 2) {
+      return texts.join('、')
+    }
+    return `${texts[0]}、${texts[1]} 等${texts.length}次`
   },
 
   formatMoney(value) {
@@ -162,7 +196,9 @@ Page({
   formatServiceDate(dateStr) {
     if (!dateStr) return ''
 
-    const date = new Date(dateStr.replace(/-/g, '/'))
+    const date = new Date(String(dateStr).replace(/-/g, '/'))
+    if (Number.isNaN(date.getTime())) return dateStr
+
     const weekMap = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')
@@ -226,6 +262,84 @@ Page({
   canCancelOrder(status) {
     return status === 'WAIT_TAKING'
   },
+
+  toggleScheduleDetail() {
+    this.setData({
+      showScheduleDetail: !this.data.showScheduleDetail
+    })
+  },
+
+  loadServiceRecordList() {
+    if (!this.data.orderId) return
+
+    this.setData({ serviceRecordLoading: true })
+
+    request(`/api/service-record/listByOrder?orderId=${this.data.orderId}`, 'GET')
+      .then((res) => {
+        const list = (res || []).map(item => this.formatServiceRecordItem(item))
+        this.setData({
+          serviceRecordList: list,
+          serviceRecordLoading: false
+        })
+      })
+      .catch((err) => {
+        console.error('loadServiceRecordList error', err)
+        this.setData({
+          serviceRecordList: [],
+          serviceRecordLoading: false
+        })
+      })
+  },
+
+  formatServiceRecordItem(item) {
+    return {
+      ...item,
+      petStatusText: this.getPetStatusText(item.petStatus),
+      submittedAtText: item.submittedAt || '',
+      imageCountText: `${item.imageCount || 0}张图片`
+    }
+  },
+
+  getPetStatusText(status) {
+    const map = {
+      NORMAL: '状态正常',
+      APPETITE_NORMAL: '食欲正常',
+      NERVOUS: '情绪紧张',
+      ABNORMAL: '有异常'
+    }
+    return map[status] || '未知状态'
+  },
+
+  goServiceRecordDetail(e) {
+    const id = e.currentTarget.dataset.id
+    if (!id) return
+
+    wx.navigateTo({
+      url: `/pages/service-record-detail/index?id=${id}`
+    })
+  },
+
+  openPetDetail(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    const pets = (this.data.order && this.data.order.pets) || []
+    const activePet = pets[index]
+
+    if (!activePet) return
+
+    this.setData({
+      activePet,
+      showPetPopup: true
+    })
+  },
+
+  closePetDetail() {
+    this.setData({
+      showPetPopup: false,
+      activePet: null
+    })
+  },
+
+  stopPopupBubble() { },
 
   handleCancelOrder() {
     const currentUser = wx.getStorageSync('currentUser') || { id: 1 }

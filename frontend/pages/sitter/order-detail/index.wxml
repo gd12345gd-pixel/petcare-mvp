@@ -46,18 +46,35 @@
         </view>
       </view>
 
-      <view class="section-card">
-        <view class="section-title">服务宠物</view>
-        <view class="pet-list">
-          <view class="pet-item" wx:for="{{order.pets}}" wx:key="petId">
-            <image class="pet-avatar" src="{{item.petImageUrl}}" mode="aspectFill" />
-            <view class="pet-info">
-              <view class="pet-name">{{item.petName}}</view>
-              <view class="pet-meta">{{item.petType || '未知类型'}}{{item.petBreed ? ' · ' + item.petBreed : ''}}</view>
-            </view>
-          </view>
+      <view class="section-card pet-section-card">
+  <view class="section-head">
+    <view class="pet-section-title-wrap">
+      <view class="pet-section-icon"></view>
+      <view class="section-title no-margin">服务宠物</view>
+    </view>
+  </view>
+
+  <view class="pet-inline-grid">
+    <view
+      class="pet-inline-item"
+      wx:for="{{order.pets}}"
+      wx:key="petId"
+      data-index="{{index}}"
+      bindtap="openPetDetail"
+    >
+      <image class="pet-inline-avatar" src="{{item.petImageUrl}}" mode="aspectFill" />
+
+      <view class="pet-inline-info">
+        <view class="pet-inline-name">{{item.petName}}</view>
+        <view class="pet-inline-meta">{{item.petTypeText}} · {{item.petBreedText}}</view>
+        <view class="pet-inline-tags">
+          <text class="pet-inline-tag">{{item.petGenderText}}</text>
+          <text class="pet-inline-tag">{{item.petAgeText}}</text>
         </view>
       </view>
+    </view>
+  </view>
+</view>
 
       <view class="section-card">
         <view class="section-title">服务地址</view>
@@ -92,6 +109,38 @@
     <button class="primary-btn action-btn" wx:if="{{order.canTake}}" bindtap="handleTakeOrder">确认接单</button>
 
     <button class="primary-btn action-btn full-btn" wx:if="{{order.canStart}}" bindtap="handleStartService">开始服务</button>
-    <button class="primary-btn action-btn full-btn" wx:if="{{order.canComplete}}" bindtap="handleCompleteService">完成服务</button>
+
+    <button class="ghost-btn action-btn" wx:if="{{order.canComplete}}" bindtap="goWriteServiceRecord">填写服务记录</button>
+    <button class="primary-btn action-btn" wx:if="{{order.canComplete}}" bindtap="handleCompleteService">完成服务</button>
   </view>
+  <view class="pet-popup-mask" wx:if="{{showPetPopup}}" bindtap="closePetDetail">
+  <view class="pet-popup-panel" catchtap="stopPopupBubble">
+    <view class="pet-popup-handle"></view>
+
+    <view class="pet-popup-header">
+      <image class="pet-popup-avatar" src="{{activePet.petImageUrl}}" mode="aspectFill" />
+      <view class="pet-popup-header-info">
+        <view class="pet-popup-name">{{activePet.petName}}</view>
+        <view class="pet-popup-type">{{activePet.petTypeText}} · {{activePet.petBreedText}}</view>
+      </view>
+    </view>
+
+    <view class="pet-popup-section">
+      <view class="pet-popup-row">
+        <view class="pet-popup-label">性别</view>
+        <view class="pet-popup-value">{{activePet.petGenderText}}</view>
+      </view>
+      <view class="pet-popup-row">
+        <view class="pet-popup-label">年龄</view>
+        <view class="pet-popup-value">{{activePet.petAgeText}}</view>
+      </view>
+      <view class="pet-popup-row column">
+        <view class="pet-popup-label">照护备注</view>
+        <view class="pet-popup-value text-left">{{activePet.petRemarkText}}</view>
+      </view>
+    </view>
+
+    <button class="primary-btn pet-popup-btn" bindtap="closePetDetail">我知道了</button>
+  </view>
+</view>
 </view>

@@ -191,6 +191,7 @@ public class SitterOrderService {
         SitterOrderDetailResponse response = new SitterOrderDetailResponse();
         response.setId(order.getId());
         response.setOrderNo(order.getOrderNo());
+        response.setUserId(order.getUserId());
         response.setOrderStatus(order.getOrderStatus());
         response.setPetCount(order.getPetCount());
         response.setServiceDateCount(order.getServiceDateCount());

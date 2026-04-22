@@ -39,11 +39,13 @@ com\example\petcare\service\OrderService.class
 com\example\petcare\common\ApiResponse.class
 com\example\petcare\dto\CreateFoundPetRequest.class
 com\example\petcare\dto\WechatLoginRequest.class
+com\example\petcare\service\ServiceRecordService$1.class
 com\example\petcare\dto\AddressUpdateRequest.class
 com\example\petcare\dto\PetPostVO.class
 com\example\petcare\dto\ServiceRecordVO.class
 com\example\petcare\dto\TencentReverseGeocodeResponse$AdInfo.class
 com\example\petcare\dto\WechatCode2SessionResponse.class
+com\example\petcare\entity\ServiceRecordImage.class
 com\example\petcare\dto\OrderStatusUpdateRequest.class
 com\example\petcare\controller\FileController.class
 com\example\petcare\entity\Sitter.class
@@ -74,6 +76,7 @@ com\example\petcare\entity\PetOrder.class
 com\example\petcare\repository\FoundPetRepository.class
 com\example\petcare\dto\UserLoginVO.class
 com\example\petcare\dto\LocationRegionResult.class
+com\example\petcare\dto\ServiceRecordListItemResponse.class
 com\example\petcare\dto\TakeOrderRequest.class
 com\example\petcare\controller\PetCommunityController.class
 com\example\petcare\enums\ServiceRecordTypeEnum.class
@@ -97,6 +100,7 @@ com\example\petcare\dto\ServiceRecordDetailResponse.class
 com\example\petcare\enums\PetTargetTypeEnum.class
 com\example\petcare\dto\CancelOrderRequest.class
 com\example\petcare\repository\PetOrderRepository.class
+com\example\petcare\dto\ServiceRecordCreateRequest.class
 com\example\petcare\dto\TencentReverseGeocodeResponse.class
 com\example\petcare\enums\PaymentStatus.class
 com\example\petcare\controller\OrderController.class
@@ -114,6 +118,7 @@ com\example\petcare\dto\SitterOrderDetailResponse.class
 com\example\petcare\repository\LostPetRepository.class
 com\example\petcare\repository\OrdersRepository.class
 com\example\petcare\repository\PetOrderLogRepository.class
+com\example\petcare\repository\ServiceRecordImageRepository.class
 com\example\petcare\dto\TencentRegionResponse$ResultData.class
 com\example\petcare\dto\AddressSetDefaultRequest.class
 com\example\petcare\controller\DbConnectTest.class

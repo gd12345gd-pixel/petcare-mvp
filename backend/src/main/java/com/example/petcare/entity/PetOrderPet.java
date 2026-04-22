@@ -1,9 +1,11 @@
 package com.example.petcare.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Table(name = "pet_order_pet")
 public class PetOrderPet {
@@ -26,6 +28,15 @@ public class PetOrderPet {
 
     @Column(name = "pet_breed", length = 50)
     private String petBreed;
+
+    @Column(name = "pet_gender", length = 20)
+    private String petGender;
+
+    @Column(name = "pet_age", length = 20)
+    private String petAge;
+
+    @Column(name = "pet_remark", length = 500)
+    private String petRemark;
 
     @Column(name = "pet_image_url", length = 255)
     private String petImageUrl;

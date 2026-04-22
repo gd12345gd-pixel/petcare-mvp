@@ -122,6 +122,9 @@ public class OrderService {
             item.setPetType(pet.getType());
             item.setPetBreed(pet.getBreed());
             item.setPetImageUrl(pet.getAvatarUrl());
+            item.setPetGender(pet.getGender());
+            item.setPetRemark(pet.getIntro());
+            item.setPetAge(pet.getAge());
             petOrderPetRepository.save(item);
         }
 
@@ -356,6 +359,9 @@ public class OrderService {
         response.setPetType(item.getPetType());
         response.setPetBreed(item.getPetBreed());
         response.setPetImageUrl(item.getPetImageUrl());
+        response.setPetGender(item.getPetGender());
+        response.setPetAge(item.getPetAge());
+        response.setPetRemark(item.getPetRemark());
         return response;
     }
 
