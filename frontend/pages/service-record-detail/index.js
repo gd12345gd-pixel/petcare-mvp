@@ -1,79 +1,96 @@
 const { request } = require('../../utils/request')
 
-const TYPE_MAP = {
-  FEEDING: '喂食',
-  CLEANING: '清理猫砂',
-  PLAY: '互动玩耍',
-  OTHER: '其他'
-}
-
 Page({
   data: {
-    orderId: null,
-    orderNo: '',
-    serviceDate: '',
-    timeSlot: '',
-    records: []
+    statusBarHeight: 20,
+    navBarHeight: 44,
+    navTotalHeight: 64,
+
+    id: null,
+    loading: true,
+    record: null,
+
+    completedItemTextMap: {
+      FED: '已喂食',
+      WATER_CHANGED: '已换水',
+      CLEANED: '已清理',
+      PLAYED: '已陪玩',
+      LITTER_CHANGED: '已补充猫砂',
+      CHECKED_STATUS: '已检查状态'
+    },
+    petStatusTextMap: {
+      NORMAL: '状态正常',
+      APPETITE_NORMAL: '食欲正常',
+      NERVOUS: '情绪紧张',
+      ABNORMAL: '有异常'
+    }
   },
 
   onLoad(options) {
-    const orderId = options.orderId ? Number(options.orderId) : null
+    const systemInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
+    const statusBarHeight = systemInfo.statusBarHeight || 20
+    const navBarHeight = 44
+
     this.setData({
-      orderId,
-      orderNo: options.orderNo || '',
-      serviceDate: options.serviceDate || '',
-      timeSlot: options.timeSlot || ''
+      statusBarHeight,
+      navBarHeight,
+      navTotalHeight: statusBarHeight + navBarHeight,
+      id: options.id || null
     })
 
-    if (orderId) {
-      this.loadRecords()
+    this.loadDetail()
+  },
+
+  navigateBack() {
+    const pages = getCurrentPages()
+    if (pages.length > 1) {
+      wx.navigateBack({ delta: 1 })
+      return
     }
   },
 
-  onShow() {
-    if (this.data.orderId) {
-      this.loadRecords()
+  loadDetail() {
+    if (!this.data.id) {
+      this.setData({ loading: false })
+      wx.showToast({ title: '记录ID缺失', icon: 'none' })
+      return
     }
-  },
 
-  loadRecords() {
-    const { orderId } = this.data
-    wx.showLoading({ title: '加载中' })
-
-    request(`/api/service-records?orderId=${orderId}`, 'GET')
-      .then((data) => {
-        const records = (data || []).map(item => {
-          return {
-            ...item,
-            typeText: TYPE_MAP[item.type] || item.type
-          }
+    request(`/api/service-record/detail?id=${this.data.id}`, 'GET')
+      .then((res) => {
+        this.setData({
+          record: this.formatRecord(res || {}),
+          loading: false
         })
-        this.setData({ records })
-        wx.hideLoading()
       })
-      .catch(() => {
-        wx.hideLoading()
+      .catch((err) => {
+        console.error('loadDetail error', err)
+        this.setData({ loading: false })
+        wx.showToast({ title: '加载失败', icon: 'none' })
       })
+  },
+
+  formatRecord(raw) {
+    const completedItems = (raw.completedItems || []).map(code => ({
+      code,
+      text: this.data.completedItemTextMap[code] || code
+    }))
+
+    return {
+      ...raw,
+      completedItems,
+      petStatusText: this.data.petStatusTextMap[raw.petStatus] || '未知状态'
+    }
   },
 
   previewImage(e) {
-    const url = e.currentTarget.dataset.url
-    if (!url) return
-
-    const urls = this.data.records
-      .map(item => item.imageUrl)
-      .filter(Boolean)
+    const current = e.currentTarget.dataset.url
+    const urls = (this.data.record && this.data.record.imageUrls) || []
+    if (!current || !urls.length) return
 
     wx.previewImage({
-      current: url,
+      current,
       urls
-    })
-  },
-
-  goUpload() {
-    const { orderId, orderNo, serviceDate, timeSlot } = this.data
-    wx.navigateTo({
-      url: `/pages/service-record-upload/index?orderId=${orderId}&orderNo=${orderNo}&serviceDate=${serviceDate}&timeSlot=${timeSlot}`
     })
   }
 })

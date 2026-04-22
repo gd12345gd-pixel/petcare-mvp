@@ -1,132 +1,182 @@
-.page {
+.record-detail-page {
   min-height: 100vh;
-  background: #fdf1f5;
-  padding: 24rpx;
+  background: #f7f8fb;
+}
+
+.custom-nav {
+  background: #fff7fa;
+  border-bottom: 1rpx solid #f2e6eb;
   box-sizing: border-box;
 }
 
-.header-card {
-  background: #fff;
-  border-radius: 24rpx;
-  padding: 24rpx;
-  margin-bottom: 20rpx;
+.nav-inner {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20rpx;
+  box-sizing: border-box;
 }
 
-.title {
-  font-size: 34rpx;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 12rpx;
+.nav-side {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 52rpx;
+  color: #111;
 }
 
-.info {
-  font-size: 24rpx;
-  color: #777;
-  line-height: 1.8;
+.nav-title {
+  flex: 1;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #111;
 }
 
-.action-bar {
-  margin-bottom: 20rpx;
+.content {
+  box-sizing: border-box;
 }
 
-.upload-btn {
-  background: #ff6b81;
-  color: #fff;
-  border-radius: 999rpx;
+.loading-wrap {
+  padding: 240rpx 0;
+  text-align: center;
+}
+
+.loading-text {
   font-size: 28rpx;
+  color: #999;
 }
 
-.timeline {
-  position: relative;
-  padding-left: 24rpx;
+.status-card,
+.section-card {
+  margin: 16rpx 16rpx 0;
+  padding: 24rpx 22rpx;
+  border-radius: 24rpx;
+  background: #fff;
+  box-shadow: 0 4rpx 14rpx rgba(31, 35, 41, 0.04);
+  box-sizing: border-box;
+}
+
+.status-card {
+  background: linear-gradient(180deg, #ffeef3 0%, #ffffff 100%);
+}
+
+.status-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #ff5f8d;
+}
+
+.status-desc {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #8b8f97;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #222;
+  margin-bottom: 18rpx;
+}
+
+.image-scroll {
+  white-space: nowrap;
+}
+
+.image-row {
+  display: inline-flex;
+  gap: 16rpx;
+}
+
+.record-image {
+  width: 220rpx;
+  height: 220rpx;
+  border-radius: 20rpx;
+  background: #f2f2f2;
+  flex-shrink: 0;
+}
+
+.tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+
+.tag-item {
+  min-width: 150rpx;
+  height: 66rpx;
+  padding: 0 18rpx;
+  border-radius: 16rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.status-pill {
+  display: inline-flex;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 24rpx;
+  line-height: 1.2;
+}
+
+.remark-text {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.7;
 }
 
 .timeline-item {
+  display: flex;
+  align-items: flex-start;
   position: relative;
-  padding-left: 28rpx;
-  margin-bottom: 24rpx;
 }
 
-.timeline-item::before {
-  content: '';
-  position: absolute;
-  left: 8rpx;
-  top: 16rpx;
-  bottom: -24rpx;
-  width: 2rpx;
-  background: #f3bfd0;
+.timeline-item + .timeline-item {
+  margin-top: 24rpx;
 }
 
-.timeline-item:last-child::before {
-  display: none;
-}
-
-.dot {
-  position: absolute;
-  left: 0;
-  top: 12rpx;
+.timeline-dot {
   width: 18rpx;
   height: 18rpx;
   border-radius: 50%;
-  background: #ff6b81;
+  background: #d9dde5;
+  margin-top: 8rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
 }
 
-.content-card {
-  background: #fff;
-  border-radius: 20rpx;
-  padding: 20rpx;
+.timeline-dot.active {
+  background: #ff5f8d;
 }
 
-.top-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16rpx;
+.timeline-content {
+  flex: 1;
 }
 
-.time {
-  font-size: 24rpx;
-  color: #888;
+.timeline-title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #222;
 }
 
-.tag {
-  background: #fff1f4;
-  color: #ff6b81;
+.timeline-time {
+  margin-top: 6rpx;
   font-size: 22rpx;
-  padding: 6rpx 16rpx;
-  border-radius: 999rpx;
+  color: #9aa0aa;
 }
 
-.record-img {
-  width: 100%;
-  height: 300rpx;
-  border-radius: 16rpx;
-  background: #f5f5f5;
-  margin-bottom: 16rpx;
-}
-
-.record-video {
-  width: 100%;
-  height: 360rpx;
-  border-radius: 16rpx;
-  margin-bottom: 16rpx;
-}
-
-.desc {
-  font-size: 28rpx;
-  color: #333;
-  line-height: 1.7;
-}
-.record-video {
-  width: 100%;
-  height: 360rpx;
-  border-radius: 16rpx;
-  margin-bottom: 16rpx;
-  background: #000;
-}
-.empty {
-  text-align: center;
-  color: #999;
-  font-size: 28rpx;
-  padding: 120rpx 0;
+.page-bottom-space {
+  height: 28rpx;
 }

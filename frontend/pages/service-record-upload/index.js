@@ -1,291 +1,248 @@
-const { request, BASE_URL } = require('../../utils/request')
+const { request } = require('../../utils/request')
 
 Page({
   data: {
+    statusBarHeight: 20,
+    navBarHeight: 44,
+    navTotalHeight: 64,
+
     orderId: null,
-    orderNo: '',
-    serviceDate: '',
-    timeSlot: '',
-    type: 'FEEDING',
-    typeOptions: [
-      { label: '喂食', value: 'FEEDING' },
-      { label: '清理猫砂', value: 'CLEANING' },
-      { label: '互动玩耍', value: 'PLAY' },
-      { label: '其他', value: 'OTHER' }
-    ],
-    imageUrl: '',
-    videoUrl: '',
-    description: '',
-    serviceStarted: false,
+    scheduleId: null,
+    loading: true,
     submitting: false,
-    uploadingImage: false,
-    uploadingVideo: false
+
+    order: null,
+
+    completedOptions: [
+      { value: 'FED', label: '已喂食', checked: false },
+      { value: 'WATER_CHANGED', label: '已换水', checked: false },
+      { value: 'CLEANED', label: '已清理', checked: false },
+      { value: 'PLAYED', label: '已陪玩', checked: false },
+      { value: 'LITTER_CHANGED', label: '已补充猫砂', checked: false },
+      { value: 'CHECKED_STATUS', label: '已检查状态', checked: false }
+    ],
+
+    petStatusOptions: [
+      { value: 'NORMAL', label: '状态正常', checked: true },
+      { value: 'APPETITE_NORMAL', label: '食欲正常', checked: false },
+      { value: 'NERVOUS', label: '情绪紧张', checked: false },
+      { value: 'ABNORMAL', label: '有异常', checked: false }
+    ],
+
+    petStatus: 'NORMAL',
+    remark: '',
+    imageUrls: []
   },
 
   onLoad(options) {
-    const orderId = options.orderId ? Number(options.orderId) : null
-    const orderNo = options.orderNo || ''
-    const serviceDate = options.serviceDate || ''
-    const timeSlot = options.timeSlot || ''
+    const systemInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
+    const statusBarHeight = systemInfo.statusBarHeight || 20
+    const navBarHeight = 44
 
     this.setData({
-      orderId,
-      orderNo,
-      serviceDate,
-      timeSlot
+      statusBarHeight,
+      navBarHeight,
+      navTotalHeight: statusBarHeight + navBarHeight,
+      orderId: options.orderId || null,
+      scheduleId: options.scheduleId || null
     })
+
+    this.loadOrderDetail()
   },
 
-  chooseType(e) {
+  navigateBack() {
+    const pages = getCurrentPages()
+    if (pages.length > 1) {
+      wx.navigateBack({ delta: 1 })
+      return
+    }
+    wx.switchTab({ url: '/pages/sitter/index' })
+  },
+
+  loadOrderDetail() {
+    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
+
+    if (!this.data.orderId) {
+      this.setData({ loading: false })
+      wx.showToast({ title: '订单参数缺失', icon: 'none' })
+      return
+    }
+
+    request(`/api/sitter/orders/detail?id=${this.data.orderId}&sitterId=${currentUser.id}`, 'GET')
+      .then((res) => {
+        this.setData({
+          order: this.formatOrder(res || {}),
+          loading: false
+        })
+      })
+      .catch((err) => {
+        console.error('loadOrderDetail error', err)
+        this.setData({ loading: false })
+        wx.showToast({ title: '加载失败', icon: 'none' })
+      })
+  },
+
+  formatOrder(raw) {
+    const pets = raw.pets || []
+    const serviceDates = raw.serviceDates || []
+
+    let currentSchedule = null
+    if (this.data.scheduleId) {
+      currentSchedule = serviceDates.find(item => String(item.scheduleId || item.id) === String(this.data.scheduleId))
+    }
+    if (!currentSchedule && serviceDates.length) {
+      currentSchedule = serviceDates[0]
+    }
+
+    return {
+      ...raw,
+      pets,
+      currentSchedule,
+      scheduleDateText: currentSchedule ? this.formatDateFull(currentSchedule.serviceDate) : '--/-- --',
+      scheduleTimeText: currentSchedule ? this.formatTimeSlots(currentSchedule.timeSlots || []) : (this.formatTimeSlots(raw.timeSlots || [])),
+      scheduleDurationText: `${(currentSchedule && currentSchedule.serviceDurationMinutes) || raw.serviceDurationMinutes || 0}分钟/次`,
+      fullAddress: raw.serviceFullAddress || ''
+    }
+  },
+
+  formatDateFull(dateStr) {
+    if (!dateStr) return '--/-- --'
+    const date = new Date(String(dateStr).replace(/-/g, '/'))
+    if (Number.isNaN(date.getTime())) return '--/-- --'
+    const weekMap = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${month}/${day} ${weekMap[date.getDay()]}`
+  },
+
+  formatTimeSlots(list) {
+    if (!list || !list.length) return '时间待确认'
+    return list.join('、')
+  },
+
+  toggleCompletedItem(e) {
     const value = e.currentTarget.dataset.value
-    this.setData({ type: value })
+    const completedOptions = this.data.completedOptions.map(item => {
+      if (item.value === value) {
+        return { ...item, checked: !item.checked }
+      }
+      return item
+    })
+    this.setData({ completedOptions })
   },
 
-  onInput(e) {
-    const field = e.currentTarget.dataset.field
+  choosePetStatus(e) {
+    const value = e.currentTarget.dataset.value
+    const petStatusOptions = this.data.petStatusOptions.map(item => ({
+      ...item,
+      checked: item.value === value
+    }))
+
     this.setData({
-      [field]: e.detail.value
+      petStatus: value,
+      petStatusOptions
     })
   },
 
-  chooseImage() {
+  onRemarkInput(e) {
+    this.setData({
+      remark: e.detail.value
+    })
+  },
+
+  chooseImages() {
+    const remainCount = 6 - this.data.imageUrls.length
+    if (remainCount <= 0) {
+      wx.showToast({ title: '最多上传6张图片', icon: 'none' })
+      return
+    }
+
     wx.chooseMedia({
-      count: 1,
+      count: remainCount,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
       success: (res) => {
-        const tempFilePath = res.tempFiles[0].tempFilePath
-        this.uploadImage(tempFilePath)
-      }
-    })
-  },
-
-  uploadImage(filePath) {
-    this.setData({ uploadingImage: true })
-    wx.showLoading({ title: '上传图片中' })
-
-    wx.uploadFile({
-      url: `${BASE_URL}/api/files/upload-image`,
-      filePath,
-      name: 'file',
-      success: (res) => {
-        try {
-          const data = JSON.parse(res.data)
-          if (data.code === 0) {
-            this.setData({
-              imageUrl: data.data.url
-            })
-            wx.showToast({
-              title: '图片上传成功',
-              icon: 'success'
-            })
-          } else {
-            wx.showToast({
-              title: data.message || '上传失败',
-              icon: 'none'
-            })
-          }
-        } catch (e) {
-          wx.showToast({
-            title: '上传返回解析失败',
-            icon: 'none'
-          })
-        }
-      },
-      fail: (err) => {
-        console.error('upload image fail:', err)
-        wx.showToast({
-          title: '图片上传失败',
-          icon: 'none'
+        const tempFiles = res.tempFiles || []
+        const tempUrls = tempFiles.map(item => item.tempFilePath)
+        this.setData({
+          imageUrls: [...this.data.imageUrls, ...tempUrls].slice(0, 6)
         })
-      },
-      complete: () => {
-        wx.hideLoading()
-        this.setData({ uploadingImage: false })
       }
     })
   },
 
-  chooseVideo() {
-    wx.chooseVideo({
-      sourceType: ['album', 'camera'],
-      maxDuration: 30,
-      camera: 'back',
-      compressed: true,
-      success: (res) => {
-        const tempFilePath = res.tempFilePath
-        this.uploadVideo(tempFilePath)
-      }
-    })
-  },
-
-  uploadVideo(filePath) {
-    this.setData({ uploadingVideo: true })
-    wx.showLoading({ title: '上传视频中' })
-
-    wx.uploadFile({
-      url: `${BASE_URL}/api/files/upload-video`,
-      filePath,
-      name: 'file',
-      success: (res) => {
-        try {
-          const data = JSON.parse(res.data)
-          if (data.code === 0) {
-            this.setData({
-              videoUrl: data.data.url
-            })
-            wx.showToast({
-              title: '视频上传成功',
-              icon: 'success'
-            })
-          } else {
-            wx.showToast({
-              title: data.message || '上传失败',
-              icon: 'none'
-            })
-          }
-        } catch (e) {
-          wx.showToast({
-            title: '上传返回解析失败',
-            icon: 'none'
-          })
-        }
-      },
-      fail: (err) => {
-        console.error('upload video fail:', err)
-        wx.showToast({
-          title: '视频上传失败',
-          icon: 'none'
-        })
-      },
-      complete: () => {
-        wx.hideLoading()
-        this.setData({ uploadingVideo: false })
-      }
-    })
-  },
-
-  previewImage() {
-    if (!this.data.imageUrl) return
+  previewImage(e) {
+    const current = e.currentTarget.dataset.url
+    if (!current) return
     wx.previewImage({
-      urls: [this.data.imageUrl]
+      current,
+      urls: this.data.imageUrls
     })
   },
 
-  removeImage() {
-    this.setData({
-      imageUrl: ''
-    })
+  removeImage(e) {
+    const index = Number(e.currentTarget.dataset.index)
+    const imageUrls = [...this.data.imageUrls]
+    imageUrls.splice(index, 1)
+    this.setData({ imageUrls })
   },
 
-  removeVideo() {
-    this.setData({
-      videoUrl: ''
-    })
+  getCheckedCompletedItems() {
+    return this.data.completedOptions.filter(item => item.checked).map(item => item.value)
   },
 
-  startService() {
-    const { orderId } = this.data
-    if (!orderId) {
-      wx.showToast({ title: '缺少订单ID', icon: 'none' })
-      return
+  validateForm() {
+    if (!this.getCheckedCompletedItems().length) {
+      wx.showToast({ title: '请选择完成事项', icon: 'none' })
+      return false
     }
-
-    wx.showLoading({ title: '开始中' })
-    request('/api/service-records/start', 'POST', { orderId })
-      .then(() => {
-        wx.hideLoading()
-        this.setData({ serviceStarted: true })
-        wx.showToast({ title: '已开始服务', icon: 'success' })
-      })
-      .catch(() => {
-        wx.hideLoading()
-      })
+    return true
   },
 
   submitRecord() {
-    const {
-      orderId,
-      type,
-      imageUrl,
-      videoUrl,
-      description,
-      submitting,
-      uploadingImage,
-      uploadingVideo
-    } = this.data
+    if (!this.validateForm()) return
+    if (this.data.submitting) return
 
-    if (submitting) return
-
-    if (uploadingImage || uploadingVideo) {
-      wx.showToast({ title: '文件上传中，请稍候', icon: 'none' })
-      return
-    }
-
-    if (!orderId) {
-      wx.showToast({ title: '缺少订单ID', icon: 'none' })
-      return
-    }
-
-    if (!imageUrl && !videoUrl) {
-      wx.showToast({ title: '请至少上传图片或视频', icon: 'none' })
-      return
-    }
+    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
+    const order = this.data.order || {}
+    const completedItems = this.getCheckedCompletedItems()
 
     this.setData({ submitting: true })
     wx.showLoading({ title: '提交中' })
 
-    request('/api/service-records', 'POST', {
-      orderId,
-      type,
-      imageUrl,
-      videoUrl,
-      description
+    const nowText = this.formatNow()
+
+    request('/api/service-record/create', 'POST', {
+      orderId: Number(this.data.orderId),
+      scheduleId: this.data.scheduleId ? Number(this.data.scheduleId) : (order.currentSchedule ? (order.currentSchedule.scheduleId || order.currentSchedule.id) : null),
+      sitterId: currentUser.id,
+      userId: order.userId,
+      petStatus: this.data.petStatus,
+      completedItems,
+      remark: this.data.remark,
+      arrivedAt: nowText,
+      imageUrls: this.data.imageUrls
+    }).then((recordId) => {
+      wx.hideLoading()
+      wx.redirectTo({
+        url: `/pages/service-record-success/index?recordId=${recordId}&orderId=${this.data.orderId}`
+      })
+    }).catch((err) => {
+      console.error('submitRecord error', err)
+      wx.hideLoading()
+    }).finally(() => {
+      this.setData({ submitting: false })
     })
-      .then(() => {
-        wx.hideLoading()
-        this.setData({
-          description: '',
-          imageUrl: '',
-          videoUrl: '',
-          submitting: false
-        })
-        wx.showToast({ title: '记录已上传', icon: 'success' })
-      })
-      .catch(() => {
-        wx.hideLoading()
-        this.setData({ submitting: false })
-      })
   },
 
-  completeService() {
-    const { orderId } = this.data
-    if (!orderId) {
-      wx.showToast({ title: '缺少订单ID', icon: 'none' })
-      return
-    }
-
-    wx.showModal({
-      title: '确认结束服务',
-      content: '结束后订单状态将变为已完成',
-      success: (res) => {
-        if (!res.confirm) return
-
-        wx.showLoading({ title: '提交中' })
-        request('/api/service-records/complete', 'POST', { orderId })
-          .then(() => {
-            wx.hideLoading()
-            wx.showToast({ title: '服务已完成', icon: 'success' })
-            setTimeout(() => {
-              wx.redirectTo({
-                url: `/pages/service-record-detail/index?orderId=${orderId}&orderNo=${this.data.orderNo}&serviceDate=${this.data.serviceDate}&timeSlot=${this.data.timeSlot}`
-              })
-            }, 600)
-          })
-          .catch(() => {
-            wx.hideLoading()
-          })
-      }
-    })
+  formatNow() {
+    const date = new Date()
+    const Y = date.getFullYear()
+    const M = String(date.getMonth() + 1).padStart(2, '0')
+    const D = String(date.getDate()).padStart(2, '0')
+    const h = String(date.getHours()).padStart(2, '0')
+    const m = String(date.getMinutes()).padStart(2, '0')
+    const s = String(date.getSeconds()).padStart(2, '0')
+    return `${Y}-${M}-${D} ${h}:${m}:${s}`
   }
 })

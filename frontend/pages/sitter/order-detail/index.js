@@ -1,4 +1,6 @@
-const { request } = require('../../../utils/request')
+const {
+  request
+} = require('../../../utils/request')
 
 Page({
   data: {
@@ -38,15 +40,23 @@ Page({
   navigateBack() {
     const pages = getCurrentPages()
     if (pages.length > 1) {
-      wx.navigateBack({ delta: 1 })
+      wx.navigateBack({
+        delta: 1
+      })
       return
     }
-    wx.switchTab({ url: '/pages/sitter/index' })
+    wx.switchTab({
+      url: '/pages/sitter/index'
+    })
   },
 
   loadOrderDetail() {
-    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
-    this.setData({ loading: true })
+    const currentUser = wx.getStorageSync('currentUser') || {
+      id: 1
+    }
+    this.setData({
+      loading: true
+    })
 
     request(`/api/sitter/orders/detail?id=${this.data.orderId}&sitterId=${currentUser.id}`, 'GET')
       .then((res) => {
@@ -57,8 +67,13 @@ Page({
       })
       .catch((err) => {
         console.error('loadOrderDetail error', err)
-        this.setData({ loading: false })
-        wx.showToast({ title: '加载失败', icon: 'none' })
+        this.setData({
+          loading: false
+        })
+        wx.showToast({
+          title: '加载失败',
+          icon: 'none'
+        })
       })
   },
 
@@ -130,20 +145,27 @@ Page({
   },
 
   handleTakeOrder() {
-    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
+    const currentUser = wx.getStorageSync('currentUser') || {
+      id: 1
+    }
     wx.showModal({
       title: '确认接单',
       content: '确认后该订单将归你处理，是否继续？',
       success: (res) => {
         if (!res.confirm) return
 
-        wx.showLoading({ title: '接单中' })
+        wx.showLoading({
+          title: '接单中'
+        })
         request('/api/sitter/orders/take', 'POST', {
           orderId: this.data.orderId,
           sitterId: currentUser.id
         }).then(() => {
           wx.hideLoading()
-          wx.showToast({ title: '接单成功', icon: 'success' })
+          wx.showToast({
+            title: '接单成功',
+            icon: 'success'
+          })
           setTimeout(() => this.loadOrderDetail(), 500)
         }).catch(() => {
           wx.hideLoading()
@@ -153,35 +175,47 @@ Page({
   },
 
   handleStartService() {
-    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
-    wx.showLoading({ title: '处理中' })
+    const currentUser = wx.getStorageSync('currentUser') || {
+      id: 1
+    }
+    wx.showLoading({
+      title: '处理中'
+    })
     request('/api/sitter/orders/start-service', 'POST', {
       orderId: this.data.orderId,
       sitterId: currentUser.id
     }).then(() => {
       wx.hideLoading()
-      wx.showToast({ title: '已开始服务', icon: 'success' })
-      setTimeout(() => this.loadOrderDetail(), 500)
+      wx.redirectTo({
+        url: `/pages/service-record-upload/index?orderId=${this.data.orderId}`
+      })
     }).catch(() => {
       wx.hideLoading()
     })
   },
 
   handleCompleteService() {
-    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
+    const currentUser = wx.getStorageSync('currentUser') || {
+      id: 1
+    }
     wx.showModal({
       title: '确认完成服务',
       content: '确认后订单将进入已完成状态。',
       success: (res) => {
         if (!res.confirm) return
 
-        wx.showLoading({ title: '处理中' })
+        wx.showLoading({
+          title: '处理中'
+        })
         request('/api/sitter/orders/complete-service', 'POST', {
           orderId: this.data.orderId,
           sitterId: currentUser.id
         }).then(() => {
           wx.hideLoading()
-          wx.showToast({ title: '服务已完成', icon: 'success' })
+          wx.showToast({
+            title: '服务已完成',
+            icon: 'success'
+          })
           setTimeout(() => this.loadOrderDetail(), 500)
         }).catch(() => {
           wx.hideLoading()

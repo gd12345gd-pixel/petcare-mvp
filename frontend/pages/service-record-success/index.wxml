@@ -1,0 +1,22 @@
+<view class="success-page">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-inner">
+      <view class="nav-side"></view>
+      <view class="nav-title">提交成功</view>
+      <view class="nav-side"></view>
+    </view>
+  </view>
+
+  <view class="success-content">
+    <view class="success-icon-wrap">
+      <view class="success-icon">✓</view>
+    </view>
+    <view class="success-title">服务记录已提交</view>
+    <view class="success-desc">感谢你的细心照顾，服务记录已经成功保存</view>
+
+    <view class="success-actions">
+      <button class="primary-btn action-btn" bindtap="goRecordDetail">查看记录详情</button>
+      <button class="secondary-btn action-btn" bindtap="goOrderDetail">返回订单</button>
+    </view>
+  </view>
+</view>

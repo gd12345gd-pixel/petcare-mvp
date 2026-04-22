@@ -19,6 +19,9 @@
       "pages/pet-map/index",
       "pages/address-list/index",
       "pages/address-edit/index",
+       
+      "pages/service-record-success/index",
+       
       "pages/profile/index"
   ],
   "requiredPrivateInfos": [
