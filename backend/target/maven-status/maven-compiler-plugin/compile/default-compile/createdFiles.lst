@@ -13,6 +13,7 @@ com\example\petcare\dto\CreateOrderRequest.class
 com\example\petcare\dto\FinishServiceRequest.class
 com\example\petcare\dto\AddressResponse.class
 com\example\petcare\dto\TencentRegionResponse.class
+com\example\petcare\dto\FinishScheduleRequest.class
 com\example\petcare\dto\PetResponse.class
 com\example\petcare\dto\PetCommentVO.class
 com\example\petcare\repository\PetRepository.class
@@ -46,6 +47,7 @@ com\example\petcare\dto\ServiceRecordVO.class
 com\example\petcare\dto\TencentReverseGeocodeResponse$AdInfo.class
 com\example\petcare\dto\WechatCode2SessionResponse.class
 com\example\petcare\entity\ServiceRecordImage.class
+com\example\petcare\dto\StartScheduleRequest.class
 com\example\petcare\dto\OrderStatusUpdateRequest.class
 com\example\petcare\controller\FileController.class
 com\example\petcare\entity\Sitter.class

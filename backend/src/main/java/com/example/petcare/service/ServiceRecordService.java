@@ -83,7 +83,8 @@ public class ServiceRecordService {
         List<String> imageUrls = request.getImageUrls() == null ? new ArrayList<>() : request.getImageUrls();
         for (int i = 0; i < imageUrls.size(); i++) {
             String url = imageUrls.get(i);
-            if (url == null || url.trim().isEmpty()) continue;
+            if (url == null || url.trim().isEmpty())
+            {continue;}
 
             ServiceRecordImage image = new ServiceRecordImage();
             image.setRecordId(record.getId());
@@ -97,15 +98,50 @@ public class ServiceRecordService {
             if (scheduleOpt.isPresent()) {
                 PetOrderSchedule schedule = scheduleOpt.get();
                 if (!"CANCELLED".equals(schedule.getScheduleStatus())) {
-                    schedule.setScheduleStatus("DONE");
+                    schedule.setScheduleStatus("RECORDED");
                     petOrderScheduleRepository.save(schedule);
                 }
             }
         }
 
+        recalculateOrderStatusAfterRecord(order.getId());
+
         writeLog(order.getId(), "SUBMIT_SERVICE_RECORD", "SITTER", request.getSitterId(), "服务者提交服务记录");
 
         return record.getId();
+    }
+
+    private void recalculateOrderStatusAfterRecord(Long orderId) {
+        PetOrder order = petOrderRepository.findByIdAndDeleted(orderId, 0)
+            .orElseThrow(() -> new RuntimeException("订单不存在"));
+
+        List<PetOrderSchedule> schedules = petOrderScheduleRepository.findByOrderIdOrderByServiceDateAsc(orderId);
+        if (schedules == null || schedules.isEmpty()) {
+            return;
+        }
+
+        long total = schedules.size();
+        long servingCount = schedules.stream().filter(s -> "SERVING".equals(s.getScheduleStatus())).count();
+        long recordedCount = schedules.stream().filter(s -> "RECORDED".equals(s.getScheduleStatus())).count();
+        long doneCount = schedules.stream().filter(s -> "DONE".equals(s.getScheduleStatus())).count();
+        long cancelledCount = schedules.stream().filter(s -> "CANCELLED".equals(s.getScheduleStatus())).count();
+
+        String newStatus;
+
+        if (cancelledCount == total) {
+            newStatus = "CANCELLED";
+        } else if (doneCount == total) {
+            newStatus = "COMPLETED";
+        } else if (servingCount > 0 || recordedCount > 0) {
+            newStatus = "PART_SERVING";
+        } else if (doneCount > 0) {
+            newStatus = "PART_COMPLETED";
+        } else {
+            newStatus = "TAKEN";
+        }
+
+        order.setOrderStatus(newStatus);
+        petOrderRepository.save(order);
     }
 
     public List<ServiceRecordListItemResponse> listByOrder(Long orderId) {

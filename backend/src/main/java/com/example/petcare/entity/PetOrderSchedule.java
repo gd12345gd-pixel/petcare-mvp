@@ -1,10 +1,13 @@
 package com.example.petcare.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Table(name = "pet_order_schedule")
 public class PetOrderSchedule {
@@ -33,6 +36,30 @@ public class PetOrderSchedule {
 
     @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
+
+    @Column(name = "start_time")
+    private LocalDateTime startTime;
+
+    @Column(name = "finish_time")
+    private LocalDateTime finishTime;
+
+    @Column(name = "start_latitude", precision = 10, scale = 7)
+    private BigDecimal startLatitude;
+
+    @Column(name = "start_longitude", precision = 10, scale = 7)
+    private BigDecimal startLongitude;
+
+    @Column(name = "finish_latitude", precision = 10, scale = 7)
+    private BigDecimal finishLatitude;
+
+    @Column(name = "finish_longitude", precision = 10, scale = 7)
+    private BigDecimal finishLongitude;
+
+    @Column(name = "start_distance_meters")
+    private Integer startDistanceMeters;
+
+    @Column(name = "finish_distance_meters")
+    private Integer finishDistanceMeters;
 
     public Long getId() { return id; }
 

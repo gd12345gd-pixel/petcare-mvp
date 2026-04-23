@@ -50,4 +50,19 @@ public class SitterOrderController {
         sitterOrderService.completeService(request);
         return ApiResponse.success("完成服务成功", null);
     }
+
+    @PostMapping("/start-schedule")
+    public ApiResponse<Void> startSchedule(@RequestBody StartScheduleRequest request) {
+        sitterOrderService.startSchedule(request);
+        return ApiResponse.success("开始本次服务成功", null);
+    }
+
+    @PostMapping("/finish-schedule")
+    public ApiResponse<Void> finishSchedule(@RequestBody FinishScheduleRequest request) {
+        sitterOrderService.finishSchedule(request);
+        return ApiResponse.success("完成本次服务成功", null);
+    }
+
+
+
 }

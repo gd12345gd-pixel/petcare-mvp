@@ -13,4 +13,6 @@ public interface ServiceRecordRepository extends JpaRepository<ServiceRecord, Lo
     Optional<ServiceRecord> findById(Long id);
 
     boolean existsByOrderIdAndScheduleId(Long orderId, Long scheduleId);
+
+
 }
