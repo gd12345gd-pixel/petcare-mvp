@@ -13,13 +13,19 @@
     </view>
 
     <block wx:elif="{{order}}">
-      <view class="status-card {{order.orderStatusClass}}">
+      <!-- 顶部状态卡 -->
+      <view class="status-card {{order.statusClass}}">
         <view class="status-top-row">
           <view class="status-main">
             <view class="status-title">{{order.headerTitle}}</view>
             <view class="status-desc">{{order.headerDesc}}</view>
-            <view class="status-order-no">订单号：{{order.orderNo}}</view>
+
+            <view class="status-order-row">
+              <view class="status-order-no">订单号：{{order.orderNo}}</view>
+              <view class="copy-order-btn" bindtap="copyOrderNo">复制</view>
+            </view>
           </view>
+
           <view class="status-price-wrap">
             <view class="status-price-label">总价</view>
             <view class="status-price">¥{{order.totalPriceText}}</view>
@@ -27,58 +33,128 @@
         </view>
       </view>
 
-      <view class="section-card compact-card">
+      <!-- 服务安排（含日期明细入口与展开内容） -->
+      <view class="section-card">
         <view class="section-title">服务安排</view>
 
-        <view class="summary-row">
-          <view class="summary-icon">📅</view>
-          <view class="summary-label">服务日期</view>
-          <view class="summary-value">{{order.serviceDateSummary}}</view>
+        <view class="arrange-row">
+          <view class="arrange-left">
+            <view class="arrange-icon">🗓</view>
+            <view class="arrange-label">服务日期</view>
+          </view>
+          <view class="arrange-right">{{order.serviceDateSummaryText}}</view>
         </view>
 
-        <view class="summary-row">
-          <view class="summary-icon">⏰</view>
-          <view class="summary-label">服务时间</view>
-          <view class="summary-value">{{order.serviceTimeSummary}}</view>
+        <view class="arrange-row">
+          <view class="arrange-left">
+            <view class="arrange-icon">⏰</view>
+            <view class="arrange-label">服务时间</view>
+          </view>
+          <view class="arrange-right">{{order.serviceTimeSummaryText}}</view>
         </view>
 
-        <view class="summary-row">
-          <view class="summary-icon">⌛</view>
-          <view class="summary-label">服务时长</view>
-          <view class="summary-value">{{order.serviceDurationSummary}}</view>
+        <view class="arrange-row">
+          <view class="arrange-left">
+            <view class="arrange-icon">⌛</view>
+            <view class="arrange-label">服务时长</view>
+          </view>
+          <view class="arrange-right">{{order.serviceDurationSummaryText}}</view>
         </view>
 
-        <view class="summary-divider"></view>
+        <view class="schedule-toggle-wrap" wx:if="{{order.showScheduleToggle}}" bindtap="toggleScheduleExpand">
+          <view class="schedule-toggle-left">
+            <view class="schedule-toggle-title">全部日期明细</view>
+            <view class="schedule-toggle-desc">
+              {{showAllSchedules ? '点击收起日期明细' : '点击展开查看每次服务安排'}}
+            </view>
+          </view>
+          <view class="schedule-toggle-right">
+            <view class="schedule-toggle-main">{{showAllSchedules ? '收起' : '查看全部'}}</view>
+            <view class="schedule-toggle-count">{{order.progressCountText}}</view>
+          </view>
+        </view>
 
-        <view class="summary-footer">
-          <view class="progress-text">{{order.progressText}}</view>
-          <view class="progress-subtext">{{order.progressSubText}}</view>
+        <view class="schedule-list" wx:if="{{showAllSchedules}}">
+          <view class="schedule-item" wx:for="{{order.serviceDates}}" wx:key="scheduleId">
+            <view class="schedule-top">
+              <view class="schedule-date">{{item.serviceDateText}}</view>
+              <view class="schedule-status schedule-status-{{item.scheduleStatus}}">
+                {{item.scheduleStatusText}}
+              </view>
+            </view>
+
+            <view class="schedule-middle">
+              <view class="schedule-time">{{item.timeSlotsText}}</view>
+              <view class="schedule-duration">{{item.serviceDurationMinutes}}分钟</view>
+            </view>
+
+            <view class="schedule-bottom">
+              <view class="schedule-hint">{{item.scheduleHintText}}</view>
+
+              <view class="schedule-action-row">
+                <button
+                  class="schedule-mini-btn schedule-mini-btn-primary"
+                  wx:if="{{item.canStartSchedule}}"
+                  data-schedule-id="{{item.scheduleId}}"
+                  bindtap="handleStartSchedule"
+                >
+                  开始服务
+                </button>
+
+                <button
+                  class="schedule-mini-btn schedule-mini-btn-ghost"
+                  wx:if="{{item.canWriteRecord}}"
+                  data-schedule-id="{{item.scheduleId}}"
+                  bindtap="goWriteServiceRecord"
+                >
+                  填写记录
+                </button>
+
+                <button
+                  class="schedule-mini-btn schedule-mini-btn-primary"
+                  wx:if="{{item.canFinishSchedule}}"
+                  data-schedule-id="{{item.scheduleId}}"
+                  bindtap="handleFinishSchedule"
+                >
+                  结束服务
+                </button>
+
+                <button
+                  class="schedule-mini-btn schedule-mini-btn-ghost"
+                  wx:if="{{item.canViewRecord}}"
+                  data-record-id="{{item.recordId}}"
+                  bindtap="handleViewRecord"
+                >
+                  查看记录
+                </button>
+              </view>
+            </view>
+          </view>
         </view>
       </view>
 
-      <view class="section-card compact-card" wx:if="{{order.currentActionSchedule}}">
-        <view class="section-head">
-          <view class="section-title">今日待处理</view>
-        </view>
+      <!-- 今日待服务 -->
+      <view class="section-card" wx:if="{{order.todayTask}}">
+        <view class="section-title no-margin">{{order.todayTask.title}}</view>
 
-        <view class="schedule-item schedule-item-focus">
-          <view class="schedule-top">
-            <view class="schedule-date">{{order.currentActionSchedule.serviceDateText}}</view>
-            <view class="schedule-status schedule-status-{{order.currentActionSchedule.scheduleStatus}}">
-              {{order.currentActionSchedule.scheduleStatusText}}
+        <view class="today-task-box" wx:if="{{order.todayTask.item}}">
+          <view class="today-task-top">
+            <view class="today-task-date">{{order.todayTask.item.serviceDateText}}</view>
+            <view class="schedule-status schedule-status-{{order.todayTask.item.scheduleStatus}}">
+              {{order.todayTask.item.scheduleStatusText}}
             </view>
           </view>
 
-          <view class="schedule-main">
-            <view class="schedule-time">{{order.currentActionSchedule.timeSlotsText}}</view>
-            <view class="schedule-duration">{{order.currentActionSchedule.serviceDurationMinutes}}分钟</view>
+          <view class="today-task-time">
+            {{order.todayTask.item.timeSlotsText}} · {{order.todayTask.item.serviceDurationMinutes}}分钟
           </view>
+          <view class="today-task-desc">{{order.todayTask.desc}}</view>
 
-          <view class="schedule-actions" wx:if="{{order.currentActionSchedule.canStartSchedule || order.currentActionSchedule.canWriteRecord || order.currentActionSchedule.canFinishSchedule || order.currentActionSchedule.canViewRecord}}">
+          <view class="today-task-actions">
             <button
               class="primary-btn schedule-btn"
-              wx:if="{{order.currentActionSchedule.canStartSchedule}}"
-              data-schedule-id="{{order.currentActionSchedule.scheduleId}}"
+              wx:if="{{order.todayTask.item.canStartSchedule}}"
+              data-schedule-id="{{order.todayTask.item.scheduleId}}"
               bindtap="handleStartSchedule"
             >
               开始本次服务
@@ -86,8 +162,8 @@
 
             <button
               class="ghost-btn schedule-btn"
-              wx:if="{{order.currentActionSchedule.canWriteRecord}}"
-              data-schedule-id="{{order.currentActionSchedule.scheduleId}}"
+              wx:if="{{order.todayTask.item.canWriteRecord}}"
+              data-schedule-id="{{order.todayTask.item.scheduleId}}"
               bindtap="goWriteServiceRecord"
             >
               填写服务记录
@@ -95,8 +171,8 @@
 
             <button
               class="primary-btn schedule-btn"
-              wx:if="{{order.currentActionSchedule.canFinishSchedule}}"
-              data-schedule-id="{{order.currentActionSchedule.scheduleId}}"
+              wx:if="{{order.todayTask.item.canFinishSchedule}}"
+              data-schedule-id="{{order.todayTask.item.scheduleId}}"
               bindtap="handleFinishSchedule"
             >
               结束本次服务
@@ -104,79 +180,67 @@
 
             <button
               class="ghost-btn schedule-btn"
-              wx:if="{{order.currentActionSchedule.canViewRecord}}"
-              data-record-id="{{order.currentActionSchedule.recordId}}"
+              wx:if="{{order.todayTask.item.canViewRecord}}"
+              data-record-id="{{order.todayTask.item.recordId}}"
               bindtap="handleViewRecord"
             >
               查看服务记录
             </button>
           </view>
         </view>
+
+        <view class="today-empty-box" wx:else>
+          <view class="today-empty-desc">{{order.todayTask.desc}}</view>
+        </view>
       </view>
 
-      <view class="section-card compact-card">
+      <!-- 服务宠物 -->
+      <view class="section-card pet-section-card">
         <view class="section-head">
-          <view class="section-title">服务日期明细</view>
-          <view class="section-tag">共{{order.scheduleCount}}次服务</view>
+          <view class="pet-section-title-wrap">
+            <view class="section-title no-margin">服务宠物</view>
+          </view>
+          <view class="section-subtitle">点击查看详情</view>
         </view>
 
-        <view class="schedule-compact-list">
-          <view class="schedule-compact-item" wx:for="{{order.serviceDates}}" wx:key="scheduleId">
-            <view class="schedule-compact-left">
-              <view class="schedule-compact-date">{{item.serviceDateText}}</view>
-              <view class="schedule-compact-time">{{item.timeSlotsText}}</view>
-            </view>
+        <view class="pet-inline-grid">
+          <view
+            class="pet-inline-item"
+            wx:for="{{order.pets}}"
+            wx:key="petId"
+            data-index="{{index}}"
+            bindtap="openPetDetail"
+          >
+            <image class="pet-inline-avatar" src="{{item.petImageUrl}}" mode="aspectFill" />
 
-            <view class="schedule-compact-right">
-              <view class="schedule-compact-status schedule-status-{{item.scheduleStatus}}">
-                {{item.scheduleStatusText}}
+            <view class="pet-inline-info">
+              <view class="pet-inline-name">{{item.petName}}</view>
+              <view class="pet-inline-meta">{{item.petTypeText}} · {{item.petBreedText}}</view>
+              <view class="pet-inline-tags" wx:if="{{item.petGenderText || item.petAgeText}}">
+                <text class="pet-inline-tag" wx:if="{{item.petGenderText}}">{{item.petGenderText}}</text>
+                <text class="pet-inline-tag" wx:if="{{item.petAgeText}}">{{item.petAgeText}}</text>
               </view>
-              <view class="schedule-compact-duration">{{item.serviceDurationMinutes}}分钟</view>
-            </view>
-          </view>
-        </view>
-
-        <view class="pending-tip" wx:if="{{order.canTake}}">
-          接单后可按日期逐次开始服务并提交服务记录
-        </view>
-      </view>
-
-      <view class="section-card compact-card">
-        <view class="section-head">
-          <view class="section-title">服务宠物</view>
-        </view>
-
-        <view class="pet-grid">
-          <view class="pet-card" wx:for="{{order.pets}}" wx:key="petId">
-            <image class="pet-card-image" src="{{item.petImageUrl}}" mode="aspectFill" />
-            <view class="pet-card-info">
-              <view class="pet-card-name">{{item.petName || '未命名宠物'}}</view>
-              <view class="pet-card-meta">{{item.petType || '未知类型'}}{{item.petBreed ? ' · ' + item.petBreed : ''}}</view>
             </view>
           </view>
         </view>
       </view>
 
-      <view class="section-card compact-card">
-        <view class="section-head">
-          <view class="section-title">服务地址</view>
-        </view>
-
+      <!-- 服务地址 -->
+      <view class="section-card">
+        <view class="section-title">服务地址</view>
         <view class="detail-block-title">{{order.serviceContactName}} {{order.serviceContactPhone}}</view>
         <view class="detail-block-desc">{{order.serviceFullAddress}}</view>
       </view>
 
-      <view class="section-card compact-card">
-        <view class="section-head">
-          <view class="section-title">照护备注</view>
-        </view>
-        <view class="remark-box">{{order.remark || '暂无备注'}}</view>
+      <!-- 照护备注 -->
+      <view class="section-card">
+        <view class="section-title">照护备注</view>
+        <view class="remark-box">{{order.remark}}</view>
       </view>
 
-      <view class="section-card compact-card">
-        <view class="section-head">
-          <view class="section-title">费用明细</view>
-        </view>
+      <!-- 费用明细 -->
+      <view class="section-card">
+        <view class="section-title">费用明细</view>
 
         <view class="price-row">
           <text class="price-label">服务单价</text>
@@ -188,15 +252,57 @@
           <text class="price-value">{{order.serviceDateCount}}次</text>
         </view>
 
-        <view class="total-box">合计总价 ¥{{order.totalPriceText}}</view>
+        <view class="summary-total-box">
+          <view class="summary-total-text">合计总价</view>
+          <view class="summary-total-price">¥{{order.totalPriceText}}</view>
+        </view>
       </view>
 
       <view class="page-bottom-space"></view>
     </block>
   </scroll-view>
 
-  <view class="bottom-bar" wx:if="{{order && !loading && order.canTake}}">
-    <button class="ghost-btn action-btn" bindtap="navigateBack">暂不接</button>
-    <button class="primary-btn action-btn" bindtap="handleTakeOrder">确认接单</button>
+  <view class="bottom-bar order-bottom-bar" wx:if="{{order && !loading && order.canTake}}">
+    <button class="secondary-btn order-action-btn cancel-btn" bindtap="navigateBack">
+      暂不接
+    </button>
+
+    <button class="primary-btn order-action-btn" bindtap="handleTakeOrder">
+      确认接单
+    </button>
+  </view>
+
+  <!-- 宠物详情浮层 -->
+  <view class="pet-popup-mask" wx:if="{{showPetPopup}}" bindtap="closePetDetail">
+    <view class="pet-popup-panel" catchtap="stopPopupBubble">
+      <view class="pet-popup-handle"></view>
+
+      <view class="pet-popup-header">
+        <image class="pet-popup-avatar" src="{{activePet.petImageUrl}}" mode="aspectFill" />
+        <view class="pet-popup-header-info">
+          <view class="pet-popup-name">{{activePet.petName}}</view>
+          <view class="pet-popup-type">{{activePet.petTypeText}} · {{activePet.petBreedText}}</view>
+        </view>
+      </view>
+
+      <view class="pet-popup-section">
+        <view class="pet-popup-row" wx:if="{{activePet.petGenderText}}">
+          <view class="pet-popup-label">性别</view>
+          <view class="pet-popup-value">{{activePet.petGenderText}}</view>
+        </view>
+
+        <view class="pet-popup-row" wx:if="{{activePet.petAgeText}}">
+          <view class="pet-popup-label">年龄</view>
+          <view class="pet-popup-value">{{activePet.petAgeText}}</view>
+        </view>
+
+        <view class="pet-popup-row column">
+          <view class="pet-popup-label">照护备注</view>
+          <view class="pet-popup-value text-left">{{activePet.petRemarkText}}</view>
+        </view>
+      </view>
+
+      <button class="primary-btn pet-popup-btn" bindtap="closePetDetail">我知道了</button>
+    </view>
   </view>
 </view>

@@ -78,6 +78,21 @@ Page({
     })
   },
 
+  copyOrderNo() {
+    const orderNo = this.data.order && this.data.order.orderNo
+    if (!orderNo) return
+
+    wx.setClipboardData({
+      data: orderNo,
+      success: () => {
+        wx.showToast({
+          title: '订单号已复制',
+          icon: 'success'
+        })
+      }
+    })
+  },
+
   loadOrderDetail() {
     const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
 
@@ -111,15 +126,13 @@ Page({
   },
 
   formatOrderDetail(raw) {
-    const timeSlots = raw.timeSlots || []
     const serviceDates = raw.serviceDates || []
-    const pets = raw.pets || []
-
 
     const formattedServiceDates = serviceDates.map(item => ({
       ...item,
       serviceDateText: this.formatServiceDate(item.serviceDate),
       scheduleStatusText: this.getScheduleStatusText(item.scheduleStatus),
+      scheduleHintText: this.getScheduleHintText(item.scheduleStatus),
       timeSlotsText: this.formatTimeSlots(item.timeSlots || []),
       serviceDurationMinutes: item.serviceDurationMinutes || raw.serviceDurationMinutes || 0
     }))
@@ -128,25 +141,21 @@ Page({
       normalizePetSnapshot(item, this.data.defaultPetImage)
     )
 
-    const orderStatusText = this.getOrderStatusText(raw.orderStatus)
-    const payStatusText = this.getPayStatusText(raw.payStatus)
-    const statusClass = this.getOrderStatusClass(raw.orderStatus)
-    const statusHintText = this.getOrderStatusHint(raw.orderStatus)
-
     const serviceDateSummaryText = this.buildServiceDateSummary(formattedServiceDates)
-    const serviceDateDetailCountText = `共${formattedServiceDates.length}次服务`
-    const showScheduleToggle = formattedServiceDates.length > 1
+    const serviceDateDetailCountText = `共${formattedServiceDates.length}次`
+    const showScheduleToggle = formattedServiceDates.length > 0
+    const todayServiceCard = this.buildTodayServiceCard(formattedServiceDates)
 
     return {
       id: raw.id,
       userId: raw.userId || null,
       orderNo: raw.orderNo || '',
       orderStatus: raw.orderStatus || '',
-      orderStatusText,
-      statusClass,
-      statusHintText,
+      orderStatusText: this.getOrderStatusText(raw.orderStatus),
+      statusClass: this.getOrderStatusClass(raw.orderStatus),
+      statusHintText: this.getOrderStatusHint(raw.orderStatus),
       payStatus: raw.payStatus || '',
-      payStatusText,
+      payStatusText: this.getPayStatusText(raw.payStatus),
       canCancel: this.canCancelOrder(raw.orderStatus),
 
       serviceContactName: raw.serviceContactName || '',
@@ -157,14 +166,15 @@ Page({
       serviceDateCount: raw.serviceDateCount || formattedServiceDates.length || 0,
       serviceDurationMinutes: raw.serviceDurationMinutes || 0,
 
-      timeSlots,
-      timeSlotsText: this.formatTimeSlots(timeSlots),
       serviceDateSummaryText,
       serviceDateDetailCountText,
       showScheduleToggle,
+      todayServiceCard,
 
       pets: formattedPets,
       serviceDates: formattedServiceDates,
+
+      timeSlotsText: this.buildServiceTimeSummary(formattedServiceDates, raw.timeSlots || []),
 
       suggestedUnitPrice: this.formatMoney(raw.suggestedUnitPrice),
       unitPrice: this.formatMoney(raw.unitPrice),
@@ -174,13 +184,57 @@ Page({
     }
   },
 
+  buildTodayServiceCard(serviceDates) {
+    if (!serviceDates || !serviceDates.length) {
+      return {
+        title: '今日服务',
+        desc: '暂无服务安排',
+        item: null
+      }
+    }
+
+    const todayText = this.getTodayDateText()
+    const todayItem = serviceDates.find(item => this.getDateKey(item.serviceDate) === todayText)
+    if (todayItem) {
+      return {
+        title: '今日服务',
+        desc: todayItem.scheduleHintText,
+        item: todayItem
+      }
+    }
+
+    const nextItem = serviceDates.find(item => item.scheduleStatus !== 'DONE' && item.scheduleStatus !== 'CANCELLED')
+    if (nextItem) {
+      return {
+        title: '今日服务',
+        desc: `今日暂无服务，下一次服务：${nextItem.serviceDateText}`,
+        item: null
+      }
+    }
+
+    return {
+      title: '今日服务',
+      desc: '本次服务已全部完成',
+      item: null
+    }
+  },
+
   buildServiceDateSummary(serviceDates) {
     if (!serviceDates || !serviceDates.length) return '未安排'
     const texts = serviceDates.map(item => item.serviceDateText)
-    if (texts.length <= 2) {
-      return texts.join('、')
+    if (texts.length === 1) {
+      return `${texts[0]} · 1次服务`
     }
-    return `${texts[0]}、${texts[1]} 等${texts.length}次`
+    return `${texts[0]} - ${texts[texts.length - 1]} · 共${texts.length}次服务`
+  },
+
+  buildServiceTimeSummary(serviceDates, fallbackSlots) {
+    const allSlots = serviceDates.map(item => item.timeSlotsText).filter(Boolean)
+    if (allSlots.length) {
+      const merged = Array.from(new Set(allSlots.join('、').split('、').filter(Boolean)))
+      return merged.join('、') || this.formatTimeSlots(fallbackSlots)
+    }
+    return this.formatTimeSlots(fallbackSlots)
   },
 
   formatMoney(value) {
@@ -189,7 +243,7 @@ Page({
   },
 
   formatTimeSlots(timeSlots) {
-    if (!timeSlots || !timeSlots.length) return '未设置'
+    if (!timeSlots || !timeSlots.length) return '不限'
     return timeSlots.join('、')
   },
 
@@ -207,11 +261,28 @@ Page({
     return `${month}/${day} ${week}`
   },
 
+  getDateKey(dateStr) {
+    const date = new Date(String(dateStr).replace(/-/g, '/'))
+    if (Number.isNaN(date.getTime())) return ''
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${month}/${day}`
+  },
+
+  getTodayDateText() {
+    const date = new Date()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${month}/${day}`
+  },
+
   getOrderStatusText(status) {
     const map = {
       WAIT_TAKING: '待接单',
       TAKEN: '已接单',
+      PART_SERVING: '服务中',
       SERVING: '服务中',
+      PART_COMPLETED: '部分已完成',
       COMPLETED: '已完成',
       CANCELLED: '已取消'
     }
@@ -222,7 +293,9 @@ Page({
     const map = {
       WAIT_TAKING: 'status-wait-taking',
       TAKEN: 'status-taken',
+      PART_SERVING: 'status-serving',
       SERVING: 'status-serving',
+      PART_COMPLETED: 'status-part-completed',
       COMPLETED: 'status-completed',
       CANCELLED: 'status-cancelled'
     }
@@ -233,7 +306,9 @@ Page({
     const map = {
       WAIT_TAKING: '我们已收到你的预约需求，正在为你安排服务人员',
       TAKEN: '订单已接单，请按预约时间等待服务',
+      PART_SERVING: '当前订单正在服务中，请留意服务进展',
       SERVING: '当前订单正在服务中，请留意服务进展',
+      PART_COMPLETED: '已有部分服务完成，请查看明细',
       COMPLETED: '本次服务已完成，欢迎再次预约',
       CANCELLED: '订单已取消，如有问题可联系客服'
     }
@@ -253,8 +328,20 @@ Page({
     const map = {
       PENDING: '待服务',
       SERVING: '服务中',
+      RECORDED: '待结束',
       DONE: '已完成',
       CANCELLED: '已取消'
+    }
+    return map[status] || '待服务'
+  },
+
+  getScheduleHintText(status) {
+    const map = {
+      PENDING: '等待服务开始',
+      SERVING: '服务进行中',
+      RECORDED: '已提交记录，待结束',
+      DONE: '本次服务已完成',
+      CANCELLED: '本次服务已取消'
     }
     return map[status] || '待服务'
   },
@@ -339,7 +426,7 @@ Page({
     })
   },
 
-  stopPopupBubble() { },
+  stopPopupBubble() {},
 
   handleCancelOrder() {
     const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
