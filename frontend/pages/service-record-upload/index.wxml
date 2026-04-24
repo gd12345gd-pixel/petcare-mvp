@@ -1,103 +1,170 @@
-<view class="service-record-page">
+<view class="record-upload-page">
   <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
     <view class="nav-inner">
       <view class="nav-side nav-left" bindtap="navigateBack">‹</view>
-      <view class="nav-title">填写服务记录</view>
+      <view class="nav-title">提交服务记录</view>
       <view class="nav-side"></view>
     </view>
   </view>
 
-  <scroll-view class="content" scroll-y style="height: calc(100vh - {{navTotalHeight}}px - 170rpx);">
+  <scroll-view class="content" scroll-y style="height: calc(100vh - {{navTotalHeight}}px - 140rpx);">
     <view class="loading-wrap" wx:if="{{loading}}">
       <view class="loading-text">加载中...</view>
     </view>
 
-    <block wx:elif="{{order}}">
-      <view class="section-card top-card">
-        <view class="section-title">本次服务</view>
+    <block wx:elif="{{!loading}}">
+      <!-- 本次服务信息 -->
+      <view class="section-card">
+        <view class="section-title">本次服务信息</view>
+
         <view class="info-row">
-          <text class="info-label">服务日期</text>
-          <text class="info-value">{{order.scheduleDateText}}</text>
+          <view class="info-label">服务日期</view>
+          <view class="info-value">{{baseInfo.serviceDateText}}</view>
         </view>
+
         <view class="info-row">
-          <text class="info-label">服务时间</text>
-          <text class="info-value">{{order.scheduleTimeText}}</text>
+          <view class="info-label">服务时间</view>
+          <view class="info-value">{{baseInfo.timeSlotsText}}</view>
         </view>
+
         <view class="info-row">
-          <text class="info-label">服务时长</text>
-          <text class="info-value">{{order.scheduleDurationText}}</text>
+          <view class="info-label">服务宠物</view>
+          <view class="info-value">{{baseInfo.petsText}}</view>
         </view>
+
         <view class="info-row">
-          <text class="info-label">服务地址</text>
-          <text class="info-value address-value">{{order.fullAddress}}</text>
+          <view class="info-label">服务地址</view>
+          <view class="info-value">{{baseInfo.addressText}}</view>
         </view>
       </view>
 
+      <!-- 服务项目 -->
       <view class="section-card">
-        <view class="section-title">服务照片</view>
-        <view class="upload-grid">
-          <view class="image-item" wx:for="{{imageUrls}}" wx:key="*this">
-            <image class="upload-image" src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="previewImage" />
-            <view class="remove-btn" data-index="{{index}}" bindtap="removeImage">×</view>
-          </view>
+        <view class="section-title">服务项目</view>
+        <view class="section-desc">请至少选择 1 项</view>
 
-          <view class="upload-add" wx:if="{{imageUrls.length < 6}}" bindtap="chooseImages">
-            <view class="upload-add-icon">+</view>
-            <view class="upload-add-text">上传图片</view>
-          </view>
-        </view>
-        <view class="field-tip">最多上传6张，建议拍摄喂食、清理、宠物状态等照片</view>
-      </view>
-
-      <view class="section-card">
-        <view class="section-title">完成事项</view>
         <view class="tag-grid">
           <view
             class="tag-item {{item.checked ? 'active' : ''}}"
-            wx:for="{{completedOptions}}"
-            wx:key="value"
-            data-value="{{item.value}}"
-            bindtap="toggleCompletedItem"
+            wx:for="{{serviceItemOptions}}"
+            wx:key="key"
+            data-key="{{item.key}}"
+            bindtap="toggleServiceItem"
           >
             {{item.label}}
           </view>
         </view>
       </view>
 
+      <!-- 宠物观察情况 -->
       <view class="section-card">
-        <view class="section-title">宠物状态</view>
-        <view class="status-list">
+        <view class="section-title">宠物观察情况</view>
+        <view class="section-desc">可多选，若有异常请补充说明</view>
+
+        <view class="tag-grid">
           <view
-            class="status-item {{item.checked ? 'active' : ''}}"
-            wx:for="{{petStatusOptions}}"
-            wx:key="value"
-            data-value="{{item.value}}"
-            bindtap="choosePetStatus"
+            class="tag-item {{item.checked ? 'active' : ''}}"
+            wx:for="{{petObservationOptions}}"
+            wx:key="key"
+            data-key="{{item.key}}"
+            bindtap="toggleObservationItem"
           >
-            <view class="status-radio {{item.checked ? 'active' : ''}}"></view>
-            <view class="status-text">{{item.label}}</view>
+            {{item.label}}
+          </view>
+        </view>
+
+        <view class="sub-section" wx:if="{{hasAbnormalSelected()}}">
+          <view class="sub-title required-title">异常情况</view>
+          <textarea
+            class="textarea"
+            value="{{abnormalDesc}}"
+            placeholder="请填写异常情况，例如宠物精神不佳、进食异常、发现不适等"
+            maxlength="300"
+            bindinput="onInputAbnormalDesc"
+          />
+        </view>
+      </view>
+
+      <!-- 服务照片 -->
+      <view class="section-card">
+        <view class="section-title">服务照片</view>
+        <view class="section-desc">建议上传现场照片，最多 9 张</view>
+
+        <view class="media-grid">
+          <view class="image-item" wx:for="{{imageList}}" wx:key="url">
+            <image
+              class="image-thumb"
+              src="{{item.url}}"
+              mode="aspectFill"
+              data-index="{{index}}"
+              bindtap="previewImage"
+            />
+            <view class="delete-badge" data-index="{{index}}" bindtap="removeImage">×</view>
+          </view>
+
+          <view class="upload-box" wx:if="{{imageList.length < 9}}" bindtap="chooseImages">
+            <view class="upload-plus">＋</view>
+            <view class="upload-text">上传图片</view>
           </view>
         </view>
       </view>
 
+      <!-- 服务视频 -->
+      <view class="section-card">
+        <view class="section-title">服务视频</view>
+        <view class="section-desc required-desc">至少上传 1 个，最多 3 个</view>
+
+        <view class="media-grid">
+          <view class="video-item" wx:for="{{videoList}}" wx:key="url">
+            <video
+              class="video-thumb"
+              src="{{item.url}}"
+              controls
+              objectFit="cover"
+            />
+            <view class="delete-badge" data-index="{{index}}" bindtap="removeVideo">×</view>
+          </view>
+
+          <view class="upload-box" wx:if="{{videoList.length < 3}}" bindtap="chooseVideos">
+            <view class="upload-plus">＋</view>
+            <view class="upload-text">上传视频</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 服务备注 -->
       <view class="section-card">
         <view class="section-title">服务备注</view>
+        <view class="section-desc">可补充本次服务细节，例如进食、情绪、排泄、陪伴等情况</view>
+
         <textarea
-          class="remark-textarea"
-          placeholder="请填写本次服务情况，如进食、饮水、情绪、清理情况等"
+          class="textarea"
           value="{{remark}}"
-          bindinput="onRemarkInput"
-          maxlength="300"
-        ></textarea>
-        <view class="remark-count">{{remark.length}}/300</view>
+          placeholder="请填写本次服务备注"
+          maxlength="500"
+          bindinput="onInputRemark"
+        />
+      </view>
+
+      <!-- 异常入口 -->
+      <view class="section-card subtle-card">
+        <view class="exception-entry" bindtap="goReportException">
+          <view class="exception-title">上报异常</view>
+          <view class="exception-desc">若服务中遇到其他问题，可在这里上报异常情况</view>
+        </view>
       </view>
 
       <view class="page-bottom-space"></view>
     </block>
   </scroll-view>
 
-  <view class="bottom-bar" wx:if="{{!loading && order}}">
-    <button class="primary-btn submit-btn" bindtap="submitRecord" loading="{{submitting}}">
+  <view class="bottom-bar">
+    <button
+      class="primary-btn submit-btn"
+      loading="{{submitting}}"
+      disabled="{{submitting}}"
+      bindtap="submitRecord"
+    >
       提交服务记录
     </button>
   </view>

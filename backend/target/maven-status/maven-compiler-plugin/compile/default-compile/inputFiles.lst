@@ -78,6 +78,8 @@ D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\entity\Revi
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\entity\ServiceItem.java
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\entity\ServiceRecord.java
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\entity\ServiceRecordImage.java
+D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\entity\ServiceRecordItem.java
+D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\entity\ServiceRecordMedia.java
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\entity\Sitter.java
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\entity\User.java
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\entity\UserAddress.java
@@ -102,6 +104,8 @@ D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\repository\
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\repository\ReviewRepository.java
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\repository\ServiceItemRepository.java
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\repository\ServiceRecordImageRepository.java
+D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\repository\ServiceRecordItemRepository.java
+D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\repository\ServiceRecordMediaRepository.java
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\repository\ServiceRecordRepository.java
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\repository\SitterRepository.java
 D:\project_wsl\petcare-mvp\backend\src\main\java\com\example\petcare\repository\UserAddressRepository.java

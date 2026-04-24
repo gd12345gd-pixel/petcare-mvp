@@ -7,72 +7,101 @@
     </view>
   </view>
 
-  <scroll-view class="content" scroll-y style="height: calc(100vh - {{navTotalHeight}}px);">
+  <scroll-view class="content" scroll-y style="height: calc(100vh - {{navTotalHeight}}px - 120rpx);">
     <view class="loading-wrap" wx:if="{{loading}}">
       <view class="loading-text">加载中...</view>
     </view>
 
-    <block wx:elif="{{record}}">
-      <view class="status-card">
-        <view class="status-title">服务记录已提交</view>
-        <view class="status-desc">本次上门服务情况如下</view>
+    <block wx:elif="{{detail}}">
+      <!-- 顶部摘要 -->
+      <view class="summary-card">
+        <view class="summary-title">本次服务已提交</view>
+        <view class="summary-time">提交时间：{{detail.submittedAtText}}</view>
       </view>
 
-      <view class="section-card" wx:if="{{record.imageUrls && record.imageUrls.length}}">
-        <view class="section-title">服务照片</view>
-        <scroll-view class="image-scroll" scroll-x>
-          <view class="image-row">
-            <image
-              class="record-image"
-              wx:for="{{record.imageUrls}}"
-              wx:key="*this"
-              src="{{item}}"
-              mode="aspectFill"
-              data-url="{{item}}"
-              bindtap="previewImage"
-            />
-          </view>
-        </scroll-view>
-      </view>
-
+      <!-- 服务项目 -->
       <view class="section-card">
-        <view class="section-title">完成事项</view>
-        <view class="tag-grid">
-          <view class="tag-item active" wx:for="{{record.completedItems}}" wx:key="code">
+        <view class="section-title">服务项目</view>
+
+        <view class="tag-grid" wx:if="{{detail.serviceItems.length}}">
+          <view class="tag-item active" wx:for="{{detail.serviceItems}}" wx:key="code">
             {{item.text}}
           </view>
         </view>
+
+        <view class="empty-text" wx:else>暂无服务项目</view>
       </view>
 
+      <!-- 宠物观察情况 -->
       <view class="section-card">
-        <view class="section-title">宠物状态</view>
-        <view class="status-pill">{{record.petStatusText}}</view>
+        <view class="section-title">宠物观察情况</view>
+
+        <view class="tag-grid" wx:if="{{detail.petObservations.length}}">
+          <view
+            class="tag-item {{item.isAbnormal ? 'warning' : 'active'}}"
+            wx:for="{{detail.petObservations}}"
+            wx:key="code"
+          >
+            {{item.text}}
+          </view>
+        </view>
+
+        <view class="empty-text" wx:else>暂无观察情况</view>
+
+        <view class="abnormal-box" wx:if="{{detail.hasAbnormal}}">
+          <view class="abnormal-title">异常情况说明</view>
+          <view class="abnormal-text">{{detail.abnormalDesc}}</view>
+        </view>
       </view>
 
+      <!-- 服务照片 -->
+      <view class="section-card">
+        <view class="section-title">服务照片</view>
+
+        <view class="media-grid" wx:if="{{detail.hasImages}}">
+          <image
+            class="image-thumb"
+            wx:for="{{detail.images}}"
+            wx:key="url"
+            src="{{item.url}}"
+            mode="aspectFill"
+            data-index="{{index}}"
+            bindtap="previewImage"
+          />
+        </view>
+
+        <view class="empty-text" wx:else>暂无服务照片</view>
+      </view>
+
+      <!-- 服务视频 -->
+      <view class="section-card">
+        <view class="section-title">服务视频</view>
+
+        <view class="video-list" wx:if="{{detail.hasVideos}}">
+          <view class="video-card" wx:for="{{detail.videos}}" wx:key="url">
+            <video
+              class="video-player"
+              src="{{item.url}}"
+              controls
+              objectFit="cover"
+            />
+          </view>
+        </view>
+
+        <view class="empty-text" wx:else>暂无服务视频</view>
+      </view>
+
+      <!-- 服务备注 -->
       <view class="section-card">
         <view class="section-title">服务备注</view>
-        <view class="remark-text">{{record.remark || '暂无备注'}}</view>
-      </view>
-
-      <view class="section-card">
-        <view class="section-title">服务时间轴</view>
-        <view class="timeline-item">
-          <view class="timeline-dot"></view>
-          <view class="timeline-content">
-            <view class="timeline-title">到达服务地址</view>
-            <view class="timeline-time">{{record.arrivedAt || '未记录'}}</view>
-          </view>
-        </view>
-        <view class="timeline-item">
-          <view class="timeline-dot active"></view>
-          <view class="timeline-content">
-            <view class="timeline-title">提交服务记录</view>
-            <view class="timeline-time">{{record.submittedAt || '未记录'}}</view>
-          </view>
-        </view>
+        <view class="remark-box">{{detail.remark}}</view>
       </view>
 
       <view class="page-bottom-space"></view>
     </block>
   </scroll-view>
+
+  <view class="bottom-bar">
+    <button class="ghost-btn action-btn" bindtap="handleContactService">联系客服</button>
+  </view>
 </view>

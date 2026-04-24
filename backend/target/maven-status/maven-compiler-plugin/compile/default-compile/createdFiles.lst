@@ -40,7 +40,6 @@ com\example\petcare\service\OrderService.class
 com\example\petcare\common\ApiResponse.class
 com\example\petcare\dto\CreateFoundPetRequest.class
 com\example\petcare\dto\WechatLoginRequest.class
-com\example\petcare\service\ServiceRecordService$1.class
 com\example\petcare\dto\AddressUpdateRequest.class
 com\example\petcare\dto\PetPostVO.class
 com\example\petcare\dto\ServiceRecordVO.class
@@ -56,6 +55,7 @@ com\example\petcare\dto\StartServiceRequest.class
 com\example\petcare\repository\PetOrderPetRepository.class
 com\example\petcare\dto\CreatePetCommentRequest.class
 com\example\petcare\entity\Review.class
+com\example\petcare\entity\ServiceRecordMedia.class
 com\example\petcare\dto\SitterAvailableOrderItemResponse.class
 com\example\petcare\service\AuthService.class
 com\example\petcare\util\GeoUtil.class
@@ -74,6 +74,7 @@ com\example\petcare\controller\HomeController.class
 com\example\petcare\entity\PetOrderSchedule.class
 com\example\petcare\dto\OrderDetailResponse.class
 com\example\petcare\service\ServiceRecordService.class
+com\example\petcare\entity\ServiceRecordItem.class
 com\example\petcare\entity\PetOrder.class
 com\example\petcare\repository\FoundPetRepository.class
 com\example\petcare\dto\UserLoginVO.class
@@ -94,6 +95,7 @@ com\example\petcare\controller\ServiceRecordController.class
 com\example\petcare\dto\AddressDeleteRequest.class
 com\example\petcare\entity\PetOrderPet.class
 com\example\petcare\entity\Pet.class
+com\example\petcare\repository\ServiceRecordMediaRepository.class
 com\example\petcare\config\BeanConfig.class
 com\example\petcare\dto\OrderCreateRequest.class
 com\example\petcare\common\Result.class
@@ -122,6 +124,7 @@ com\example\petcare\repository\OrdersRepository.class
 com\example\petcare\repository\PetOrderLogRepository.class
 com\example\petcare\repository\ServiceRecordImageRepository.class
 com\example\petcare\dto\TencentRegionResponse$ResultData.class
+com\example\petcare\repository\ServiceRecordItemRepository.class
 com\example\petcare\dto\AddressSetDefaultRequest.class
 com\example\petcare\controller\DbConnectTest.class
 com\example\petcare\repository\ServiceRecordRepository.class

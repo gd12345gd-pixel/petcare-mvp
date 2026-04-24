@@ -8,21 +8,26 @@ Page({
 
     id: null,
     loading: true,
-    record: null,
+    detail: null,
 
-    completedItemTextMap: {
-      FED: '已喂食',
-      WATER_CHANGED: '已换水',
-      CLEANED: '已清理',
-      PLAYED: '已陪玩',
-      LITTER_CHANGED: '已补充猫砂',
-      CHECKED_STATUS: '已检查状态'
+    serviceItemTextMap: {
+      FEED: '已喂食',
+      WATER: '已换水',
+      CLEAN: '已清理排泄区',
+      WALK_PLAY: '已遛狗/陪玩',
+      CHECK: '已观察宠物状态',
+      OTHER: '其他服务'
     },
-    petStatusTextMap: {
+
+    petObservationTextMap: {
       NORMAL: '状态正常',
       APPETITE_NORMAL: '食欲正常',
-      NERVOUS: '情绪紧张',
-      ABNORMAL: '有异常'
+      WATER_NORMAL: '饮水正常',
+      EMOTION_STABLE: '情绪稳定',
+      EXCRETION_NORMAL: '排泄正常',
+      ENERGY_GOOD: '精神不错',
+      RESTED: '已休息',
+      ABNORMAL: '有异常情况'
     }
   },
 
@@ -30,13 +35,25 @@ Page({
     const systemInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
     const statusBarHeight = systemInfo.statusBarHeight || 20
     const navBarHeight = 44
+    const id = options.id
 
     this.setData({
       statusBarHeight,
       navBarHeight,
       navTotalHeight: statusBarHeight + navBarHeight,
-      id: options.id || null
+      id: id || null
     })
+
+    if (!id) {
+      wx.showToast({
+        title: '缺少记录ID',
+        icon: 'none'
+      })
+      setTimeout(() => {
+        this.navigateBack()
+      }, 800)
+      return
+    }
 
     this.loadDetail()
   },
@@ -49,48 +66,82 @@ Page({
     }
   },
 
-  loadDetail() {
-    if (!this.data.id) {
-      this.setData({ loading: false })
-      wx.showToast({ title: '记录ID缺失', icon: 'none' })
-      return
-    }
+  async loadDetail() {
+    this.setData({ loading: true })
 
-    request(`/api/service-record/detail?id=${this.data.id}`, 'GET')
-      .then((res) => {
-        this.setData({
-          record: this.formatRecord(res || {}),
-          loading: false
-        })
+    try {
+      const res = await request(`/api/service-record/detail?id=${this.data.id}`, 'GET')
+      const raw = res || {}
+
+      this.setData({
+        detail: this.formatDetail(raw),
+        loading: false
       })
-      .catch((err) => {
-        console.error('loadDetail error', err)
-        this.setData({ loading: false })
-        wx.showToast({ title: '加载失败', icon: 'none' })
+    } catch (err) {
+      console.error('loadDetail error', err)
+      this.setData({ loading: false })
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
       })
+    }
   },
 
-  formatRecord(raw) {
-    const completedItems = (raw.completedItems || []).map(code => ({
+  formatDetail(raw) {
+    const serviceItems = (raw.serviceItems || []).map(code => ({
       code,
-      text: this.data.completedItemTextMap[code] || code
+      text: this.data.serviceItemTextMap[code] || code
     }))
 
+    const petObservations = (raw.petObservations || []).map(code => ({
+      code,
+      text: this.data.petObservationTextMap[code] || code,
+      isAbnormal: code === 'ABNORMAL'
+    }))
+
+    const images = (raw.images || []).map(url => ({ url }))
+    const videos = (raw.videos || []).map(url => ({ url }))
+
     return {
-      ...raw,
-      completedItems,
-      petStatusText: this.data.petStatusTextMap[raw.petStatus] || '未知状态'
+      id: raw.id,
+      orderId: raw.orderId,
+      scheduleId: raw.scheduleId,
+      sitterId: raw.sitterId,
+      remark: raw.remark || '暂无备注',
+      abnormalDesc: raw.abnormalDesc || '',
+      submittedAtText: this.formatDateTime(raw.submittedAt),
+      serviceItems,
+      petObservations,
+      images,
+      videos,
+      hasImages: images.length > 0,
+      hasVideos: videos.length > 0,
+      hasAbnormal: !!raw.abnormalDesc
     }
+  },
+
+  formatDateTime(value) {
+    if (!value) return '--'
+    const text = String(value).replace('T', ' ')
+    return text.length >= 16 ? text.slice(0, 16) : text
   },
 
   previewImage(e) {
-    const current = e.currentTarget.dataset.url
-    const urls = (this.data.record && this.data.record.imageUrls) || []
-    if (!current || !urls.length) return
+    const index = Number(e.currentTarget.dataset.index)
+    const detail = this.data.detail
+    if (!detail || !detail.images || !detail.images.length) return
 
+    const urls = detail.images.map(item => item.url)
     wx.previewImage({
-      current,
+      current: urls[index],
       urls
+    })
+  },
+
+  handleContactService() {
+    wx.showToast({
+      title: '这里后面接客服能力',
+      icon: 'none'
     })
   }
 })

@@ -1,6 +1,8 @@
 .record-detail-page {
   min-height: 100vh;
   background: #f7f8fb;
+  padding-bottom: 120rpx;
+  box-sizing: border-box;
 }
 
 .custom-nav {
@@ -51,7 +53,7 @@
   color: #999;
 }
 
-.status-card,
+.summary-card,
 .section-card {
   margin: 16rpx 16rpx 0;
   padding: 24rpx 22rpx;
@@ -61,122 +63,155 @@
   box-sizing: border-box;
 }
 
-.status-card {
-  background: linear-gradient(180deg, #ffeef3 0%, #ffffff 100%);
+.summary-card {
+  background: linear-gradient(180deg, #fff1f5 0%, #fff8fa 100%);
 }
 
-.status-title {
-  font-size: 36rpx;
+.summary-title {
+  font-size: 34rpx;
   font-weight: 800;
   color: #ff5f8d;
+  line-height: 1.3;
 }
 
-.status-desc {
+.summary-time {
   margin-top: 10rpx;
   font-size: 24rpx;
   color: #8b8f97;
+  line-height: 1.6;
 }
 
 .section-title {
   font-size: 30rpx;
   font-weight: 800;
   color: #222;
-  margin-bottom: 18rpx;
-}
-
-.image-scroll {
-  white-space: nowrap;
-}
-
-.image-row {
-  display: inline-flex;
-  gap: 16rpx;
-}
-
-.record-image {
-  width: 220rpx;
-  height: 220rpx;
-  border-radius: 20rpx;
-  background: #f2f2f2;
-  flex-shrink: 0;
+  line-height: 1.4;
 }
 
 .tag-grid {
+  margin-top: 18rpx;
   display: flex;
   flex-wrap: wrap;
   gap: 14rpx;
 }
 
 .tag-item {
-  min-width: 150rpx;
-  height: 66rpx;
-  padding: 0 18rpx;
-  border-radius: 16rpx;
-  background: #fff1f5;
-  color: #ff5f8d;
-  font-size: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-.status-pill {
-  display: inline-flex;
-  padding: 10rpx 18rpx;
+  padding: 14rpx 22rpx;
   border-radius: 999rpx;
-  background: #fff1f5;
-  color: #ff5f8d;
   font-size: 24rpx;
   line-height: 1.2;
+  border: 1rpx solid transparent;
 }
 
-.remark-text {
+.tag-item.active {
+  background: #fff1f5;
+  color: #ff5f8d;
+  border-color: #ffd6e2;
+}
+
+.tag-item.warning {
+  background: #fff4e8;
+  color: #ff8a00;
+  border-color: #ffd7ae;
+}
+
+.abnormal-box {
+  margin-top: 20rpx;
+  padding: 18rpx;
+  border-radius: 18rpx;
+  background: #fff8f0;
+  border: 1rpx solid #ffe2bf;
+}
+
+.abnormal-title {
   font-size: 24rpx;
-  color: #666;
+  font-weight: 700;
+  color: #ff8a00;
+  line-height: 1.4;
+}
+
+.abnormal-text {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #7a4a16;
   line-height: 1.7;
 }
 
-.timeline-item {
-  display: flex;
-  align-items: flex-start;
-  position: relative;
-}
-
-.timeline-item + .timeline-item {
-  margin-top: 24rpx;
-}
-
-.timeline-dot {
-  width: 18rpx;
-  height: 18rpx;
-  border-radius: 50%;
-  background: #d9dde5;
-  margin-top: 8rpx;
-  margin-right: 16rpx;
-  flex-shrink: 0;
-}
-
-.timeline-dot.active {
-  background: #ff5f8d;
-}
-
-.timeline-content {
-  flex: 1;
-}
-
-.timeline-title {
-  font-size: 26rpx;
-  font-weight: 700;
-  color: #222;
-}
-
-.timeline-time {
-  margin-top: 6rpx;
-  font-size: 22rpx;
+.empty-text {
+  margin-top: 18rpx;
+  font-size: 24rpx;
   color: #9aa0aa;
+  line-height: 1.6;
+}
+
+.media-grid {
+  margin-top: 18rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+
+.image-thumb {
+  width: 210rpx;
+  height: 210rpx;
+  border-radius: 18rpx;
+  background: #f3f4f6;
+}
+
+.video-list {
+  margin-top: 18rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.video-card {
+  background: #f8f9fc;
+  border-radius: 18rpx;
+  padding: 14rpx;
+}
+
+.video-player {
+  width: 100%;
+  height: 360rpx;
+  border-radius: 14rpx;
+  background: #000;
+}
+
+.remark-box {
+  margin-top: 18rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 18rpx;
+  background: #f8f9fc;
+  font-size: 26rpx;
+  color: #222;
+  line-height: 1.8;
+}
+
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 14rpx 20rpx calc(14rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1rpx solid #f0f0f0;
+  box-sizing: border-box;
+}
+
+.action-btn {
+  width: 100%;
+  height: 88rpx;
+  border-radius: 18rpx;
+}
+
+.ghost-btn {
+  background: #fff;
+  color: #666;
+  border: 1rpx solid #eceef2;
 }
 
 .page-bottom-space {
-  height: 28rpx;
+  height: 32rpx;
 }

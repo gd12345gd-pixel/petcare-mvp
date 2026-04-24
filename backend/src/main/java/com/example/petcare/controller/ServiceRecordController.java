@@ -4,6 +4,7 @@ import com.example.petcare.common.ApiResponse;
 import com.example.petcare.dto.ServiceRecordCreateRequest;
 import com.example.petcare.dto.ServiceRecordDetailResponse;
 import com.example.petcare.dto.ServiceRecordListItemResponse;
+import com.example.petcare.entity.ServiceRecord;
 import com.example.petcare.service.ServiceRecordService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,12 +22,12 @@ public class ServiceRecordController {
     }
 
     @PostMapping("/create")
-    public ApiResponse<Long> create(@RequestBody ServiceRecordCreateRequest request) {
+    public ApiResponse<ServiceRecord> create(@RequestBody ServiceRecordCreateRequest request) {
         return ApiResponse.success("提交服务记录成功", serviceRecordService.create(request));
     }
 
     @GetMapping("/listByOrder")
-    public ApiResponse<List<ServiceRecordListItemResponse>> listByOrder(@RequestParam Long orderId) {
+    public ApiResponse<List<ServiceRecord>> listByOrder(@RequestParam Long orderId) {
         return ApiResponse.success(serviceRecordService.listByOrder(orderId));
     }
 

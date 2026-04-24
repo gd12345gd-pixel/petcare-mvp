@@ -1,5 +1,6 @@
 package com.example.petcare.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ServiceRecordDetailResponse {
@@ -8,50 +9,101 @@ public class ServiceRecordDetailResponse {
     private Long orderId;
     private Long scheduleId;
     private Long sitterId;
-    private Long userId;
 
-    private String recordStatus;
-    private String petStatus;
-    private List<String> completedItems;
     private String remark;
-    private String arrivedAt;
-    private String submittedAt;
+    private String abnormalDesc;
+    private LocalDateTime submittedAt;
 
-    private List<String> imageUrls;
+    private List<String> serviceItems;
+    private List<String> petObservations;
+    private List<String> images;
+    private List<String> videos;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public Long getOrderId() { return orderId; }
-    public void setOrderId(Long orderId) { this.orderId = orderId; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public Long getScheduleId() { return scheduleId; }
-    public void setScheduleId(Long scheduleId) { this.scheduleId = scheduleId; }
+    public Long getOrderId() {
+        return orderId;
+    }
 
-    public Long getSitterId() { return sitterId; }
-    public void setSitterId(Long sitterId) { this.sitterId = sitterId; }
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
 
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public Long getScheduleId() {
+        return scheduleId;
+    }
 
-    public String getRecordStatus() { return recordStatus; }
-    public void setRecordStatus(String recordStatus) { this.recordStatus = recordStatus; }
+    public void setScheduleId(Long scheduleId) {
+        this.scheduleId = scheduleId;
+    }
 
-    public String getPetStatus() { return petStatus; }
-    public void setPetStatus(String petStatus) { this.petStatus = petStatus; }
+    public Long getSitterId() {
+        return sitterId;
+    }
 
-    public List<String> getCompletedItems() { return completedItems; }
-    public void setCompletedItems(List<String> completedItems) { this.completedItems = completedItems; }
+    public void setSitterId(Long sitterId) {
+        this.sitterId = sitterId;
+    }
 
-    public String getRemark() { return remark; }
-    public void setRemark(String remark) { this.remark = remark; }
+    public String getRemark() {
+        return remark;
+    }
 
-    public String getArrivedAt() { return arrivedAt; }
-    public void setArrivedAt(String arrivedAt) { this.arrivedAt = arrivedAt; }
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
-    public String getSubmittedAt() { return submittedAt; }
-    public void setSubmittedAt(String submittedAt) { this.submittedAt = submittedAt; }
+    public String getAbnormalDesc() {
+        return abnormalDesc;
+    }
 
-    public List<String> getImageUrls() { return imageUrls; }
-    public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
+    public void setAbnormalDesc(String abnormalDesc) {
+        this.abnormalDesc = abnormalDesc;
+    }
+
+    public LocalDateTime getSubmittedAt() {
+        return submittedAt;
+    }
+
+    public void setSubmittedAt(LocalDateTime submittedAt) {
+        this.submittedAt = submittedAt;
+    }
+
+    public List<String> getServiceItems() {
+        return serviceItems;
+    }
+
+    public void setServiceItems(List<String> serviceItems) {
+        this.serviceItems = serviceItems;
+    }
+
+    public List<String> getPetObservations() {
+        return petObservations;
+    }
+
+    public void setPetObservations(List<String> petObservations) {
+        this.petObservations = petObservations;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public List<String> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<String> videos) {
+        this.videos = videos;
+    }
 }
