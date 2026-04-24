@@ -18,6 +18,8 @@ public class User {
 
     private String unionid;
 
+    private String sessionKey;
+
     private String nickname;
 
     private String avatarUrl;
@@ -33,4 +35,12 @@ public class User {
     private LocalDateTime updatedAt;
 
     private LocalDateTime lastLoginAt;
+
+    private String lastLoginIp;
+
+    @Column(length = 512)
+    private String lastLoginUserAgent;
+
+    @Column(length = 2048)
+    private String wxLoginRaw;
 }

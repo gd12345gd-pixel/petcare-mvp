@@ -19,8 +19,8 @@
     <view class="empty-wrap" wx:elif="{{!orders.length}}">
       <view class="empty-illustration">📦</view>
       <view class="empty-title">还没有订单</view>
-      <view class="empty-desc">去预约一次上门喂养吧</view>
-      <button class="primary-btn empty-btn" bindtap="goCreateOrder">立即下单</button>
+      <view class="empty-desc">{{isLoggedIn ? '去预约一次上门照护吧' : '登录后可查看预约进度和服务记录'}}</view>
+      <button class="primary-btn empty-btn" bindtap="goCreateOrder">去预约</button>
     </view>
 
     <block wx:else>

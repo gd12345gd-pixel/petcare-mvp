@@ -6,29 +6,31 @@
 
       <view class="hero-top">
         <image
-          class="profile-avatar"
-          src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300"
+          class="profile-avatar {{!isLoggedIn ? 'empty-avatar' : ''}}"
+          src="{{isLoggedIn && currentUser.avatarUrl ? currentUser.avatarUrl : ''}}"
           mode="aspectFill"
         />
         <view class="profile-info">
-          <view class="page-title">奶糕主人</view>
-          <view class="desc-text profile-sub">欢迎回来，今天也要照顾好毛孩子呀</view>
+          <view class="page-title" wx:if="{{isLoggedIn}}">{{currentUser.nickname || '微信用户'}}</view>
+          <view class="page-title login-entry" wx:else bindtap="goLogin">登录/注册</view>
+          <view class="desc-text profile-sub" wx:if="{{isLoggedIn}}">欢迎回来，今天也要照顾好毛孩子呀</view>
+          <view class="desc-text profile-sub" wx:else>登录后可管理宠物、地址和订单</view>
         </view>
       </view>
 
       <view class="hero-stats">
         <view class="stat-item">
-          <view class="stat-num">2</view>
+          <view class="stat-num">{{isLoggedIn ? 2 : 0}}</view>
           <view class="muted-text stat-label">宠物档案</view>
         </view>
         <view class="stat-divider"></view>
         <view class="stat-item">
-          <view class="stat-num">6</view>
+          <view class="stat-num">{{isLoggedIn ? 6 : 0}}</view>
           <view class="muted-text stat-label">历史订单</view>
         </view>
         <view class="stat-divider"></view>
         <view class="stat-item">
-          <view class="stat-num">1</view>
+          <view class="stat-num">{{isLoggedIn ? 1 : 0}}</view>
           <view class="muted-text stat-label">常用地址</view>
         </view>
       </view>

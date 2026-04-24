@@ -1,5 +1,6 @@
 package com.example.petcare.controller;
 
+import com.example.petcare.auth.AuthContext;
 import com.example.petcare.common.Result;
 import com.example.petcare.dto.*;
 import com.example.petcare.service.PetCommunityService;
@@ -34,12 +35,14 @@ public class PetCommunityController {
 
     @PostMapping("/lost")
     public Result<Map<String, Long>> createLost(@RequestBody CreateLostPetRequest request) {
+        request.setUserId(AuthContext.requireCurrentUserId());
         Long id = petCommunityService.createLostPet(request);
         return Result.success(Map.of("id", id));
     }
 
     @PostMapping("/found")
     public Result<Map<String, Long>> createFound(@RequestBody CreateFoundPetRequest request) {
+        request.setUserId(AuthContext.requireCurrentUserId());
         Long id = petCommunityService.createFoundPet(request);
         return Result.success(Map.of("id", id));
     }
@@ -66,6 +69,7 @@ public class PetCommunityController {
 
     @PostMapping("/comments")
     public Result<Void> createComment(@RequestBody CreatePetCommentRequest request) {
+        request.setUserId(AuthContext.requireCurrentUserId());
         petCommunityService.createComment(request);
         return Result.success(null);
     }

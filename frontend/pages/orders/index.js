@@ -1,7 +1,7 @@
 const {
   request
 } = require('../../utils/request');
-const app = getApp();
+const { ensureLogin } = require('../../utils/auth')
 Page({
   data: {
     orders: [],
@@ -19,7 +19,9 @@ Page({
     this.loadOrders();
   },
   async loadOrders() {
-    const orders = await request(`/api/orders/list?userId=${app.globalData.userId}`);
+    const currentUser = ensureLogin()
+    if (!currentUser.id) return
+    const orders = await request(`/api/orders/list?userId=${currentUser.id}`);
     this.setData({
       orders
     });

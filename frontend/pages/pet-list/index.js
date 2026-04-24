@@ -1,3 +1,4 @@
+﻿const { ensureLogin } = require('../../utils/auth')
 const { request } = require('../../utils/request')
 const { formatPetAge } = require('../../utils/pet-display')
 
@@ -42,7 +43,7 @@ Page({
   },
 
   loadPetList() {
-    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
+    const currentUser = ensureLogin()
 
     this.setData({ loading: true })
 

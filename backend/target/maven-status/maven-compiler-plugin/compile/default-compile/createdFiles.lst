@@ -16,6 +16,7 @@ com\example\petcare\dto\TencentRegionResponse.class
 com\example\petcare\dto\FinishScheduleRequest.class
 com\example\petcare\dto\PetResponse.class
 com\example\petcare\dto\PetCommentVO.class
+com\example\petcare\auth\TokenService.class
 com\example\petcare\repository\PetRepository.class
 com\example\petcare\entity\User.class
 com\example\petcare\repository\ServiceItemRepository.class
@@ -40,6 +41,7 @@ com\example\petcare\service\OrderService.class
 com\example\petcare\common\ApiResponse.class
 com\example\petcare\dto\CreateFoundPetRequest.class
 com\example\petcare\dto\WechatLoginRequest.class
+com\example\petcare\dto\UserProfileUpdateRequest.class
 com\example\petcare\dto\AddressUpdateRequest.class
 com\example\petcare\dto\PetPostVO.class
 com\example\petcare\dto\ServiceRecordVO.class
@@ -53,6 +55,7 @@ com\example\petcare\entity\Sitter.class
 com\example\petcare\dto\CreateServiceRecordRequest.class
 com\example\petcare\dto\StartServiceRequest.class
 com\example\petcare\repository\PetOrderPetRepository.class
+com\example\petcare\auth\AuthInterceptor.class
 com\example\petcare\dto\CreatePetCommentRequest.class
 com\example\petcare\entity\Review.class
 com\example\petcare\entity\ServiceRecordMedia.class
@@ -64,11 +67,14 @@ com\example\petcare\dto\TencentReverseGeocodeResponse$AddressComponent.class
 com\example\petcare\config\DataSourceConfig.class
 com\example\petcare\dto\PetPostVO$PetPostVOBuilder.class
 com\example\petcare\service\SitterOrderService$1.class
+com\example\petcare\auth\AuthContext.class
 com\example\petcare\entity\ServiceRecord.class
 com\example\petcare\config\CorsConfig.class
 com\example\petcare\config\WebConfig.class
 com\example\petcare\entity\AppUser.class
+com\example\petcare\dto\LoginDeviceInfo.class
 com\example\petcare\repository\ReviewRepository.class
+com\example\petcare\entity\UserLoginLog.class
 com\example\petcare\service\PetService$1.class
 com\example\petcare\controller\HomeController.class
 com\example\petcare\entity\PetOrderSchedule.class
@@ -117,6 +123,7 @@ com\example\petcare\dto\CompleteServiceRequest.class
 com\example\petcare\PetcareApplication.class
 com\example\petcare\common\GlobalExceptionHandler.class
 com\example\petcare\dto\TencentReverseGeocodeResponse$ResultData.class
+com\example\petcare\repository\UserLoginLogRepository.class
 com\example\petcare\config\WebMvcConfig.class
 com\example\petcare\dto\SitterOrderDetailResponse.class
 com\example\petcare\repository\LostPetRepository.class

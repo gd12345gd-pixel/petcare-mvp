@@ -1,3 +1,4 @@
+﻿const { ensureLogin, getToken } = require('../../utils/auth')
 const { request, BASE_URL } = require('../../utils/request')
 const { QQMAP_KEY } = require('../../utils/qqmap-config')
 
@@ -59,6 +60,7 @@ Page({
       url: `${BASE_URL}/api/files/upload-image`,
       filePath,
       name: 'file',
+      header: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
       success: (res) => {
         try {
           const data = JSON.parse(res.data || '{}')
@@ -165,7 +167,7 @@ Page({
   submitPublish() {
     if (!this.validateForm() || this.data.submitting) return
 
-    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
+    const currentUser = ensureLogin()
     const { form, activeType } = this.data
     const isLost = activeType === 'lost'
     const api = isLost ? '/api/pet-community/lost' : '/api/pet-community/found'

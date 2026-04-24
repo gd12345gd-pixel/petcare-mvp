@@ -1,7 +1,9 @@
 {
   "pages": [
       "pages/home/index",
+      "pages/login/index",
       "pages/detail/index",
+      "pages/service-detail/index",
       "pages/order/create/index",
       "pages/order/detail/index",
       "pages/order/list/index",

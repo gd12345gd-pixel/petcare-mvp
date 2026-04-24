@@ -1,8 +1,10 @@
 const { request } = require('../../../utils/request')
+const { ensureLogin, getCurrentUser, getToken } = require('../../../utils/auth')
 
 Page({
   data: {
     loading: true,
+    isLoggedIn: false,
     orders: [],
     filteredOrders: [],
 
@@ -40,9 +42,20 @@ Page({
   },
 
   loadOrders() {
-    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
+    const currentUser = getCurrentUser()
+    const isLoggedIn = !!(getToken() && currentUser && currentUser.id)
 
-    this.setData({ loading: true })
+    if (!isLoggedIn) {
+      this.setData({
+        isLoggedIn: false,
+        loading: false,
+        orders: [],
+        filteredOrders: []
+      })
+      return
+    }
+
+    this.setData({ loading: true, isLoggedIn: true })
 
     request(`/api/orders/list?userId=${currentUser.id}`, 'GET')
       .then((res) => {
@@ -158,8 +171,9 @@ Page({
   },
 
   goCreateOrder() {
+    if (!ensureLogin().id) return
     wx.navigateTo({
-      url: '/pages/order/create/index'
+      url: '/pages/service-detail/index'
     })
   }
 })

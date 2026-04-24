@@ -1,12 +1,7 @@
 package com.example.petcare.service;
 
 import com.example.petcare.dto.*;
-import com.example.petcare.entity.PetOrder;
-import com.example.petcare.entity.PetOrderLog;
-import com.example.petcare.entity.PetOrderPet;
-import com.example.petcare.entity.PetOrderSchedule;
-import com.example.petcare.entity.Pet;
-import com.example.petcare.entity.ServiceRecord;
+import com.example.petcare.entity.*;
 import com.example.petcare.repository.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,20 +23,24 @@ public class SitterOrderService {
     private final ServiceRecordRepository serviceRecordRepository;
     private final PetRepository petRepository;
 
+    private final SitterAcceptOrderRuleService acceptOrderRuleService;
+    private final SitterProfileRepository  sitterProfileRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SitterOrderService(PetOrderRepository petOrderRepository,
-        PetOrderPetRepository petOrderPetRepository,
-        PetOrderScheduleRepository petOrderScheduleRepository,
-        PetOrderLogRepository petOrderLogRepository,
-        ServiceRecordRepository serviceRecordRepository,
-        PetRepository petRepository) {
+                              PetOrderPetRepository petOrderPetRepository,
+                              PetOrderScheduleRepository petOrderScheduleRepository,
+                              PetOrderLogRepository petOrderLogRepository,
+                              ServiceRecordRepository serviceRecordRepository,
+                              PetRepository petRepository, SitterAcceptOrderRuleService acceptOrderRuleService, SitterProfileRepository sitterProfileRepository) {
         this.petOrderRepository = petOrderRepository;
         this.petOrderPetRepository = petOrderPetRepository;
         this.petOrderScheduleRepository = petOrderScheduleRepository;
         this.petOrderLogRepository = petOrderLogRepository;
         this.serviceRecordRepository = serviceRecordRepository;
         this.petRepository = petRepository;
+        this.acceptOrderRuleService = acceptOrderRuleService;
+        this.sitterProfileRepository = sitterProfileRepository;
     }
 
     public List<SitterAvailableOrderItemResponse> availableOrders(SitterOrderListRequest request) {
@@ -230,12 +229,24 @@ public class SitterOrderService {
     public void takeOrder(TakeOrderRequest request) {
         validateOperator(request.getOrderId(), request.getSitterId());
 
+        acceptOrderRuleService.checkCanAcceptOrder(request.getSitterId());
+
+        SitterProfile sitter = sitterProfileRepository.findByUserId(request.getSitterId())
+                .orElseThrow(() -> new RuntimeException("接单师不存在"));
+
         PetOrder order = petOrderRepository.findByIdAndDeleted(request.getOrderId(), 0)
             .orElseThrow(() -> new RuntimeException("订单不存在"));
 
         if (!"WAIT_TAKING".equals(order.getOrderStatus())) {
             throw new RuntimeException("该订单已不可接");
         }
+
+        if ("PAID".equals(sitter.getDepositStatus())) {
+            sitter.setDepositStatus("LOCKED");
+        }
+
+
+        sitterProfileRepository.save(sitter);
 
         order.setOrderStatus("TAKEN");
         order.setSitterId(request.getSitterId());

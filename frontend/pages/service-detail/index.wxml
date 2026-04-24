@@ -1,0 +1,127 @@
+<view class="detail-page">
+  <scroll-view class="detail-scroll" scroll-y>
+    <view class="hero">
+      <view class="hero-copy">
+        <view class="hero-kicker">PetCare 上门照护</view>
+        <view class="hero-title">安心喂养，放心出门</view>
+        <view class="hero-desc">喂食换水、清洁护理、遛狗陪伴，全程记录可追溯。</view>
+        <view class="hero-tags">
+          <view class="hero-tag">喂猫</view>
+          <view class="hero-tag">遛狗</view>
+          <view class="hero-tag">视频记录</view>
+        </view>
+      </view>
+      <view class="hero-pet-card">
+        <image class="hero-pet-image" src="/assets/service/shiba.png" mode="aspectFit" />
+      </view>
+    </view>
+
+    <view class="service-summary">
+      <view class="service-icon">
+        <image class="service-icon-image" src="/assets/service/cat-dog.png" mode="aspectFit" />
+      </view>
+      <view class="service-main">
+        <view class="service-title">上门喂猫 / 遛狗</view>
+        <view class="service-subtitle">专业上门照护，全程图片/视频记录</view>
+      </view>
+      <view class="service-price">
+        <view class="price-main">自定预算</view>
+        <view class="price-unit">下单时填写</view>
+      </view>
+    </view>
+
+    <view class="assurance-section">
+      <view class="section-title">安心保障</view>
+      <view class="assurance-grid">
+        <view class="assurance-item">
+          <view class="assurance-icon">✓</view>
+          <view class="assurance-text">实名托托师</view>
+        </view>
+        <view class="assurance-item">
+          <view class="assurance-icon">录</view>
+          <view class="assurance-text">服务录像</view>
+        </view>
+        <view class="assurance-item">
+          <view class="assurance-icon">沟</view>
+          <view class="assurance-text">专属沟通</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="sticky-tabs">
+      <view
+        class="tab-item {{activeTab === 'detail' ? 'active' : ''}}"
+        data-tab="detail"
+        bindtap="switchTab"
+      >项目详情</view>
+      <view
+        class="tab-item {{activeTab === 'record' ? 'active' : ''}}"
+        data-tab="record"
+        bindtap="switchTab"
+      >宠托日记</view>
+      <view
+        class="tab-item {{activeTab === 'review' ? 'active' : ''}}"
+        data-tab="review"
+        bindtap="switchTab"
+      >家长评价</view>
+    </view>
+
+    <block wx:if="{{activeTab === 'detail'}}">
+      <view class="content-section">
+        <view class="content-title">服务内容</view>
+        <view class="care-row" wx:for="{{careItems}}" wx:key="*this">
+          <view class="care-index">{{index + 1}}</view>
+          <view class="care-text">{{item}}</view>
+        </view>
+      </view>
+
+      <view class="content-section">
+        <view class="content-title">服务流程</view>
+        <view class="flow-item" wx:for="{{flowItems}}" wx:key="title">
+          <view class="flow-index">{{index + 1}}</view>
+          <view class="flow-main">
+            <view class="flow-title">{{item.title}}</view>
+            <view class="flow-desc">{{item.desc}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="content-section">
+        <view class="content-title">收费说明</view>
+        <view class="price-text">本平台采用用户自定义服务费模式，下单时你可以根据服务日期、宠物数量、服务时长和照护难度填写本次预算。</view>
+        <view class="price-text">多只宠物、长时陪伴、节假日、喂药或特殊清洁等需求，建议在备注里写清楚，并适当提高预算，便于托托师判断是否接单。</view>
+        <view class="price-text">同一天多次上门可分别下单，单次服务费以你提交订单时填写的金额为准。</view>
+      </view>
+
+      <view class="content-section">
+        <view class="content-title">下单须知</view>
+        <view class="notice-row" wx:for="{{notices}}" wx:key="*this">
+          <view class="notice-dot"></view>
+          <view class="notice-text">{{index + 1}}、{{item}}</view>
+        </view>
+      </view>
+    </block>
+
+    <view class="content-section" wx:elif="{{activeTab === 'record'}}">
+      <view class="content-title">宠托日记</view>
+      <view class="placeholder-title">服务完成后展示</view>
+      <view class="placeholder-desc">托托师提交的图片、视频、喂食换水和清洁记录会在这里汇总。</view>
+    </view>
+
+    <view class="content-section" wx:else>
+      <view class="content-title">家长评价</view>
+      <view class="placeholder-title">暂无评价</view>
+      <view class="placeholder-desc">完成订单后，家长可对托托师和本次照护体验进行评价。</view>
+    </view>
+
+    <view class="bottom-space"></view>
+  </scroll-view>
+
+  <view class="bottom-bar detail-bottom">
+    <view class="contact-btn" bindtap="goContact">
+      <view class="contact-icon">客</view>
+      <view class="contact-text">客服</view>
+    </view>
+    <button class="order-btn" bindtap="goOrder">立即下单</button>
+  </view>
+</view>

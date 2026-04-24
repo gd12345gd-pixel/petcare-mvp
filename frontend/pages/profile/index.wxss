@@ -51,6 +51,14 @@
   flex-shrink: 0;
 }
 
+.empty-avatar {
+  background: #f3f4f6;
+}
+
+.login-entry {
+  color: #ff5f8d;
+}
+
 .profile-info {
   margin-left: 20rpx;
   min-width: 0;

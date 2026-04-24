@@ -1,4 +1,5 @@
 const { request, BASE_URL } = require('../../utils/request')
+const { getToken } = require('../../utils/auth')
 
 Page({
   data: {
@@ -291,6 +292,7 @@ Page({
       url: `${BASE_URL}/api/files/upload-image`,
       filePath,
       name: 'file',
+      header: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
       success: (res) => {
         try {
           const data = JSON.parse(res.data)
@@ -326,6 +328,7 @@ Page({
       url: `${BASE_URL}/api/files/upload-image`,
       filePath,
       name: 'file',
+      header: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
       success: (res) => {
         try {
           const data = JSON.parse(res.data)

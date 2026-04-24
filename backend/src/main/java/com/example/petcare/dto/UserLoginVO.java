@@ -10,6 +10,7 @@ public class UserLoginVO {
     private String openid;
     private String nickname;
     private String avatarUrl;
+    private String phone;
     private String role;
     private String sitterStatus;
     private String currentRole;
