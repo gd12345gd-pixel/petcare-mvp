@@ -2,6 +2,16 @@
   height: calc(100vh - 96rpx - 156rpx);
 }
 
+.nav-bar {
+  height: 96rpx;
+  align-items: center;
+}
+
+.back-area {
+  height: 96rpx;
+  align-self: center;
+}
+
 .hero-upload {
   margin: 16rpx 20rpx 0;
   height: 220rpx;
@@ -80,14 +90,17 @@
   display: flex;
   justify-content: flex-end;
   flex-wrap: wrap;
-  gap: 20rpx;
+  gap: 14rpx;
 }
 
 .radio-item {
   display: flex;
   align-items: center;
+  min-height: 56rpx;
+  padding: 0 4rpx;
   font-size: 28rpx;
   color: #666;
+  line-height: normal;
 }
 
 .radio-dot {
@@ -197,6 +210,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: normal;
   box-sizing: border-box;
 }
  
@@ -233,6 +247,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: normal;
   box-sizing: border-box;
 }
 
@@ -296,8 +311,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: normal;
 }
 
 .save-btn {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: normal;
+  margin: 0;
 }

@@ -25,6 +25,7 @@ public class OrderService {
     private final PetOrderLogRepository petOrderLogRepository;
     private final PetRepository petRepository;
     private final UserAddressRepository userAddressRepository;
+    private final ServiceRecordRepository serviceRecordRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -33,13 +34,15 @@ public class OrderService {
                         PetOrderScheduleRepository petOrderScheduleRepository,
                         PetOrderLogRepository petOrderLogRepository,
                         UserAddressRepository userAddressRepository,
-                        PetRepository petRepository) {
+                        PetRepository petRepository,
+                        ServiceRecordRepository serviceRecordRepository) {
         this.petOrderRepository = petOrderRepository;
         this.petOrderPetRepository = petOrderPetRepository;
         this.petOrderScheduleRepository = petOrderScheduleRepository;
         this.petOrderLogRepository = petOrderLogRepository;
         this.userAddressRepository = userAddressRepository;
         this.petRepository = petRepository;
+        this.serviceRecordRepository = serviceRecordRepository;
     }
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
@@ -164,6 +167,14 @@ public class OrderService {
 
         List<PetOrderPet> orderPets = petOrderPetRepository.findByOrderId(order.getId());
         List<PetOrderSchedule> schedules = petOrderScheduleRepository.findByOrderIdOrderByServiceDateAsc(order.getId());
+        Map<Long, Long> recordIdMap = serviceRecordRepository.findByOrderIdOrderBySubmittedAtDesc(order.getId())
+                .stream()
+                .filter(record -> record.getScheduleId() != null)
+                .collect(Collectors.toMap(
+                        ServiceRecord::getScheduleId,
+                        ServiceRecord::getId,
+                        (first, second) -> first
+                ));
 
         OrderDetailResponse response = new OrderDetailResponse();
         response.setId(order.getId());
@@ -186,7 +197,7 @@ public class OrderService {
         response.setTimeSlots(parseJsonList(order.getTimeSlotsJson()));
 
         response.setPets(orderPets.stream().map(this::toPetResponse).collect(Collectors.toList()));
-        response.setServiceDates(schedules.stream().map(this::toScheduleResponse).collect(Collectors.toList()));
+        response.setServiceDates(schedules.stream().map(item -> toScheduleResponse(item, recordIdMap)).collect(Collectors.toList()));
 
         response.setSuggestedUnitPrice(order.getSuggestedUnitPrice());
         response.setUnitPrice(order.getUnitPrice());
@@ -362,11 +373,40 @@ public class OrderService {
         response.setPetGender(item.getPetGender());
         response.setPetAge(item.getPetAge());
         response.setPetRemark(item.getPetRemark());
+        petRepository.findByIdAndDeleted(item.getPetId(), 0).ifPresent(pet -> enrichPetResponse(response, pet));
         return response;
     }
 
+    private void enrichPetResponse(OrderPetItemResponse response, Pet pet) {
+        response.setPetName(firstText(pet.getName(), response.getPetName()));
+        response.setPetType(firstText(pet.getType(), response.getPetType()));
+        response.setPetBreed(firstText(pet.getBreed(), response.getPetBreed()));
+        response.setPetImageUrl(firstText(pet.getAvatarUrl(), response.getPetImageUrl()));
+        response.setPetGender(firstText(pet.getGender(), response.getPetGender()));
+        response.setPetAge(firstText(pet.getAge(), response.getPetAge()));
+        response.setPetRemark(firstText(pet.getIntro(), response.getPetRemark()));
+        response.setPetWeight(pet.getWeight());
+        response.setPetTags(parseJsonList(pet.getTagsJson()));
+        response.setHasAggression(pet.getHasAggression());
+        response.setVaccinated(pet.getVaccinated());
+        response.setPetIntro(pet.getIntro());
+        response.setPetAlbumList(parseJsonList(pet.getAlbumJson()));
+    }
+
+    private String firstText(String preferred, String fallback) {
+        return preferred == null || preferred.trim().isEmpty() ? fallback : preferred;
+    }
+
     private OrderScheduleItemResponse toScheduleResponse(PetOrderSchedule item) {
+        return toScheduleResponse(item, null);
+    }
+
+    private OrderScheduleItemResponse toScheduleResponse(PetOrderSchedule item, Map<Long, Long> recordIdMap) {
         OrderScheduleItemResponse response = new OrderScheduleItemResponse();
+        response.setScheduleId(item.getId());
+        if (recordIdMap != null) {
+            response.setRecordId(recordIdMap.get(item.getId()));
+        }
         response.setServiceDate(item.getServiceDate().toString());
         response.setScheduleStatus(item.getScheduleStatus());
         response.setTimeSlots(parseJsonList(item.getTimeSlotsJson()));

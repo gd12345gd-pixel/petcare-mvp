@@ -1,7 +1,15 @@
 <view class="record-upload-page">
+  <view class="form-tip {{formTipVisible ? 'show' : ''}}" style="top: {{navTotalHeight + 12}}px;">
+    {{formTip}}
+  </view>
+
   <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
     <view class="nav-inner">
-      <view class="nav-side nav-left" bindtap="navigateBack">‹</view>
+      <view class="nav-side nav-left" bindtap="navigateBack">
+        <view class="nav-back-hit">
+          <view class="nav-back-icon"></view>
+        </view>
+      </view>
       <view class="nav-title">提交服务记录</view>
       <view class="nav-side"></view>
     </view>
@@ -73,13 +81,15 @@
           </view>
         </view>
 
-        <view class="sub-section" wx:if="{{hasAbnormalSelected()}}">
+        <view class="sub-section abnormal-panel" wx:if="{{hasAbnormal}}">
           <view class="sub-title required-title">异常情况</view>
           <textarea
-            class="textarea"
+            class="textarea abnormal-textarea"
             value="{{abnormalDesc}}"
             placeholder="请填写异常情况，例如宠物精神不佳、进食异常、发现不适等"
             maxlength="300"
+            show-confirm-bar="{{false}}"
+            auto-height
             bindinput="onInputAbnormalDesc"
           />
         </view>

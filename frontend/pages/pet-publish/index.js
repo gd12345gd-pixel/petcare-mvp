@@ -3,48 +3,38 @@ const { QQMAP_KEY } = require('../../utils/qqmap-config')
 
 Page({
   data: {
-    petTypeOptions: ['狗狗', '猫咪', '其他'],
-    petTypeIndex: 0,
-
+    activeType: 'lost',
     form: {
       petName: '',
-      petType: '狗狗',
+      breed: '',
       imageUrl: '',
-
       province: '',
       city: '',
       district: '',
       regionText: '',
+      location: '',
       latitude: null,
       longitude: null,
-      detailAddress: '',
-
-      startDate: '',
-      endDate: '',
-      serviceFee: '',
-
-      description: '',
-      specialRequirement: ''
+      time: '',
+      contact: '',
+      reward: '',
+      tempCare: false,
+      desc: ''
     },
-
     uploading: false,
     submitting: false
   },
 
-  onInput(e) {
-    const field = e.currentTarget.dataset.field
-    const value = e.detail.value
+  switchType(e) {
     this.setData({
-      [`form.${field}`]: value
+      activeType: e.currentTarget.dataset.type || 'lost'
     })
   },
 
-  choosePetType(e) {
-    const index = Number(e.currentTarget.dataset.index)
-    const type = this.data.petTypeOptions[index]
+  onInput(e) {
+    const field = e.currentTarget.dataset.field
     this.setData({
-      petTypeIndex: index,
-      'form.petType': type
+      [`form.${field}`]: e.detail.value
     })
   },
 
@@ -53,15 +43,17 @@ Page({
       count: 1,
       mediaType: ['image'],
       success: (res) => {
-        const tempPath = res.tempFiles[0].tempFilePath
-        this.uploadImage(tempPath)
+        const tempPath = res.tempFiles && res.tempFiles[0] && res.tempFiles[0].tempFilePath
+        if (tempPath) {
+          this.uploadImage(tempPath)
+        }
       }
     })
   },
 
   uploadImage(filePath) {
     this.setData({ uploading: true })
-    wx.showLoading({ title: '上传图片中' })
+    wx.showLoading({ title: 'Uploading' })
 
     wx.uploadFile({
       url: `${BASE_URL}/api/files/upload-image`,
@@ -69,33 +61,24 @@ Page({
       name: 'file',
       success: (res) => {
         try {
-          const data = JSON.parse(res.data)
-          if (data.code === 0) {
+          const data = JSON.parse(res.data || '{}')
+          if (data.code === 0 && data.data && data.data.url) {
             this.setData({
               'form.imageUrl': data.data.url
             })
-            wx.showToast({
-              title: '图片上传成功',
-              icon: 'success'
-            })
+            wx.showToast({ title: 'Uploaded', icon: 'success' })
           } else {
             wx.showToast({
-              title: data.message || '图片上传失败',
+              title: data.message || 'Upload failed',
               icon: 'none'
             })
           }
-        } catch (e) {
-          wx.showToast({
-            title: '上传返回解析失败',
-            icon: 'none'
-          })
+        } catch (err) {
+          wx.showToast({ title: 'Upload failed', icon: 'none' })
         }
       },
       fail: () => {
-        wx.showToast({
-          title: '图片上传失败',
-          icon: 'none'
-        })
+        wx.showToast({ title: 'Upload failed', icon: 'none' })
       },
       complete: () => {
         this.setData({ uploading: false })
@@ -104,30 +87,26 @@ Page({
     })
   },
 
-  chooseRegionByMap() {
+  chooseLocation() {
     wx.chooseLocation({
       success: (res) => {
         const latitude = res.latitude
         const longitude = res.longitude
         this.setData({
           'form.latitude': latitude,
-          'form.longitude': longitude
+          'form.longitude': longitude,
+          'form.location': res.address || res.name || ''
         })
         this.reverseGeocode(latitude, longitude)
       },
       fail: (err) => {
         console.error('chooseLocation fail:', err)
-        wx.showToast({
-          title: '请选择地图位置',
-          icon: 'none'
-        })
+        wx.showToast({ title: 'Choose location', icon: 'none' })
       }
     })
   },
 
   reverseGeocode(latitude, longitude) {
-    wx.showLoading({ title: '解析地区中' })
-
     wx.request({
       url: 'https://apis.map.qq.com/ws/geocoder/v1/',
       method: 'GET',
@@ -139,77 +118,44 @@ Page({
         const data = res.data
         if (data && data.status === 0 && data.result) {
           const ac = data.result.address_component || {}
-
           this.setData({
             'form.province': ac.province || '',
             'form.city': ac.city || '',
             'form.district': ac.district || '',
             'form.regionText': `${ac.province || ''} ${ac.city || ''} ${ac.district || ''}`.trim()
           })
-        } else {
-          wx.showToast({
-            title: (data && data.message) || '地区解析失败',
-            icon: 'none'
-          })
         }
-      },
-      fail: () => {
-        wx.showToast({
-          title: '地区解析失败',
-          icon: 'none'
-        })
-      },
-      complete: () => {
-        wx.hideLoading()
       }
     })
   },
 
-  bindStartDateChange(e) {
+  toggleTempCare() {
     this.setData({
-      'form.startDate': e.detail.value
-    })
-  },
-
-  bindEndDateChange(e) {
-    this.setData({
-      'form.endDate': e.detail.value
+      'form.tempCare': !this.data.form.tempCare
     })
   },
 
   validateForm() {
-    const { form } = this.data
+    const { form, activeType } = this.data
 
-    if (!form.petName) {
-      wx.showToast({ title: '请输入宠物名字', icon: 'none' })
+    if (activeType === 'lost' && !form.petName) {
+      wx.showToast({ title: 'Pet name required', icon: 'none' })
       return false
     }
     if (!form.imageUrl) {
-      wx.showToast({ title: '请上传宠物照片', icon: 'none' })
+      wx.showToast({ title: 'Photo required', icon: 'none' })
       return false
     }
-    if (!form.regionText) {
-      wx.showToast({ title: '请选择所在地区', icon: 'none' })
+    if (!form.location) {
+      wx.showToast({ title: 'Location required', icon: 'none' })
       return false
     }
-    if (!form.detailAddress) {
-      wx.showToast({ title: '请输入详细地址', icon: 'none' })
+    if (!form.time) {
+      wx.showToast({ title: 'Time required', icon: 'none' })
       return false
     }
-    if (!form.startDate) {
-      wx.showToast({ title: '请选择开始日期', icon: 'none' })
-      return false
-    }
-    if (!form.endDate) {
-      wx.showToast({ title: '请选择结束日期', icon: 'none' })
-      return false
-    }
-    if (!form.serviceFee) {
-      wx.showToast({ title: '请输入服务费用', icon: 'none' })
-      return false
-    }
-    if (!form.description) {
-      wx.showToast({ title: '请填写详细描述', icon: 'none' })
+    if (!form.contact) {
+      wx.showToast({ title: 'Contact required', icon: 'none' })
       return false
     }
 
@@ -217,39 +163,40 @@ Page({
   },
 
   submitPublish() {
-    if (!this.validateForm()) return
-    if (this.data.submitting) return
+    if (!this.validateForm() || this.data.submitting) return
 
     const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
-    const { form } = this.data
-
-    this.setData({ submitting: true })
-    wx.showLoading({ title: '提交中' })
-
-    request('/api/demand/publish', 'POST', {
+    const { form, activeType } = this.data
+    const isLost = activeType === 'lost'
+    const api = isLost ? '/api/pet-community/lost' : '/api/pet-community/found'
+    const payload = {
       userId: currentUser.id,
       petName: form.petName,
-      petType: form.petType,
+      breed: form.breed,
       imageUrl: form.imageUrl,
-
-      province: form.province,
-      city: form.city,
-      district: form.district,
+      contact: form.contact,
+      description: form.desc,
       latitude: form.latitude,
       longitude: form.longitude,
-      detailAddress: form.detailAddress,
+      district: form.district
+    }
 
-      startDate: form.startDate,
-      endDate: form.endDate,
-      serviceFee: form.serviceFee,
+    if (isLost) {
+      payload.lostLocation = form.location
+      payload.lostTime = form.time
+      payload.rewardAmount = form.reward
+    } else {
+      payload.foundLocation = form.location
+      payload.foundTime = form.time
+      payload.tempCare = form.tempCare
+    }
 
-      description: form.description,
-    }).then(() => {
+    this.setData({ submitting: true })
+    wx.showLoading({ title: 'Submitting' })
+
+    request(api, 'POST', payload).then(() => {
       wx.hideLoading()
-      wx.showToast({
-        title: '发布成功',
-        icon: 'success'
-      })
+      wx.showToast({ title: 'Published', icon: 'success' })
       setTimeout(() => {
         wx.navigateBack()
       }, 800)

@@ -112,8 +112,6 @@ Page({
           order,
           loading: false
         })
-
-        this.loadServiceRecordList()
       })
       .catch((err) => {
         console.error('加载订单详情失败', err)
@@ -128,14 +126,21 @@ Page({
   formatOrderDetail(raw) {
     const serviceDates = raw.serviceDates || []
 
-    const formattedServiceDates = serviceDates.map(item => ({
-      ...item,
-      serviceDateText: this.formatServiceDate(item.serviceDate),
-      scheduleStatusText: this.getScheduleStatusText(item.scheduleStatus),
-      scheduleHintText: this.getScheduleHintText(item.scheduleStatus),
-      timeSlotsText: this.formatTimeSlots(item.timeSlots || []),
-      serviceDurationMinutes: item.serviceDurationMinutes || raw.serviceDurationMinutes || 0
-    }))
+    const formattedServiceDates = serviceDates.map(item => {
+      const recordId = item.recordId || null
+      return {
+        ...item,
+        scheduleId: item.scheduleId || item.id || null,
+        recordId,
+        hasRecord: !!recordId,
+        canViewRecord: !!recordId,
+        serviceDateText: this.formatServiceDate(item.serviceDate),
+        scheduleStatusText: this.getScheduleStatusText(item.scheduleStatus),
+        scheduleHintText: this.getScheduleHintText(item.scheduleStatus),
+        timeSlotsText: this.formatTimeSlots(item.timeSlots || []),
+        serviceDurationMinutes: item.serviceDurationMinutes || raw.serviceDurationMinutes || 0
+      }
+    })
 
     const formattedPets = (raw.pets || []).map(item =>
       normalizePetSnapshot(item, this.data.defaultPetImage)

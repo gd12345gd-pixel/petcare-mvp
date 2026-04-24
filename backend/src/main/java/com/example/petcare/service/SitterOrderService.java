@@ -5,6 +5,8 @@ import com.example.petcare.entity.PetOrder;
 import com.example.petcare.entity.PetOrderLog;
 import com.example.petcare.entity.PetOrderPet;
 import com.example.petcare.entity.PetOrderSchedule;
+import com.example.petcare.entity.Pet;
+import com.example.petcare.entity.ServiceRecord;
 import com.example.petcare.repository.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,18 +26,22 @@ public class SitterOrderService {
     private final PetOrderScheduleRepository petOrderScheduleRepository;
     private final PetOrderLogRepository petOrderLogRepository;
     private final ServiceRecordRepository serviceRecordRepository;
+    private final PetRepository petRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SitterOrderService(PetOrderRepository petOrderRepository,
         PetOrderPetRepository petOrderPetRepository,
         PetOrderScheduleRepository petOrderScheduleRepository,
-        PetOrderLogRepository petOrderLogRepository, ServiceRecordRepository serviceRecordRepository) {
+        PetOrderLogRepository petOrderLogRepository,
+        ServiceRecordRepository serviceRecordRepository,
+        PetRepository petRepository) {
         this.petOrderRepository = petOrderRepository;
         this.petOrderPetRepository = petOrderPetRepository;
         this.petOrderScheduleRepository = petOrderScheduleRepository;
         this.petOrderLogRepository = petOrderLogRepository;
         this.serviceRecordRepository = serviceRecordRepository;
+        this.petRepository = petRepository;
     }
 
     public List<SitterAvailableOrderItemResponse> availableOrders(SitterOrderListRequest request) {
@@ -186,6 +192,14 @@ public class SitterOrderService {
 
         List<PetOrderPet> orderPets = petOrderPetRepository.findByOrderId(order.getId());
         List<PetOrderSchedule> schedules = petOrderScheduleRepository.findByOrderIdOrderByServiceDateAsc(order.getId());
+        Map<Long, Long> recordIdMap = serviceRecordRepository.findByOrderIdOrderBySubmittedAtDesc(order.getId())
+            .stream()
+            .filter(record -> record.getScheduleId() != null)
+            .collect(Collectors.toMap(
+                ServiceRecord::getScheduleId,
+                ServiceRecord::getId,
+                (first, second) -> first
+            ));
 
         SitterOrderDetailResponse response = new SitterOrderDetailResponse();
         response.setId(order.getId());
@@ -208,7 +222,7 @@ public class SitterOrderService {
         response.setRemark(order.getRemark());
         response.setTimeSlots(parseJsonList(order.getTimeSlotsJson()));
         response.setPets(orderPets.stream().map(this::toPetResponse).collect(Collectors.toList()));
-        response.setServiceDates(schedules.stream().map(this::toScheduleResponse).collect(Collectors.toList()));
+        response.setServiceDates(schedules.stream().map(item -> toScheduleResponse(item, recordIdMap)).collect(Collectors.toList()));
         return response;
     }
 
@@ -524,16 +538,43 @@ public class SitterOrderService {
         response.setPetType(item.getPetType());
         response.setPetBreed(item.getPetBreed());
         response.setPetImageUrl(item.getPetImageUrl());
+        response.setPetGender(item.getPetGender());
+        response.setPetAge(item.getPetAge());
+        response.setPetRemark(item.getPetRemark());
+        petRepository.findByIdAndDeleted(item.getPetId(), 0).ifPresent(pet -> enrichPetResponse(response, pet));
         return response;
     }
 
+    private void enrichPetResponse(OrderPetItemResponse response, Pet pet) {
+        response.setPetName(firstText(pet.getName(), response.getPetName()));
+        response.setPetType(firstText(pet.getType(), response.getPetType()));
+        response.setPetBreed(firstText(pet.getBreed(), response.getPetBreed()));
+        response.setPetImageUrl(firstText(pet.getAvatarUrl(), response.getPetImageUrl()));
+        response.setPetGender(firstText(pet.getGender(), response.getPetGender()));
+        response.setPetAge(firstText(pet.getAge(), response.getPetAge()));
+        response.setPetRemark(firstText(pet.getIntro(), response.getPetRemark()));
+        response.setPetWeight(pet.getWeight());
+        response.setPetTags(parseJsonList(pet.getTagsJson()));
+        response.setHasAggression(pet.getHasAggression());
+        response.setVaccinated(pet.getVaccinated());
+        response.setPetIntro(pet.getIntro());
+        response.setPetAlbumList(parseJsonList(pet.getAlbumJson()));
+    }
+
+    private String firstText(String preferred, String fallback) {
+        return preferred == null || preferred.trim().isEmpty() ? fallback : preferred;
+    }
+
     private OrderScheduleItemResponse toScheduleResponse(PetOrderSchedule item) {
+        return toScheduleResponse(item, null);
+    }
+
+    private OrderScheduleItemResponse toScheduleResponse(PetOrderSchedule item, Map<Long, Long> recordIdMap) {
         OrderScheduleItemResponse response = new OrderScheduleItemResponse();
-        response.setServiceDate(item.getServiceDate().toString());
-        response.setScheduleStatus(item.getScheduleStatus());
-        response.setTimeSlots(parseJsonList(item.getTimeSlotsJson()));
-        response.setServiceDurationMinutes(item.getServiceDurationMinutes());
         response.setScheduleId(item.getId());
+        if (recordIdMap != null) {
+            response.setRecordId(recordIdMap.get(item.getId()));
+        }
         response.setServiceDate(item.getServiceDate().toString());
         response.setScheduleStatus(item.getScheduleStatus());
         response.setTimeSlots(parseJsonList(item.getTimeSlotsJson()));

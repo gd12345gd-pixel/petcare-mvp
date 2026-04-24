@@ -2,12 +2,19 @@ package com.example.petcare.service;
 
 import com.example.petcare.dto.ServiceRecordCreateRequest;
 import com.example.petcare.dto.ServiceRecordDetailResponse;
+import com.example.petcare.dto.OrderPetItemResponse;
+import com.example.petcare.dto.LocationRegionResult;
 import com.example.petcare.entity.*;
 import com.example.petcare.repository.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,17 +26,26 @@ public class ServiceRecordService {
     private final ServiceRecordMediaRepository serviceRecordMediaRepository;
     private final PetOrderRepository petOrderRepository;
     private final PetOrderScheduleRepository petOrderScheduleRepository;
+    private final PetOrderPetRepository petOrderPetRepository;
+    private final GeoCodeService geoCodeService;
+    private final ObjectMapper objectMapper;
 
     public ServiceRecordService(ServiceRecordRepository serviceRecordRepository,
         ServiceRecordItemRepository serviceRecordItemRepository,
         ServiceRecordMediaRepository serviceRecordMediaRepository,
         PetOrderRepository petOrderRepository,
-        PetOrderScheduleRepository petOrderScheduleRepository) {
+        PetOrderScheduleRepository petOrderScheduleRepository,
+        PetOrderPetRepository petOrderPetRepository,
+        GeoCodeService geoCodeService,
+        ObjectMapper objectMapper) {
         this.serviceRecordRepository = serviceRecordRepository;
         this.serviceRecordItemRepository = serviceRecordItemRepository;
         this.serviceRecordMediaRepository = serviceRecordMediaRepository;
         this.petOrderRepository = petOrderRepository;
         this.petOrderScheduleRepository = petOrderScheduleRepository;
+        this.petOrderPetRepository = petOrderPetRepository;
+        this.geoCodeService = geoCodeService;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional
@@ -85,6 +101,11 @@ public class ServiceRecordService {
 
         List<ServiceRecordItem> items = serviceRecordItemRepository.findByRecordId(record.getId());
         List<ServiceRecordMedia> mediaList = serviceRecordMediaRepository.findByRecordIdOrderBySortNoAscIdAsc(record.getId());
+        PetOrderSchedule schedule = petOrderScheduleRepository.findByIdAndOrderId(
+            record.getScheduleId(), record.getOrderId()
+        ).orElse(null);
+        PetOrder order = petOrderRepository.findByIdAndDeleted(record.getOrderId(), 0).orElse(null);
+        List<PetOrderPet> orderPets = petOrderPetRepository.findByOrderId(record.getOrderId());
 
         List<String> serviceItems = items.stream()
             .filter(item -> "SERVICE_ITEM".equals(item.getItemType()))
@@ -118,8 +139,105 @@ public class ServiceRecordService {
         response.setPetObservations(petObservations);
         response.setImages(images);
         response.setVideos(videos);
+        response.setPets(orderPets.stream().map(this::toPetResponse).collect(Collectors.toList()));
+        if (order != null) {
+            response.setOrderNo(order.getOrderNo());
+            response.setOrderStatus(order.getOrderStatus());
+            response.setPayStatus(order.getPayStatus());
+            response.setServiceContactName(order.getServiceContactName());
+            response.setServiceContactPhone(order.getServiceContactPhone());
+            response.setServiceFullAddress(buildFullAddress(order));
+            response.setServiceLatitude(order.getServiceLatitude());
+            response.setServiceLongitude(order.getServiceLongitude());
+            response.setPetCount(order.getPetCount());
+            response.setServiceDateCount(order.getServiceDateCount());
+            response.setOrderRemark(order.getRemark());
+            response.setSpecialRequirement(order.getSpecialRequirement());
+        }
+        if (schedule != null) {
+            response.setServiceDate(schedule.getServiceDate());
+            response.setTimeSlots(parseTimeSlots(schedule.getTimeSlotsJson()));
+            response.setServiceDurationMinutes(schedule.getServiceDurationMinutes());
+            response.setScheduleStatus(schedule.getScheduleStatus());
+            response.setStartTime(schedule.getStartTime());
+            response.setFinishTime(schedule.getFinishTime());
+            response.setStartLatitude(schedule.getStartLatitude());
+            response.setStartLongitude(schedule.getStartLongitude());
+            response.setFinishLatitude(schedule.getFinishLatitude());
+            response.setFinishLongitude(schedule.getFinishLongitude());
+            response.setStartDistanceMeters(schedule.getStartDistanceMeters());
+            response.setFinishDistanceMeters(schedule.getFinishDistanceMeters());
+            response.setStartLocationText(resolveLocationText(
+                schedule.getStartLatitude(), schedule.getStartLongitude(), response.getServiceFullAddress()
+            ));
+            response.setFinishLocationText(resolveLocationText(
+                schedule.getFinishLatitude(), schedule.getFinishLongitude(), response.getServiceFullAddress()
+            ));
+            response.setActualServiceDurationMinutes(calculateActualDurationMinutes(schedule));
+        }
 
         return response;
+    }
+
+    private Integer calculateActualDurationMinutes(PetOrderSchedule schedule) {
+        if (schedule.getStartTime() == null || schedule.getFinishTime() == null) {
+            return null;
+        }
+        long minutes = Duration.between(schedule.getStartTime(), schedule.getFinishTime()).toMinutes();
+        return minutes < 0 ? null : (int) minutes;
+    }
+
+    private String resolveLocationText(BigDecimal latitude, BigDecimal longitude, String fallbackAddress) {
+        if (latitude == null || longitude == null) {
+            return "未记录";
+        }
+        try {
+            LocationRegionResult region = geoCodeService.reverseRegion(latitude.doubleValue(), longitude.doubleValue());
+            if (region != null && !isBlank(region.getFullAddress())) {
+                return region.getFullAddress();
+            }
+        } catch (Exception ignored) {
+            // Reverse geocoding is best-effort for detail display.
+        }
+        if (!isBlank(fallbackAddress)) {
+            return fallbackAddress + "附近";
+        }
+        return "已记录打卡位置";
+    }
+
+    private OrderPetItemResponse toPetResponse(PetOrderPet item) {
+        OrderPetItemResponse response = new OrderPetItemResponse();
+        response.setPetId(item.getPetId());
+        response.setPetName(item.getPetName());
+        response.setPetType(item.getPetType());
+        response.setPetBreed(item.getPetBreed());
+        response.setPetImageUrl(item.getPetImageUrl());
+        response.setPetGender(item.getPetGender());
+        response.setPetAge(item.getPetAge());
+        response.setPetRemark(item.getPetRemark());
+        return response;
+    }
+
+    private String buildFullAddress(PetOrder order) {
+        return safe(order.getServiceProvince()) +
+            safe(order.getServiceCity()) +
+            safe(order.getServiceDistrict()) +
+            safe(order.getServiceDetailAddress());
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
+    }
+
+    private List<String> parseTimeSlots(String value) {
+        if (isBlank(value)) {
+            return Collections.emptyList();
+        }
+        try {
+            return objectMapper.readValue(value, new TypeReference<List<String>>() {});
+        } catch (Exception ex) {
+            return Collections.emptyList();
+        }
     }
 
     private void validateCreateRequest(ServiceRecordCreateRequest request) {

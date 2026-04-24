@@ -1,5 +1,7 @@
 package com.example.petcare.dto;
 
+import java.util.List;
+
 public class OrderPetItemResponse {
 
     private Long petId;
@@ -10,6 +12,12 @@ public class OrderPetItemResponse {
     private String petGender;
     private String petAge;
     private String petRemark;
+    private String petWeight;
+    private List<String> petTags;
+    private Integer hasAggression;
+    private Integer vaccinated;
+    private String petIntro;
+    private List<String> petAlbumList;
 
     public Long getPetId() {
         return petId;
@@ -73,5 +81,53 @@ public class OrderPetItemResponse {
 
     public void setPetRemark(String petRemark) {
         this.petRemark = petRemark;
+    }
+
+    public String getPetWeight() {
+        return petWeight;
+    }
+
+    public void setPetWeight(String petWeight) {
+        this.petWeight = petWeight;
+    }
+
+    public List<String> getPetTags() {
+        return petTags;
+    }
+
+    public void setPetTags(List<String> petTags) {
+        this.petTags = petTags;
+    }
+
+    public Integer getHasAggression() {
+        return hasAggression;
+    }
+
+    public void setHasAggression(Integer hasAggression) {
+        this.hasAggression = hasAggression;
+    }
+
+    public Integer getVaccinated() {
+        return vaccinated;
+    }
+
+    public void setVaccinated(Integer vaccinated) {
+        this.vaccinated = vaccinated;
+    }
+
+    public String getPetIntro() {
+        return petIntro;
+    }
+
+    public void setPetIntro(String petIntro) {
+        this.petIntro = petIntro;
+    }
+
+    public List<String> getPetAlbumList() {
+        return petAlbumList;
+    }
+
+    public void setPetAlbumList(List<String> petAlbumList) {
+        this.petAlbumList = petAlbumList;
     }
 }

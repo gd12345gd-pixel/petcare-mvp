@@ -19,13 +19,13 @@ Page({
     this.loadOrders();
   },
   async loadOrders() {
-    const orders = await request(`/api/orders?userId=${app.globalData.userId}`);
+    const orders = await request(`/api/orders/list?userId=${app.globalData.userId}`);
     this.setData({
       orders
     });
   },
   async viewRecords(e) {
-    const records = await request(`/api/records?orderId=${e.currentTarget.dataset.id}`);
+    const records = await request(`/api/service-record/listByOrder?orderId=${e.currentTarget.dataset.id}`);
     this.setData({
       records,
       recordPopup: true
@@ -48,4 +48,4 @@ Page({
     })
   },
   noop() {}
-}, );
+});

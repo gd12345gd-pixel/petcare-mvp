@@ -25,7 +25,7 @@
 }
 
 .nav-side {
-  width: 88rpx;
+  width: 96rpx;
   height: 88rpx;
   flex-shrink: 0;
   display: flex;
@@ -39,19 +39,24 @@
 }
 
 .nav-back-hit {
-  width: 72rpx;
-  height: 72rpx;
+  position: relative;
+  width: 96rpx;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .nav-back-icon {
-  font-size: 52rpx;
-  color: #111;
-  line-height: 1;
-  font-weight: 400;
-  margin-top: -6rpx;
+  position: relative;
+  z-index: 1;
+  width: 22rpx;
+  height: 22rpx;
+  border-left: 5rpx solid #222;
+  border-bottom: 5rpx solid #222;
+  transform: rotate(45deg);
+  margin-left: 8rpx;
+  box-sizing: border-box;
 }
 
 .nav-title {
@@ -389,12 +394,37 @@
 
 .schedule-bottom {
   margin-top: 10rpx;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12rpx;
 }
 
 .schedule-hint {
   font-size: 22rpx;
   color: #9aa0aa;
   line-height: 1.5;
+  flex: 1;
+  min-width: 0;
+}
+
+.schedule-record-link {
+  flex-shrink: 0;
+  min-height: 44rpx;
+  padding: 0 2rpx 0 16rpx;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff5f8d;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 44rpx;
+}
+
+.schedule-record-arrow {
+  margin-left: 4rpx;
+  font-size: 28rpx;
+  line-height: 1;
 }
 
 /* 今日服务 */
@@ -429,6 +459,31 @@
   font-size: 22rpx;
   color: #8b8f97;
   line-height: 1.6;
+}
+
+.today-task-actions {
+  margin-top: 16rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.record-view-btn {
+  min-width: 188rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #ff5f8d;
+  border: 1rpx solid #ffd6e2;
+  font-size: 24rpx;
+  font-weight: 700;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.record-view-btn::after {
+  border: none;
 }
 
 .today-empty-box {
@@ -746,6 +801,8 @@
 
 .pet-popup-panel {
   width: 100%;
+  max-height: 82vh;
+  overflow-y: auto;
   background: #fff;
   border-radius: 28rpx 28rpx 0 0;
   padding: 18rpx 24rpx calc(24rpx + env(safe-area-inset-bottom));
@@ -833,6 +890,39 @@
 .pet-popup-value.text-left {
   text-align: left;
   font-weight: 500;
+}
+
+.pet-popup-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.pet-popup-tag {
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 22rpx;
+  line-height: 1.2;
+}
+
+.pet-popup-album-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.pet-popup-album {
+  display: inline-flex;
+  gap: 12rpx;
+  padding-right: 8rpx;
+}
+
+.pet-popup-album-image {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 16rpx;
+  background: #f0f0f0;
 }
 
 .pet-popup-btn {

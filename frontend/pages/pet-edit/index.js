@@ -1,4 +1,4 @@
-const { request } = require('../../utils/request')
+const { request, BASE_URL } = require('../../utils/request')
 
 Page({
   data: {
@@ -288,7 +288,7 @@ Page({
 
   uploadAlbumImage(filePath) {
     wx.uploadFile({
-      url: 'https://baisui.online/api/files/upload-image',
+      url: `${BASE_URL}/api/files/upload-image`,
       filePath,
       name: 'file',
       success: (res) => {
@@ -323,7 +323,7 @@ Page({
 
   uploadImage(filePath, field) {
     wx.uploadFile({
-      url: 'https://baisui.online/api/files/upload-image',
+      url: `${BASE_URL}/api/files/upload-image`,
       filePath,
       name: 'file',
       success: (res) => {

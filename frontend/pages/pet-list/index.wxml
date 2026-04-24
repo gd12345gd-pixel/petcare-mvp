@@ -24,7 +24,7 @@
           </view>
 
           <view class="desc-text pet-meta">
-            {{item.breed || '未填写品种'}}<text wx:if="{{item.gender}}"> · {{item.gender}}</text><text wx:if="{{item.age}}"> · {{item.age}}岁</text>
+            {{item.breed || '未填写品种'}}<text wx:if="{{item.gender}}"> · {{item.gender}}</text><text wx:if="{{item.ageText}}"> · {{item.ageText}}</text>
           </view>
 
           <view class="tag-row" wx:if="{{item.tags && item.tags.length}}">

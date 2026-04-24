@@ -3,7 +3,7 @@
     <view class="nav-inner">
       <view class="nav-side nav-left" bindtap="navigateBack">
         <view class="nav-back-hit">
-          <text class="nav-back-icon">‹</text>
+          <view class="nav-back-icon"></view>
         </view>
       </view>
       <view class="nav-title">下单预约</view>

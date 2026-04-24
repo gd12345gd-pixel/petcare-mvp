@@ -147,13 +147,14 @@ Page({
       const scheduleId = item.scheduleId || item.id || null
       const scheduleStatus = item.scheduleStatus || 'PENDING'
       const matchedRecord = scheduleId ? recordMap[String(scheduleId)] : null
+      const recordId = matchedRecord ? matchedRecord.id : (item.recordId || null)
       const displayState = this.resolveScheduleDisplayState(item, scheduleStatus, raw.orderStatus)
 
       return {
         ...item,
         scheduleId,
-        recordId: matchedRecord ? matchedRecord.id : null,
-        hasRecord: !!matchedRecord,
+        recordId,
+        hasRecord: !!recordId,
         serviceDateText: this.formatDateFull(item.serviceDate),
         timeSlotsText: this.formatTimeSlots(item.timeSlots || []),
         serviceDurationMinutes: item.serviceDurationMinutes || raw.serviceDurationMinutes || 0,
@@ -164,7 +165,7 @@ Page({
         canStartSchedule: canOperateSchedules && displayState === 'TODAY_PENDING' && scheduleStatus === 'PENDING',
         canWriteRecord: canOperateSchedules && scheduleStatus === 'SERVING',
         canFinishSchedule: canOperateSchedules && scheduleStatus === 'RECORDED',
-        canViewRecord: !!matchedRecord
+        canViewRecord: !!recordId
       }
     })
 
@@ -209,6 +210,7 @@ Page({
   },
 
   buildHeader(orderStatus, serviceDates) {
+    const todayDone = serviceDates.find(item => item.scheduleStatus === 'DONE' && this.getDateKey(item.serviceDate) === this.getTodayDateText())
     const nextPending = serviceDates.find(item => item.scheduleStatus === 'PENDING')
     const servingItem = serviceDates.find(item => item.scheduleStatus === 'SERVING')
     const recordedItem = serviceDates.find(item => item.scheduleStatus === 'RECORDED')
@@ -298,6 +300,14 @@ Page({
         title: '今日待服务',
         desc: '请按预约时间开始本次服务',
         item: todayPending
+      }
+    }
+
+    if (todayDone) {
+      return {
+        title: '今日服务',
+        desc: '今日服务已完成',
+        item: todayDone
       }
     }
 
@@ -421,6 +431,21 @@ Page({
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')
     return `${month}/${day} ${weekMap[date.getDay()]}`
+  },
+
+  getDateKey(dateStr) {
+    const date = new Date(String(dateStr).replace(/-/g, '/'))
+    if (Number.isNaN(date.getTime())) return ''
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${month}/${day}`
+  },
+
+  getTodayDateText() {
+    const date = new Date()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${month}/${day}`
   },
 
   toggleScheduleExpand() {

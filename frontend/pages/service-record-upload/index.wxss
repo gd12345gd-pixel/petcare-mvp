@@ -5,6 +5,31 @@
   box-sizing: border-box;
 }
 
+.form-tip {
+  position: fixed;
+  left: 32rpx;
+  right: 32rpx;
+  z-index: 99;
+  min-height: 72rpx;
+  padding: 18rpx 24rpx;
+  border-radius: 18rpx;
+  background: rgba(34, 34, 34, 0.92);
+  color: #fff;
+  font-size: 26rpx;
+  line-height: 1.45;
+  box-shadow: 0 12rpx 32rpx rgba(31, 35, 41, 0.18);
+  opacity: 0;
+  transform: translateY(-18rpx);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  box-sizing: border-box;
+}
+
+.form-tip.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .custom-nav {
   background: #fff7fa;
   border-bottom: 1rpx solid #f2e6eb;
@@ -21,14 +46,12 @@
 }
 
 .nav-side {
-  width: 72rpx;
-  height: 72rpx;
+  width: 96rpx;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 52rpx;
-  color: #111;
 }
 
 .nav-title {
@@ -138,6 +161,13 @@
   margin-top: 22rpx;
 }
 
+.abnormal-panel {
+  padding: 20rpx;
+  border-radius: 18rpx;
+  background: #fff7fa;
+  border: 1rpx solid #ffd8e4;
+}
+
 .sub-title {
   font-size: 26rpx;
   font-weight: 700;
@@ -155,6 +185,11 @@
   color: #222;
   border: 1rpx solid #edf0f4;
   line-height: 1.6;
+}
+
+.abnormal-textarea {
+  background: #fff;
+  border-color: #ffd2df;
 }
 
 .media-grid {

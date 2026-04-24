@@ -1,4 +1,5 @@
 const { request } = require('../../utils/request')
+const { formatPetAge } = require('../../utils/pet-display')
 
 Page({
   data: {
@@ -48,7 +49,10 @@ Page({
     request(`/api/pet/list?userId=${currentUser.id}`, 'GET')
       .then((list) => {
         this.setData({
-          pets: list || []
+          pets: (list || []).map(item => ({
+            ...item,
+            ageText: formatPetAge(item.age)
+          }))
         })
       })
       .catch(() => {})

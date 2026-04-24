@@ -1,7 +1,11 @@
 <view class="sitter-detail-page">
   <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
     <view class="nav-inner">
-      <view class="nav-side nav-left" bindtap="navigateBack">‹</view>
+      <view class="nav-side nav-left" bindtap="navigateBack">
+        <view class="nav-back-hit">
+          <view class="nav-back-icon"></view>
+        </view>
+      </view>
       <view class="nav-title">接单详情</view>
       <view class="nav-side"></view>
     </view>
@@ -294,6 +298,38 @@
         <view class="pet-popup-row" wx:if="{{activePet.petAgeText}}">
           <view class="pet-popup-label">年龄</view>
           <view class="pet-popup-value">{{activePet.petAgeText}}</view>
+        </view>
+        <view class="pet-popup-row" wx:if="{{activePet.petWeightText}}">
+          <view class="pet-popup-label">体重</view>
+          <view class="pet-popup-value">{{activePet.petWeightText}}</view>
+        </view>
+        <view class="pet-popup-row" wx:if="{{activePet.petVaccinatedText}}">
+          <view class="pet-popup-label">疫苗</view>
+          <view class="pet-popup-value">{{activePet.petVaccinatedText}}</view>
+        </view>
+        <view class="pet-popup-row" wx:if="{{activePet.petAggressionText}}">
+          <view class="pet-popup-label">攻击性</view>
+          <view class="pet-popup-value">{{activePet.petAggressionText}}</view>
+        </view>
+        <view class="pet-popup-row column" wx:if="{{activePet.petTags && activePet.petTags.length}}">
+          <view class="pet-popup-label">标签</view>
+          <view class="pet-popup-tags">
+            <view class="pet-popup-tag" wx:for="{{activePet.petTags}}" wx:key="*this">{{item}}</view>
+          </view>
+        </view>
+        <view class="pet-popup-row column" wx:if="{{activePet.petAlbumList && activePet.petAlbumList.length}}">
+          <view class="pet-popup-label">相册</view>
+          <scroll-view class="pet-popup-album-scroll" scroll-x>
+            <view class="pet-popup-album">
+              <image
+                class="pet-popup-album-image"
+                wx:for="{{activePet.petAlbumList}}"
+                wx:key="*this"
+                src="{{item}}"
+                mode="aspectFill"
+              />
+            </view>
+          </scroll-view>
         </view>
 
         <view class="pet-popup-row column">

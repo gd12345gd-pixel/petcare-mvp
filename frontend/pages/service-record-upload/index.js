@@ -1,7 +1,4 @@
-const { request } = require('../../utils/request')
-
-const BASE_URL = 'http://127.0.0.1:8080'
-const UPLOAD_PATH = '/api/common/upload'
+const { request, BASE_URL } = require('../../utils/request')
 
 Page({
   data: {
@@ -44,6 +41,9 @@ Page({
 
     abnormalDesc: '',
     remark: '',
+    hasAbnormal: false,
+    formTip: '',
+    formTipVisible: false,
 
     imageList: [],
     videoList: []
@@ -162,7 +162,12 @@ Page({
       }
       return item
     })
-    this.setData({ petObservationOptions: next })
+    const hasAbnormal = next.some(item => item.key === 'ABNORMAL' && item.checked)
+    this.setData({
+      petObservationOptions: next,
+      hasAbnormal,
+      abnormalDesc: hasAbnormal ? this.data.abnormalDesc : ''
+    })
   },
 
   onInputAbnormalDesc(e) {
@@ -187,6 +192,23 @@ Page({
 
   hasAbnormalSelected() {
     return this.getSelectedObservationItems().includes('ABNORMAL')
+  },
+
+  showFormTip(message) {
+    if (this.formTipTimer) {
+      clearTimeout(this.formTipTimer)
+    }
+
+    this.setData({
+      formTip: message,
+      formTipVisible: true
+    })
+
+    this.formTipTimer = setTimeout(() => {
+      this.setData({
+        formTipVisible: false
+      })
+    }, 3200)
   },
 
   chooseImages() {
@@ -287,7 +309,7 @@ Page({
 
     return new Promise((resolve, reject) => {
       wx.uploadFile({
-        url: `${BASE_URL}${UPLOAD_PATH}`,
+        url: `${BASE_URL}${mediaType === 'video' ? '/api/files/upload-video' : '/api/files/upload-image'}`,
         filePath,
         name: 'file',
         formData: { mediaType },
@@ -417,6 +439,34 @@ Page({
     } finally {
       this.setData({ submitting: false })
     }
+  },
+
+  validateForm() {
+    const serviceItems = this.getSelectedServiceItems()
+    const observations = this.getSelectedObservationItems()
+    const hasAbnormal = observations.includes('ABNORMAL')
+
+    if (!serviceItems.length) {
+      this.showFormTip('请至少选择 1 项服务项目')
+      return false
+    }
+
+    if (!observations.length) {
+      this.showFormTip('请至少选择 1 项宠物观察情况')
+      return false
+    }
+
+    if (hasAbnormal && !String(this.data.abnormalDesc || '').trim()) {
+      this.showFormTip('已选择有异常情况，请填写异常说明')
+      return false
+    }
+
+    if (this.data.videoList.length < 1) {
+      this.showFormTip('请至少上传 1 个服务视频')
+      return false
+    }
+
+    return true
   },
 
   goReportException() {

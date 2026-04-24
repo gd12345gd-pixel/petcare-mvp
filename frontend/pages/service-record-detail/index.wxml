@@ -1,7 +1,11 @@
 <view class="record-detail-page">
   <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
     <view class="nav-inner">
-      <view class="nav-side nav-left" bindtap="navigateBack">‹</view>
+      <view class="nav-side nav-left" bindtap="navigateBack">
+        <view class="nav-back-hit">
+          <view class="nav-back-icon"></view>
+        </view>
+      </view>
       <view class="nav-title">服务记录详情</view>
       <view class="nav-side"></view>
     </view>
@@ -13,88 +17,159 @@
     </view>
 
     <block wx:elif="{{detail}}">
-      <!-- 顶部摘要 -->
-      <view class="summary-card">
-        <view class="summary-title">本次服务已提交</view>
-        <view class="summary-time">提交时间：{{detail.submittedAtText}}</view>
+      <view class="hero-panel">
+        <view class="hero-meta">订单 {{detail.orderNo}}</view>
+        <view class="hero-title">本次服务已提交</view>
+        <view class="hero-subtitle">提交时间 {{detail.submittedAtText}}</view>
+        <view class="hero-badges">
+          <view class="hero-badge primary">{{detail.scheduleStatusText}}</view>
+          <view class="hero-badge">{{detail.orderStatusText}}</view>
+        </view>
       </view>
 
-      <!-- 服务项目 -->
-      <view class="section-card">
-        <view class="section-title">服务项目</view>
-
-        <view class="tag-grid" wx:if="{{detail.serviceItems.length}}">
-          <view class="tag-item active" wx:for="{{detail.serviceItems}}" wx:key="code">
-            {{item.text}}
+      <view class="section-card overview-card">
+        <view class="section-title">服务概览</view>
+        <view class="overview-grid">
+          <view class="overview-item" wx:for="{{detail.summaryItems}}" wx:key="label">
+            <view class="overview-label">{{item.label}}</view>
+            <view class="overview-value">{{item.value}}</view>
           </view>
         </view>
 
-        <view class="empty-text" wx:else>暂无服务项目</view>
-      </view>
+        <view class="divider"></view>
 
-      <!-- 宠物观察情况 -->
-      <view class="section-card">
-        <view class="section-title">宠物观察情况</view>
-
-        <view class="tag-grid" wx:if="{{detail.petObservations.length}}">
-          <view
-            class="tag-item {{item.isAbnormal ? 'warning' : 'active'}}"
-            wx:for="{{detail.petObservations}}"
-            wx:key="code"
-          >
-            {{item.text}}
+        <view class="detail-row">
+          <view class="detail-label">联系人</view>
+          <view class="detail-value">{{detail.serviceContactName}} {{detail.serviceContactPhone}}</view>
+        </view>
+        <view class="detail-row">
+          <view class="detail-label">服务地址</view>
+          <view class="detail-value">{{detail.serviceFullAddress}}</view>
+        </view>
+        <view class="pet-strip" wx:if="{{detail.hasPets}}">
+          <view class="pet-chip" wx:for="{{detail.pets}}" wx:key="id">
+            <image class="pet-avatar" src="{{item.avatar}}" mode="aspectFill" wx:if="{{item.avatar}}" />
+            <view class="pet-avatar placeholder" wx:else>{{item.initial}}</view>
+            <view class="pet-info">
+              <view class="pet-name">{{item.name}}</view>
+              <view class="pet-desc">{{item.breed || item.type}} {{item.gender}} {{item.age}}</view>
+            </view>
           </view>
         </view>
 
-        <view class="empty-text" wx:else>暂无观察情况</view>
-
-        <view class="abnormal-box" wx:if="{{detail.hasAbnormal}}">
-          <view class="abnormal-title">异常情况说明</view>
-          <view class="abnormal-text">{{detail.abnormalDesc}}</view>
-        </view>
-      </view>
-
-      <!-- 服务照片 -->
-      <view class="section-card">
-        <view class="section-title">服务照片</view>
-
-        <view class="media-grid" wx:if="{{detail.hasImages}}">
-          <image
-            class="image-thumb"
-            wx:for="{{detail.images}}"
-            wx:key="url"
-            src="{{item.url}}"
-            mode="aspectFill"
-            data-index="{{index}}"
-            bindtap="previewImage"
-          />
-        </view>
-
-        <view class="empty-text" wx:else>暂无服务照片</view>
-      </view>
-
-      <!-- 服务视频 -->
-      <view class="section-card">
-        <view class="section-title">服务视频</view>
-
-        <view class="video-list" wx:if="{{detail.hasVideos}}">
-          <view class="video-card" wx:for="{{detail.videos}}" wx:key="url">
-            <video
-              class="video-player"
-              src="{{item.url}}"
-              controls
-              objectFit="cover"
-            />
+        <view class="note-panel" wx:if="{{detail.hasOrderNote}}">
+          <view class="note-row" wx:if="{{detail.specialRequirement}}">
+            <text class="note-label">特殊要求</text>
+            <text class="note-text">{{detail.specialRequirement}}</text>
+          </view>
+          <view class="note-row" wx:if="{{detail.orderRemark}}">
+            <text class="note-label">订单备注</text>
+            <text class="note-text">{{detail.orderRemark}}</text>
           </view>
         </view>
-
-        <view class="empty-text" wx:else>暂无服务视频</view>
       </view>
 
-      <!-- 服务备注 -->
-      <view class="section-card">
-        <view class="section-title">服务备注</view>
-        <view class="remark-box">{{detail.remark}}</view>
+      <view class="section-card timeline-card">
+        <view class="section-title">服务时间线</view>
+        <view class="timeline-list">
+          <view class="timeline-item {{item.done ? 'done' : 'pending'}}" wx:for="{{detail.timeline}}" wx:key="key">
+            <view class="timeline-axis">
+              <view class="timeline-dot"></view>
+              <view class="timeline-line" wx:if="{{index < detail.timeline.length - 1}}"></view>
+            </view>
+            <view class="timeline-content">
+              <view class="timeline-head">
+                <view>
+                  <view class="timeline-title">{{item.title}}</view>
+                  <view class="timeline-time">{{item.time}}</view>
+                </view>
+                <view class="timeline-state">{{item.done ? '已记录' : '未记录'}}</view>
+              </view>
+
+              <view class="checkin-box" wx:if="{{item.distance || item.location || item.duration}}">
+                <view class="checkin-row" wx:if="{{item.distance}}">
+                  <text class="checkin-label">打卡距离</text>
+                  <text class="checkin-value">{{item.distance}}</text>
+                </view>
+                <view class="checkin-row" wx:if="{{item.location}}">
+                  <text class="checkin-label">打卡位置</text>
+                  <text class="checkin-value">{{item.location}}</text>
+                </view>
+                <view class="checkin-row" wx:if="{{item.duration}}">
+                  <text class="checkin-label">实际结算时长</text>
+                  <text class="checkin-value">{{item.duration}}</text>
+                </view>
+              </view>
+
+              <view class="record-inline" wx:if="{{item.isSubmit}}">
+                <view class="record-block">
+                  <view class="record-block-title">服务项目</view>
+                  <view class="tag-grid compact" wx:if="{{detail.serviceItems.length}}">
+                    <view class="tag-item active" wx:for="{{detail.serviceItems}}" wx:key="code">
+                      {{item.text}}
+                    </view>
+                  </view>
+                  <view class="empty-text compact-empty" wx:else>暂无服务项目</view>
+                </view>
+
+                <view class="record-block">
+                  <view class="record-block-title">宠物观察情况</view>
+                  <view class="tag-grid compact" wx:if="{{detail.petObservations.length}}">
+                    <view
+                      class="tag-item {{item.isAbnormal ? 'warning' : 'active'}}"
+                      wx:for="{{detail.petObservations}}"
+                      wx:key="code"
+                    >
+                      {{item.text}}
+                    </view>
+                  </view>
+                  <view class="empty-text compact-empty" wx:else>暂无观察情况</view>
+
+                  <view class="abnormal-box inline" wx:if="{{detail.hasAbnormal}}">
+                    <view class="abnormal-title">异常情况说明</view>
+                    <view class="abnormal-text">{{detail.abnormalDesc}}</view>
+                  </view>
+                </view>
+
+                <view class="record-block">
+                  <view class="record-block-title">服务照片</view>
+                  <view class="media-grid compact-media" wx:if="{{detail.hasImages}}">
+                    <image
+                      class="image-thumb inline-thumb"
+                      wx:for="{{detail.images}}"
+                      wx:key="url"
+                      src="{{item.url}}"
+                      mode="aspectFill"
+                      data-index="{{index}}"
+                      bindtap="previewImage"
+                    />
+                  </view>
+                  <view class="empty-text compact-empty" wx:else>暂无服务照片</view>
+                </view>
+
+                <view class="record-block">
+                  <view class="record-block-title">服务视频</view>
+                  <view class="video-list compact-video" wx:if="{{detail.hasVideos}}">
+                    <view class="video-card inline-video-card" wx:for="{{detail.videos}}" wx:key="url">
+                      <video
+                        class="video-player inline-video"
+                        src="{{item.url}}"
+                        controls
+                        objectFit="cover"
+                      />
+                    </view>
+                  </view>
+                  <view class="empty-text compact-empty" wx:else>暂无服务视频</view>
+                </view>
+
+                <view class="record-block">
+                  <view class="record-block-title">服务备注</view>
+                  <view class="remark-box inline-remark">{{detail.remark}}</view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
       </view>
 
       <view class="page-bottom-space"></view>

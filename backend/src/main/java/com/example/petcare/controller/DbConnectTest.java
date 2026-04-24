@@ -10,12 +10,15 @@ import java.sql.DriverManager;
 public class DbConnectTest {
 
     public static void main(String[] args) {
+        String host = System.getenv().getOrDefault("DB_HOST", "localhost");
+        String port = System.getenv().getOrDefault("DB_PORT", "3306");
+        String database = System.getenv().getOrDefault("DB_NAME", "petcare_mvp");
         String url =
-            "jdbc:mysql://8.146.237.74:3306/petcare_mvp?useUnicode=true&characterEncoding=UTF-8"
+            "jdbc:mysql://" + host + ":" + port + "/" + database + "?useUnicode=true&characterEncoding=UTF-8"
                 + "&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
                 + "&connectTimeout=5000&socketTimeout=60000";
-        String username = "petcare";
-        String password = "960925jing";
+        String username = System.getenv().getOrDefault("DB_USER", "root");
+        String password = System.getenv().getOrDefault("DB_PASSWORD", "");
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");

@@ -21,14 +21,12 @@
 }
 
 .nav-side {
-  width: 72rpx;
-  height: 72rpx;
+  width: 96rpx;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 52rpx;
-  color: #111;
 }
 
 .nav-title {
@@ -708,6 +706,8 @@
 
 .pet-popup-panel {
   width: 100%;
+  max-height: 82vh;
+  overflow-y: auto;
   background: #fff;
   border-radius: 28rpx 28rpx 0 0;
   padding: 18rpx 24rpx calc(24rpx + env(safe-area-inset-bottom));
@@ -795,6 +795,39 @@
 .pet-popup-value.text-left {
   text-align: left;
   font-weight: 500;
+}
+
+.pet-popup-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.pet-popup-tag {
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 22rpx;
+  line-height: 1.2;
+}
+
+.pet-popup-album-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.pet-popup-album {
+  display: inline-flex;
+  gap: 12rpx;
+  padding-right: 8rpx;
+}
+
+.pet-popup-album-image {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 16rpx;
+  background: #f0f0f0;
 }
 
 .pet-popup-btn {

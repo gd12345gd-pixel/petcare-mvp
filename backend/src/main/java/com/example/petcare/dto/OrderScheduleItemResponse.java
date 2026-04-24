@@ -10,9 +10,13 @@ public class OrderScheduleItemResponse {
     private Integer serviceDurationMinutes;
 
     private Long scheduleId;
+    private Long recordId;
 
     public Long getScheduleId() { return scheduleId; }
     public void setScheduleId(Long scheduleId) { this.scheduleId = scheduleId; }
+
+    public Long getRecordId() { return recordId; }
+    public void setRecordId(Long recordId) { this.recordId = recordId; }
 
     public String getServiceDate() { return serviceDate; }
     public void setServiceDate(String serviceDate) { this.serviceDate = serviceDate; }
