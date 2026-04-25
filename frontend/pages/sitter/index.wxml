@@ -32,6 +32,14 @@
       </view>
     </view>
 
+    <view class="workbench-entry" wx:if="{{profile && profile.canAcceptOrder}}" bindtap="goWorkbench">
+      <view class="workbench-entry-left">
+        <view class="workbench-entry-title">托托师工作台</view>
+        <view class="workbench-entry-desc">查看今日接单、服务安排、收益和等级信誉</view>
+      </view>
+      <view class="workbench-entry-btn">进入 ›</view>
+    </view>
+
     <view class="main-tabs">
       <view
         class="main-tab-item {{currentMainTab === item.key ? 'active' : ''}}"
@@ -74,6 +82,14 @@
 
     <view class="loading-wrap" wx:if="{{loading}}">
       <view class="loading-text">加载中...</view>
+    </view>
+
+    <view class="register-card" wx:elif="{{needRegister}}">
+      <view class="register-title">{{gateInfo.title}}</view>
+      <view class="register-desc">{{gateInfo.desc}}</view>
+      <button class="primary-btn register-btn" bindtap="goRegister">
+        {{gateInfo.button}}
+      </button>
     </view>
 
     <view class="empty-wrap" wx:elif="{{!displayedOrders.length}}">

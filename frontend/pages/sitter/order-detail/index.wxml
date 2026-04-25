@@ -238,8 +238,35 @@
 
       <!-- 照护备注 -->
       <view class="section-card">
-        <view class="section-title">照护备注</view>
-        <view class="remark-box">{{order.remark}}</view>
+        <view class="section-head">
+          <view class="section-title no-margin">照护备注</view>
+          <view class="new-remark-badge" wx:if="{{order.hasSupplementRemark}}">有新的补充说明</view>
+        </view>
+
+        <view class="remark-timeline" wx:if="{{order.remarkTimeline && order.remarkTimeline.length}}">
+          <view class="remark-timeline-item" wx:for="{{order.remarkTimeline}}" wx:key="id">
+            <view class="remark-dot"></view>
+            <view class="remark-card">
+              <view class="remark-title">{{item.title}}</view>
+              <view class="remark-content">{{item.content}}</view>
+              <view class="remark-images" wx:if="{{item.imageUrls && item.imageUrls.length}}">
+                <image
+                  class="remark-image"
+                  wx:for="{{item.imageUrls}}"
+                  wx:for-item="imageUrl"
+                  wx:key="*this"
+                  src="{{imageUrl}}"
+                  mode="aspectFill"
+                  data-url="{{imageUrl}}"
+                  data-urls="{{item.imageUrls}}"
+                  bindtap="previewRemarkImage"
+                />
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="remark-box" wx:else>暂无备注</view>
       </view>
 
       <!-- 费用明细 -->

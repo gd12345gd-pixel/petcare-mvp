@@ -8,4 +8,6 @@ import java.util.List;
 public interface PetOrderPetRepository extends JpaRepository<PetOrderPet, Long> {
 
     List<PetOrderPet> findByOrderId(Long orderId);
+
+    List<PetOrderPet> findByOrderIdIn(List<Long> orderIds);
 }

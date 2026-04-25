@@ -6,14 +6,18 @@ Page({
     userId: 1,
     id: null,
     isEdit: false,
+    tagOptions: ['家', '公司', '学校'],
 
     form: {
       contactName: '',
       contactPhone: '',
+      gender: '',
       province: '',
       city: '',
       district: '',
       regionText: '',
+      addressName: '',
+      addressText: '',
       detailAddress: '',
       latitude: null,
       longitude: null,
@@ -63,10 +67,13 @@ Page({
           form: {
             contactName: data.contactName || '',
             contactPhone: data.contactPhone || '',
+            gender: '',
             province: data.province || '',
             city: data.city || '',
             district: data.district || '',
             regionText: `${data.province || ''} ${data.city || ''} ${data.district || ''}`.trim(),
+            addressName: data.detailAddress || data.fullAddress || '',
+            addressText: `${data.province || ''}${data.city || ''}${data.district || ''}`,
             detailAddress: data.detailAddress || '',
             latitude: data.latitude || null,
             longitude: data.longitude || null,
@@ -76,6 +83,36 @@ Page({
         })
       })
       .catch(() => {})
+  },
+
+  pasteAddress() {
+    wx.getClipboardData({
+      success: (res) => {
+        const text = (res.data || '').trim()
+        if (!text) {
+          wx.showToast({ title: '剪贴板没有地址信息', icon: 'none' })
+          return
+        }
+        this.parseClipboardAddress(text)
+      }
+    })
+  },
+
+  parseClipboardAddress(text) {
+    const phoneMatch = text.match(/1[3-9]\d{9}/)
+    const phone = phoneMatch ? phoneMatch[0] : ''
+    const textWithoutPhone = phone ? text.replace(phone, ' ') : text
+    const compact = textWithoutPhone.replace(/\s+/g, ' ').trim()
+    const parts = compact.split(/[，,；;]+/).map(item => item.trim()).filter(Boolean)
+    const detail = parts[0] || compact
+
+    this.setData({
+      'form.contactPhone': phone || this.data.form.contactPhone,
+      'form.detailAddress': detail || this.data.form.detailAddress,
+      'form.addressName': detail || this.data.form.addressName
+    })
+
+    wx.showToast({ title: '已识别地址信息', icon: 'success' })
   },
 
   onInput(e) {
@@ -91,10 +128,14 @@ Page({
       success: (res) => {
         const latitude = res.latitude
         const longitude = res.longitude
+        const name = res.name || ''
+        const address = res.address || ''
 
         this.setData({
           'form.latitude': latitude,
-          'form.longitude': longitude
+          'form.longitude': longitude,
+          'form.addressName': name || address,
+          'form.addressText': address
         })
 
         this.reverseGeocode(latitude, longitude)
@@ -127,7 +168,8 @@ Page({
             'form.province': ac.province || '',
             'form.city': ac.city || '',
             'form.district': ac.district || '',
-            'form.regionText': `${ac.province || ''} ${ac.city || ''} ${ac.district || ''}`.trim()
+            'form.regionText': `${ac.province || ''} ${ac.city || ''} ${ac.district || ''}`.trim(),
+            'form.addressText': data.result.address || this.data.form.addressText
           })
         } else {
           wx.showToast({
@@ -154,6 +196,16 @@ Page({
     })
   },
 
+  chooseGender(e) {
+    const gender = e.currentTarget.dataset.gender || ''
+    this.setData({ 'form.gender': gender })
+  },
+
+  chooseTag(e) {
+    const tag = e.currentTarget.dataset.tag || ''
+    this.setData({ 'form.tagName': tag })
+  },
+
   validateForm() {
     const { form } = this.data
 
@@ -166,7 +218,7 @@ Page({
       return false
     }
     if (!form.regionText) {
-      wx.showToast({ title: '请选择所在地区', icon: 'none' })
+      wx.showToast({ title: '请选择地址', icon: 'none' })
       return false
     }
     if (!form.detailAddress) {
@@ -182,6 +234,8 @@ Page({
 
     const { form, userId, isEdit, id } = this.data
 
+    const detailAddress = form.detailAddress || form.addressName
+
     const payload = {
       userId,
       contactName: form.contactName,
@@ -189,7 +243,7 @@ Page({
       province: form.province,
       city: form.city,
       district: form.district,
-      detailAddress: form.detailAddress,
+      detailAddress,
       latitude: form.latitude,
       longitude: form.longitude,
       tagName: form.tagName,

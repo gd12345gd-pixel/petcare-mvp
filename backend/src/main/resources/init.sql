@@ -118,6 +118,7 @@ CREATE TABLE review (
   user_id BIGINT NOT NULL,
   sitter_id BIGINT NOT NULL,
   rating INT NOT NULL,
+  tags VARCHAR(255) DEFAULT NULL,
   content VARCHAR(255) DEFAULT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_review_order FOREIGN KEY (order_id) REFERENCES orders(id),

@@ -1,0 +1,172 @@
+<view class="page-bg">
+  <view class="container" wx:if="{{!loading}}">
+    <view class="top-back" bindtap="navigateBack">‹ 返回</view>
+    <view class="hero-card">
+      <view class="eyebrow">接单师入驻</view>
+      <view class="title">成为托托师</view>
+      <view class="subtitle">灵活接单，照顾附近毛孩子</view>
+    </view>
+
+    <view wx:if="{{step === 'intro'}}">
+      <view class="section-card">
+        <view class="card-title">权益</view>
+        <view class="bullet">自由选择服务时间</view>
+        <view class="bullet">完成订单获得收入</view>
+        <view class="bullet">等级越高可接单越多</view>
+      </view>
+      <view class="section-card">
+        <view class="card-title">要求</view>
+        <view class="bullet">实名认证和身份证审核</view>
+        <view class="bullet">缴纳99元履约押金</view>
+        <view class="bullet">服务过程需上传图片/视频记录</view>
+      </view>
+      <button class="primary-btn" bindtap="startApply">立即申请</button>
+    </view>
+
+    <view wx:elif="{{step === 'basic'}}">
+      <view class="step-title">第一步：基础信息</view>
+      <view class="form-card">
+        <input class="input" placeholder="真实姓名（必填）" value="{{form.realName}}" data-field="realName" bindinput="onInput" />
+        <input class="input" placeholder="手机号（必填）" value="{{form.phone}}" data-field="phone" bindinput="onInput" />
+        <input class="input" placeholder="性别" value="{{form.gender}}" data-field="gender" bindinput="onInput" />
+        <input class="input" type="number" placeholder="年龄" value="{{form.age}}" data-field="age" bindinput="onInput" />
+        <input class="input" placeholder="所在城市" value="{{form.city}}" data-field="city" bindinput="onInput" />
+        <input class="input" placeholder="服务区域（必填）" value="{{form.serviceArea}}" data-field="serviceArea" bindinput="onInput" />
+      </view>
+      <button class="primary-btn" bindtap="nextAbility">下一步</button>
+    </view>
+
+    <view wx:elif="{{step === 'ability'}}">
+      <view class="step-title">第二步：服务能力</view>
+      <view class="form-card">
+        <view class="field-label">可服务宠物</view>
+        <radio-group class="option-group" bindchange="onPetTypeChange">
+          <label class="option" wx:for="{{petTypeOptions}}" wx:key="value">
+            <radio value="{{item.value}}" checked="{{item.checked}}" color="#FF5A7A" />{{item.label}}
+          </label>
+        </radio-group>
+
+        <view class="field-label">服务经验</view>
+        <radio-group class="option-group" bindchange="onExperienceChange">
+          <label class="option" wx:for="{{experienceOptions}}" wx:key="value">
+            <radio value="{{item.value}}" checked="{{item.checked}}" color="#FF5A7A" />{{item.label}}
+          </label>
+        </radio-group>
+
+        <view class="field-label">是否养过宠物</view>
+        <radio-group class="option-group" bindchange="onHasPetChange">
+          <label class="option"><radio value="true" checked="{{form.hasPetExperience}}" color="#FF5A7A" />是</label>
+          <label class="option"><radio value="false" checked="{{!form.hasPetExperience}}" color="#FF5A7A" />否</label>
+        </radio-group>
+
+        <view class="field-label">可服务时间段</view>
+        <checkbox-group class="option-group" bindchange="onTimesChange">
+          <label class="option" wx:for="{{timeOptions}}" wx:key="value">
+            <checkbox value="{{item.value}}" checked="{{item.checked}}" color="#FF5A7A" />{{item.label}}
+          </label>
+        </checkbox-group>
+
+        <textarea class="textarea" placeholder="个人简介（必填）" value="{{form.introduction}}" data-field="introduction" bindinput="onInput" />
+      </view>
+      <view class="btn-row">
+        <button class="secondary-btn" bindtap="backBasic">上一步</button>
+        <button class="primary-btn small" bindtap="nextIdentity">下一步</button>
+      </view>
+    </view>
+
+    <view wx:elif="{{step === 'identity'}}">
+      <view class="step-title">第三步：实名认证</view>
+      <view class="notice">身份证信息仅用于平台审核，不会对外展示。</view>
+      <view class="form-card">
+        <input class="input" placeholder="身份证号（必填）" value="{{form.idCardNo}}" data-field="idCardNo" bindinput="onInput" />
+        <view class="upload-item">
+          <view>
+            <view class="upload-title">身份证正面照片（必填）</view>
+            <view class="upload-url">{{form.idCardFrontUrl ? '已上传' : '未上传'}}</view>
+          </view>
+          <button class="upload-btn" data-field="idCardFrontUrl" bindtap="uploadImage">上传</button>
+        </view>
+        <image wx:if="{{form.idCardFrontUrl}}" class="preview" src="{{form.idCardFrontUrl}}" mode="aspectFill" />
+
+        <view class="upload-item">
+          <view>
+            <view class="upload-title">身份证反面照片（必填）</view>
+            <view class="upload-url">{{form.idCardBackUrl ? '已上传' : '未上传'}}</view>
+          </view>
+          <button class="upload-btn" data-field="idCardBackUrl" bindtap="uploadImage">上传</button>
+        </view>
+        <image wx:if="{{form.idCardBackUrl}}" class="preview" src="{{form.idCardBackUrl}}" mode="aspectFill" />
+
+        <view class="upload-item">
+          <view>
+            <view class="upload-title">资质证书（选填）</view>
+            <view class="upload-url">{{form.certificateUrl ? '已上传' : '未上传'}}</view>
+          </view>
+          <button class="upload-btn" data-field="certificateUrl" bindtap="uploadImage">上传</button>
+        </view>
+        <image wx:if="{{form.certificateUrl}}" class="preview" src="{{form.certificateUrl}}" mode="aspectFill" />
+      </view>
+      <view class="btn-row">
+        <button class="secondary-btn" bindtap="backAbility">上一步</button>
+        <button class="primary-btn small" loading="{{submitting}}" bindtap="submitApply">提交审核</button>
+      </view>
+      <view class="agreement-row" bindtap="toggleSitterAgreement">
+        <view class="check-box {{sitterAgreementChecked ? 'checked' : ''}}"></view>
+        <view class="agreement-text">
+          我已阅读并同意
+          <text class="agreement-link" catchtap="openAgreement" data-type="sitter">《接单师服务协议》</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:elif="{{step === 'pending'}}" class="state-card">
+      <view class="state-title">资料已提交</view>
+      <view class="state-desc">平台将在1-2个工作日内完成审核</view>
+      <button class="secondary-btn full" bindtap="loadData">刷新状态</button>
+    </view>
+
+    <view wx:elif="{{step === 'rejected'}}" class="state-card">
+      <view class="state-title">审核未通过</view>
+      <view class="state-desc">原因：{{profile.rejectReason || '资料信息不完整'}}</view>
+      <button class="primary-btn" bindtap="resubmit">重新提交</button>
+    </view>
+
+    <view wx:elif="{{step === 'approved'}}" class="state-card">
+      <view class="state-title">恭喜，资料审核通过</view>
+      <view class="state-desc">缴纳99元履约押金后即可开始接单</view>
+      <button class="primary-btn" bindtap="goDeposit">缴纳押金</button>
+    </view>
+
+    <view wx:elif="{{step === 'deposit'}}">
+      <view class="section-card">
+        <view class="card-title">押金金额：99元</view>
+        <view class="bullet">接单前必须缴纳押金</view>
+        <view class="bullet">无接单时可随时申请退还</view>
+        <view class="bullet">接单后押金锁定</view>
+        <view class="bullet">完成所有订单后可申请退还</view>
+        <view class="bullet">未履约/临时取消可能扣除押金</view>
+      </view>
+      <button class="primary-btn" bindtap="payDeposit">确认缴纳99元</button>
+      <view class="agreement-row" bindtap="toggleDepositRule">
+        <view class="check-box {{depositRuleChecked ? 'checked' : ''}}"></view>
+        <view class="agreement-text">
+          我已阅读并同意
+          <text class="agreement-link" catchtap="openAgreement" data-type="deposit">押金规则</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:elif="{{step === 'ready'}}" class="section-card">
+      <view class="ready-title">可接单</view>
+      <view class="status-line">接单师等级：{{profile.levelCode}} {{profile.levelName}}</view>
+      <view class="status-line">今日可接：{{profile.dailyOrderLimit}}单</view>
+      <view class="status-line">信誉分：{{profile.creditScore}}</view>
+      <view class="status-line">押金状态：已缴纳</view>
+      <view class="status-line">审核状态：已通过</view>
+      <button class="secondary-btn full" bindtap="goWorkbench">进入托托师工作台</button>
+      <button class="primary-btn" bindtap="goOrders">去接单</button>
+    </view>
+  </view>
+
+  <view class="loading" wx:else>加载中...</view>
+</view>

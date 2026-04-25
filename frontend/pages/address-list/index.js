@@ -34,6 +34,10 @@ Page({
             wx.reLaunch({
               url: '/pages/order/create/index'
             })
+          } else if (this.data.from === 'home') {
+            wx.switchTab({
+              url: '/pages/home/index'
+            })
           } else {
             wx.switchTab({
               url: '/pages/profile/index'
@@ -45,6 +49,10 @@ Page({
       if (this.data.from === 'orderCreate') {
         wx.reLaunch({
           url: '/pages/order-create/index'
+        })
+      } else if (this.data.from === 'home') {
+        wx.switchTab({
+          url: '/pages/home/index'
         })
       } else {
         wx.switchTab({

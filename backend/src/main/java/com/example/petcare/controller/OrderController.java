@@ -7,9 +7,11 @@ import com.example.petcare.dto.CreateOrderRequest;
 import com.example.petcare.dto.CreateOrderResponse;
 import com.example.petcare.dto.OrderDetailResponse;
 import com.example.petcare.dto.OrderListItemResponse;
+import com.example.petcare.dto.RescheduleOrderResponse;
 import com.example.petcare.service.OrderService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +47,12 @@ public class OrderController {
         request.setUserId(AuthContext.requireCurrentUserId());
         orderService.cancelOrder(request);
         return ApiResponse.success("取消订单成功", null);
+    }
+
+    @PostMapping("/{id}/reschedule")
+    public ApiResponse<RescheduleOrderResponse> reschedule(@PathVariable Long id, @RequestBody CreateOrderRequest request) {
+        request.setUserId(AuthContext.requireCurrentUserId());
+        return ApiResponse.success("修改预约成功", orderService.rescheduleOrder(id, request));
     }
 
     @GetMapping("/list")

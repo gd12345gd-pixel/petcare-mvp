@@ -24,6 +24,7 @@ public class Review {
     private Long userId;
     private Long sitterId;
     private Integer rating;
+    private String tags;
     private String content;
     private LocalDateTime createdAt;
 }

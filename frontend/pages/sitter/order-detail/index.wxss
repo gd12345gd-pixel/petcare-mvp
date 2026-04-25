@@ -95,6 +95,17 @@
   flex-shrink: 0;
 }
 
+.new-remark-badge {
+  padding: 9rpx 16rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 22rpx;
+  font-weight: 800;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
 /* 顶部状态卡 */
 .status-card {
   margin: 18rpx 16rpx 0;
@@ -608,6 +619,74 @@
   font-size: 26rpx;
   color: #222;
   line-height: 1.8;
+}
+
+.remark-timeline {
+  position: relative;
+  padding-left: 18rpx;
+}
+
+.remark-timeline::before {
+  content: '';
+  position: absolute;
+  left: 7rpx;
+  top: 12rpx;
+  bottom: 16rpx;
+  width: 2rpx;
+  background: #ffe0e9;
+}
+
+.remark-timeline-item {
+  position: relative;
+  padding-left: 22rpx;
+}
+
+.remark-timeline-item + .remark-timeline-item {
+  margin-top: 18rpx;
+}
+
+.remark-dot {
+  position: absolute;
+  left: -16rpx;
+  top: 18rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #ff5f8d;
+  box-shadow: 0 0 0 6rpx #fff1f5;
+}
+
+.remark-card {
+  padding: 18rpx;
+  border-radius: 18rpx;
+  background: #f8f9fc;
+}
+
+.remark-title {
+  font-size: 24rpx;
+  font-weight: 800;
+  color: #ff5f8d;
+}
+
+.remark-content {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: #222;
+  line-height: 1.65;
+}
+
+.remark-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.remark-image {
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 14rpx;
+  background: #eef0f4;
 }
 
 /* 费用 */

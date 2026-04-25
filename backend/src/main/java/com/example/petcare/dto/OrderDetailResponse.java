@@ -9,6 +9,15 @@ public class OrderDetailResponse {
     private String orderNo;
     private String orderStatus;
     private String payStatus;
+    private String createdAt;
+    private String takenAt;
+    private Long sitterId;
+    private String sitterName;
+    private String sitterPhone;
+    private Long addressId;
+    private Boolean canReschedule;
+    private Integer rescheduleCount;
+    private Integer maxRescheduleCount;
 
     private String serviceContactName;
     private String serviceContactPhone;
@@ -21,6 +30,11 @@ public class OrderDetailResponse {
     private List<String> timeSlots;
     private List<OrderPetItemResponse> pets;
     private List<OrderScheduleItemResponse> serviceDates;
+    private List<OrderRemarkResponse> remarkTimeline;
+    private Boolean canAppendRemark;
+    private Boolean canReview;
+    private Boolean reviewed;
+    private ReviewResponse review;
 
     private BigDecimal suggestedUnitPrice;
     private BigDecimal unitPrice;
@@ -39,6 +53,33 @@ public class OrderDetailResponse {
 
     public String getPayStatus() { return payStatus; }
     public void setPayStatus(String payStatus) { this.payStatus = payStatus; }
+
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public String getTakenAt() { return takenAt; }
+    public void setTakenAt(String takenAt) { this.takenAt = takenAt; }
+
+    public Long getSitterId() { return sitterId; }
+    public void setSitterId(Long sitterId) { this.sitterId = sitterId; }
+
+    public String getSitterName() { return sitterName; }
+    public void setSitterName(String sitterName) { this.sitterName = sitterName; }
+
+    public String getSitterPhone() { return sitterPhone; }
+    public void setSitterPhone(String sitterPhone) { this.sitterPhone = sitterPhone; }
+
+    public Long getAddressId() { return addressId; }
+    public void setAddressId(Long addressId) { this.addressId = addressId; }
+
+    public Boolean getCanReschedule() { return canReschedule; }
+    public void setCanReschedule(Boolean canReschedule) { this.canReschedule = canReschedule; }
+
+    public Integer getRescheduleCount() { return rescheduleCount; }
+    public void setRescheduleCount(Integer rescheduleCount) { this.rescheduleCount = rescheduleCount; }
+
+    public Integer getMaxRescheduleCount() { return maxRescheduleCount; }
+    public void setMaxRescheduleCount(Integer maxRescheduleCount) { this.maxRescheduleCount = maxRescheduleCount; }
 
     public String getServiceContactName() { return serviceContactName; }
     public void setServiceContactName(String serviceContactName) { this.serviceContactName = serviceContactName; }
@@ -66,6 +107,21 @@ public class OrderDetailResponse {
 
     public List<OrderScheduleItemResponse> getServiceDates() { return serviceDates; }
     public void setServiceDates(List<OrderScheduleItemResponse> serviceDates) { this.serviceDates = serviceDates; }
+
+    public List<OrderRemarkResponse> getRemarkTimeline() { return remarkTimeline; }
+    public void setRemarkTimeline(List<OrderRemarkResponse> remarkTimeline) { this.remarkTimeline = remarkTimeline; }
+
+    public Boolean getCanAppendRemark() { return canAppendRemark; }
+    public void setCanAppendRemark(Boolean canAppendRemark) { this.canAppendRemark = canAppendRemark; }
+
+    public Boolean getCanReview() { return canReview; }
+    public void setCanReview(Boolean canReview) { this.canReview = canReview; }
+
+    public Boolean getReviewed() { return reviewed; }
+    public void setReviewed(Boolean reviewed) { this.reviewed = reviewed; }
+
+    public ReviewResponse getReview() { return review; }
+    public void setReview(ReviewResponse review) { this.review = review; }
 
     public BigDecimal getSuggestedUnitPrice() { return suggestedUnitPrice; }
     public void setSuggestedUnitPrice(BigDecimal suggestedUnitPrice) { this.suggestedUnitPrice = suggestedUnitPrice; }

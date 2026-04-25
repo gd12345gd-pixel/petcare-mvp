@@ -26,6 +26,10 @@ public class OrderService {
     private final PetRepository petRepository;
     private final UserAddressRepository userAddressRepository;
     private final ServiceRecordRepository serviceRecordRepository;
+    private final SitterProfileRepository sitterProfileRepository;
+    private final OrderRemarkService orderRemarkService;
+    private final ReviewService reviewService;
+    private final ReviewRepository reviewRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -35,7 +39,11 @@ public class OrderService {
                         PetOrderLogRepository petOrderLogRepository,
                         UserAddressRepository userAddressRepository,
                         PetRepository petRepository,
-                        ServiceRecordRepository serviceRecordRepository) {
+                        ServiceRecordRepository serviceRecordRepository,
+                        SitterProfileRepository sitterProfileRepository,
+                        OrderRemarkService orderRemarkService,
+                        ReviewService reviewService,
+                        ReviewRepository reviewRepository) {
         this.petOrderRepository = petOrderRepository;
         this.petOrderPetRepository = petOrderPetRepository;
         this.petOrderScheduleRepository = petOrderScheduleRepository;
@@ -43,11 +51,62 @@ public class OrderService {
         this.userAddressRepository = userAddressRepository;
         this.petRepository = petRepository;
         this.serviceRecordRepository = serviceRecordRepository;
+        this.sitterProfileRepository = sitterProfileRepository;
+        this.orderRemarkService = orderRemarkService;
+        this.reviewService = reviewService;
+        this.reviewRepository = reviewRepository;
     }
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
         validateCreateRequest(request);
+        PetOrder savedOrder = createOrderInternal(request, null, 0, "MINI_APP", "CREATE_ORDER", "用户创建订单");
+        return toCreateOrderResponse(savedOrder);
+    }
 
+    @Transactional
+    public RescheduleOrderResponse rescheduleOrder(Long originalOrderId, CreateOrderRequest request) {
+        if (originalOrderId == null) {
+            throw new RuntimeException("原订单ID不能为空");
+        }
+        validateCreateRequest(request);
+
+        PetOrder oldOrder = petOrderRepository.findByIdAndUserIdAndDeleted(originalOrderId, request.getUserId(), 0)
+                .orElseThrow(() -> new RuntimeException("原订单不存在"));
+
+        validateRescheduleAllowed(oldOrder);
+
+        int nextRescheduleCount = safeCount(oldOrder.getRescheduleCount()) + 1;
+        PetOrder newOrder = createOrderInternal(
+                request,
+                resolveRootOrderId(oldOrder),
+                nextRescheduleCount,
+                "RESCHEDULE",
+                "RESCHEDULE_CREATE",
+                "用户修改预约生成新订单，原订单号：" + oldOrder.getOrderNo()
+        );
+
+        oldOrder.setOrderStatus("CANCELLED");
+        oldOrder.setCancelReason("用户修改预约");
+        petOrderRepository.save(oldOrder);
+
+        List<PetOrderSchedule> oldSchedules = petOrderScheduleRepository.findByOrderIdOrderByServiceDateAsc(oldOrder.getId());
+        for (PetOrderSchedule item : oldSchedules) {
+            item.setScheduleStatus("CANCELLED");
+        }
+        petOrderScheduleRepository.saveAll(oldSchedules);
+
+        saveOrderLog(oldOrder.getId(), "RESCHEDULE_CANCEL", "USER", request.getUserId(),
+                "用户修改预约，关闭旧订单，新订单号：" + newOrder.getOrderNo());
+
+        return toRescheduleResponse(oldOrder, newOrder);
+    }
+
+    private PetOrder createOrderInternal(CreateOrderRequest request,
+                                         Long originalOrderId,
+                                         int rescheduleCount,
+                                         String source,
+                                         String logAction,
+                                         String logRemark) {
         UserAddress address = userAddressRepository
                 .findByIdAndUserIdAndDeleted(request.getAddressId(), request.getUserId(), 0)
                 .orElseThrow(() -> new RuntimeException("服务地址不存在"));
@@ -62,20 +121,13 @@ public class OrderService {
             throw new RuntimeException("所选宠物不存在或不属于当前用户");
         }
 
-        BigDecimal suggestedUnitPrice = calculateSuggestedUnitPrice(
-                request.getPetIds() == null ? 0 : request.getPetIds().size(),
-                request.getServiceDurationMinutes()
+        BigDecimal unitPrice = calculateSuggestedUnitPrice(
+                pets.size(),
+                request.getServiceDurationMinutes(),
+                request.getTimeSlots()
         );
-
-        BigDecimal unitPrice = safeMoney(request.getServiceFee());
-        BigDecimal totalPrice = safeMoney(request.getTotalPrice());
-
-        BigDecimal expectedTotalPrice = unitPrice.multiply(BigDecimal.valueOf(request.getServiceDates().size()))
+        BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(request.getServiceDates().size()))
                 .setScale(2, RoundingMode.HALF_UP);
-
-        if (expectedTotalPrice.compareTo(totalPrice) != 0) {
-            throw new RuntimeException("总价计算不正确");
-        }
 
         PetOrder order = new PetOrder();
         order.setOrderNo(generateOrderNo());
@@ -101,10 +153,12 @@ public class OrderService {
         order.setRemark(request.getRemark());
         order.setSpecialRequirement(request.getSpecialRequirement());
 
-        order.setSuggestedUnitPrice(suggestedUnitPrice);
+        order.setSuggestedUnitPrice(unitPrice);
         order.setUnitPrice(unitPrice);
         order.setTotalPrice(totalPrice);
-        order.setSource("MINI_APP");
+        order.setSource(source);
+        order.setOriginalOrderId(originalOrderId);
+        order.setRescheduleCount(rescheduleCount);
         order.setDeleted(0);
 
         PetOrder savedOrder = petOrderRepository.save(order);
@@ -142,24 +196,9 @@ public class OrderService {
             petOrderScheduleRepository.save(schedule);
         }
 
-        PetOrderLog log = new PetOrderLog();
-        log.setOrderId(savedOrder.getId());
-        log.setAction("CREATE_ORDER");
-        log.setOperatorType("USER");
-        log.setOperatorId(request.getUserId());
-        log.setRemark("用户创建订单");
-        petOrderLogRepository.save(log);
+        saveOrderLog(savedOrder.getId(), logAction, "USER", request.getUserId(), logRemark);
 
-        CreateOrderResponse response = new CreateOrderResponse();
-        response.setId(savedOrder.getId());
-        response.setOrderNo(savedOrder.getOrderNo());
-        response.setOrderStatus(savedOrder.getOrderStatus());
-        response.setPayStatus(savedOrder.getPayStatus());
-        response.setPetCount(savedOrder.getPetCount());
-        response.setServiceDateCount(savedOrder.getServiceDateCount());
-        response.setUnitPrice(savedOrder.getUnitPrice());
-        response.setTotalPrice(savedOrder.getTotalPrice());
-        return response;
+        return savedOrder;
     }
     public OrderDetailResponse detail(Long id, Long userId) {
         PetOrder order = petOrderRepository.findByIdAndUserIdAndDeleted(id, userId, 0)
@@ -181,6 +220,18 @@ public class OrderService {
         response.setOrderNo(order.getOrderNo());
         response.setOrderStatus(order.getOrderStatus());
         response.setPayStatus(order.getPayStatus());
+        response.setCreatedAt(order.getCreatedAt() == null ? "" : order.getCreatedAt().toString());
+        response.setTakenAt(order.getTakenAt() == null ? "" : order.getTakenAt().toString());
+        response.setSitterId(order.getSitterId());
+        response.setAddressId(order.getAddressId());
+        response.setCanReschedule(canReschedule(order, schedules));
+        response.setRescheduleCount(safeCount(order.getRescheduleCount()));
+        if (order.getSitterId() != null) {
+            sitterProfileRepository.findById(order.getSitterId()).ifPresent(sitter -> {
+                response.setSitterName(safe(sitter.getRealName()));
+                response.setSitterPhone(safe(sitter.getPhone()));
+            });
+        }
 
         response.setServiceContactName(order.getServiceContactName());
         response.setServiceContactPhone(order.getServiceContactPhone());
@@ -198,6 +249,13 @@ public class OrderService {
 
         response.setPets(orderPets.stream().map(this::toPetResponse).collect(Collectors.toList()));
         response.setServiceDates(schedules.stream().map(item -> toScheduleResponse(item, recordIdMap)).collect(Collectors.toList()));
+        response.setRemarkTimeline(orderRemarkService.timeline(order));
+        response.setCanAppendRemark(orderRemarkService.canAppendRemark(order.getOrderStatus()));
+        ReviewResponse review = reviewService.findByOrder(order.getId(), userId);
+        boolean reviewed = review != null;
+        response.setReview(review);
+        response.setReviewed(reviewed);
+        response.setCanReview("COMPLETED".equals(order.getOrderStatus()) && !reviewed && order.getSitterId() != null);
 
         response.setSuggestedUnitPrice(order.getSuggestedUnitPrice());
         response.setUnitPrice(order.getUnitPrice());
@@ -215,15 +273,31 @@ public class OrderService {
         List<Long> orderIds = orders.stream().map(PetOrder::getId).collect(Collectors.toList());
 
         List<PetOrderSchedule> schedules = petOrderScheduleRepository.findByOrderIdInOrderByServiceDateAsc(orderIds);
+        List<PetOrderPet> orderPets = petOrderPetRepository.findByOrderIdIn(orderIds);
 
         Map<Long, List<PetOrderSchedule>> scheduleMap = schedules.stream()
                 .collect(Collectors.groupingBy(PetOrderSchedule::getOrderId));
+        Map<Long, List<PetOrderPet>> petMap = orderPets.stream()
+                .collect(Collectors.groupingBy(PetOrderPet::getOrderId));
 
         List<OrderListItemResponse> result = new ArrayList<>();
 
         for (PetOrder order : orders) {
             List<PetOrderSchedule> currentSchedules = scheduleMap.getOrDefault(order.getId(), new ArrayList<>());
+            List<PetOrderPet> currentPets = petMap.getOrDefault(order.getId(), new ArrayList<>());
             String firstServiceDate = currentSchedules.isEmpty() ? "" : currentSchedules.get(0).getServiceDate().toString();
+            String lastServiceDate = currentSchedules.isEmpty()
+                    ? ""
+                    : currentSchedules.get(currentSchedules.size() - 1).getServiceDate().toString();
+            int completedServiceCount = (int) currentSchedules.stream()
+                    .filter(schedule -> "DONE".equals(schedule.getScheduleStatus()))
+                    .count();
+            int catCount = (int) currentPets.stream()
+                    .filter(pet -> isCatType(pet.getPetType()))
+                    .count();
+            int dogCount = (int) currentPets.stream()
+                    .filter(pet -> isDogType(pet.getPetType()))
+                    .count();
 
             OrderListItemResponse item = new OrderListItemResponse();
             item.setId(order.getId());
@@ -231,7 +305,10 @@ public class OrderService {
             item.setOrderStatus(order.getOrderStatus());
             item.setPayStatus(order.getPayStatus());
             item.setPetCount(order.getPetCount());
+            item.setCatCount(catCount);
+            item.setDogCount(dogCount);
             item.setServiceDateCount(order.getServiceDateCount());
+            item.setCompletedServiceCount(completedServiceCount);
             item.setServiceDurationMinutes(order.getServiceDurationMinutes());
             item.setServiceContactName(order.getServiceContactName());
             item.setServiceContactPhone(order.getServiceContactPhone());
@@ -244,6 +321,14 @@ public class OrderService {
             item.setUnitPrice(order.getUnitPrice());
             item.setTotalPrice(order.getTotalPrice());
             item.setFirstServiceDate(firstServiceDate);
+            item.setLastServiceDate(lastServiceDate);
+            item.setCreatedAt(order.getCreatedAt() == null ? "" : order.getCreatedAt().toString());
+            boolean canReschedule = canReschedule(order, currentSchedules);
+            item.setCanReschedule(canReschedule);
+            item.setRescheduleHint(canReschedule ? "待接单 · 可修改预约" : "");
+            boolean reviewed = reviewRepository.existsByOrderIdAndUserId(order.getId(), userId);
+            item.setReviewed(reviewed);
+            item.setCanReview("COMPLETED".equals(order.getOrderStatus()) && !reviewed && order.getSitterId() != null);
 
             result.add(item);
         }
@@ -267,6 +352,7 @@ public class OrderService {
         }
 
         order.setOrderStatus("CANCELLED");
+        order.setCancelReason(isBlank(request.getReason()) ? "用户取消订单" : request.getReason());
         petOrderRepository.save(order);
 
         List<PetOrderSchedule> schedules = petOrderScheduleRepository.findByOrderIdOrderByServiceDateAsc(order.getId());
@@ -275,18 +361,22 @@ public class OrderService {
         }
         petOrderScheduleRepository.saveAll(schedules);
 
-        PetOrderLog log = new PetOrderLog();
-        log.setOrderId(order.getId());
-        log.setAction("CANCEL_ORDER");
-        log.setOperatorType("USER");
-        log.setOperatorId(request.getUserId());
-        log.setRemark(isBlank(request.getReason()) ? "用户取消订单" : request.getReason());
-        petOrderLogRepository.save(log);
+        saveOrderLog(order.getId(), "CANCEL_ORDER", "USER", request.getUserId(),
+                isBlank(request.getReason()) ? "用户取消订单" : request.getReason());
     }
 
     private boolean isBlank(String str) {
         return str == null || str.trim().isEmpty();
     }
+
+    private boolean isCatType(String petType) {
+        return petType != null && (petType.contains("猫") || "CAT".equalsIgnoreCase(petType));
+    }
+
+    private boolean isDogType(String petType) {
+        return petType != null && (petType.contains("狗") || "DOG".equalsIgnoreCase(petType));
+    }
+
     private void validateCreateRequest(CreateOrderRequest request) {
         if (request.getUserId() == null) {
             throw new RuntimeException("用户ID不能为空");
@@ -306,19 +396,12 @@ public class OrderService {
         if (request.getServiceDurationMinutes() == null || request.getServiceDurationMinutes() <= 0) {
             throw new RuntimeException("服务时长不正确");
         }
-        if (safeMoney(request.getServiceFee()).compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("单次价格不正确");
-        }
-        if (safeMoney(request.getTotalPrice()).compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("总价不正确");
-        }
-
         if (request.getTimeSlots().contains("不限") && request.getTimeSlots().size() > 1) {
             throw new RuntimeException("选择“时间不限”时不能再选其他时间段");
         }
     }
 
-    private BigDecimal calculateSuggestedUnitPrice(int petCount, Integer durationMinutes) {
+    private BigDecimal calculateSuggestedUnitPrice(int petCount, Integer durationMinutes, List<String> timeSlots) {
         int price = 49;
 
         if (durationMinutes != null && durationMinutes >= 40) price += 10;
@@ -329,7 +412,87 @@ public class OrderService {
             price += (petCount - 1) * 10;
         }
 
+        List<String> slots = timeSlots == null ? new ArrayList<>() : timeSlots;
+        long concreteSlotCount = slots.stream().filter(slot -> !"不限".equals(slot)).count();
+        if (concreteSlotCount > 1) {
+            price += (int) (concreteSlotCount - 1) * 5;
+        }
+        boolean hasLateSlot = slots.stream().anyMatch(slot -> slot != null && slot.startsWith("20:00"));
+        if (hasLateSlot) {
+            price += 10;
+        }
+
         return BigDecimal.valueOf(price).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private void validateRescheduleAllowed(PetOrder order) {
+        if (!"WAIT_TAKING".equals(order.getOrderStatus())) {
+            throw new RuntimeException("只有待接单状态的订单允许修改预约");
+        }
+    }
+
+    private boolean canReschedule(PetOrder order, List<PetOrderSchedule> schedules) {
+        return "WAIT_TAKING".equals(order.getOrderStatus());
+    }
+
+    private Long resolveRootOrderId(PetOrder oldOrder) {
+        return oldOrder.getOriginalOrderId() == null ? oldOrder.getId() : oldOrder.getOriginalOrderId();
+    }
+
+    private int safeCount(Integer count) {
+        return count == null ? 0 : count;
+    }
+
+    private CreateOrderResponse toCreateOrderResponse(PetOrder savedOrder) {
+        CreateOrderResponse response = new CreateOrderResponse();
+        response.setId(savedOrder.getId());
+        response.setOrderNo(savedOrder.getOrderNo());
+        response.setOrderStatus(savedOrder.getOrderStatus());
+        response.setPayStatus(savedOrder.getPayStatus());
+        response.setPetCount(savedOrder.getPetCount());
+        response.setServiceDateCount(savedOrder.getServiceDateCount());
+        response.setSuggestedUnitPrice(savedOrder.getSuggestedUnitPrice());
+        response.setUnitPrice(savedOrder.getUnitPrice());
+        response.setTotalPrice(savedOrder.getTotalPrice());
+        return response;
+    }
+
+    private RescheduleOrderResponse toRescheduleResponse(PetOrder oldOrder, PetOrder newOrder) {
+        BigDecimal oldTotal = safeMoney(oldOrder.getTotalPrice());
+        BigDecimal newTotal = safeMoney(newOrder.getTotalPrice());
+        BigDecimal diff = newTotal.subtract(oldTotal).setScale(2, RoundingMode.HALF_UP);
+
+        RescheduleOrderResponse response = new RescheduleOrderResponse();
+        response.setOldOrderId(oldOrder.getId());
+        response.setNewOrderId(newOrder.getId());
+        response.setNewOrderNo(newOrder.getOrderNo());
+        response.setOldTotalPrice(oldTotal);
+        response.setNewTotalPrice(newTotal);
+        response.setPriceDiff(diff.abs());
+        response.setRescheduleCount(safeCount(newOrder.getRescheduleCount()));
+
+        if (diff.compareTo(BigDecimal.ZERO) > 0) {
+            response.setPriceChangeType("INCREASE");
+            response.setPaymentAction("NEED_PAY_DIFF");
+        } else if (diff.compareTo(BigDecimal.ZERO) < 0) {
+            response.setPriceChangeType("DECREASE");
+            response.setPaymentAction("REFUND_DIFF");
+        } else {
+            response.setPriceChangeType("UNCHANGED");
+            response.setPaymentAction("NONE");
+        }
+
+        return response;
+    }
+
+    private void saveOrderLog(Long orderId, String action, String operatorType, Long operatorId, String remark) {
+        PetOrderLog log = new PetOrderLog();
+        log.setOrderId(orderId);
+        log.setAction(action);
+        log.setOperatorType(operatorType);
+        log.setOperatorId(operatorId);
+        log.setRemark(remark);
+        petOrderLogRepository.save(log);
     }
 
     private String generateOrderNo() {

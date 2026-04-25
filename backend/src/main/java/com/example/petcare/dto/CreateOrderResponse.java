@@ -12,6 +12,7 @@ public class CreateOrderResponse {
     private Integer serviceDateCount;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
+    private BigDecimal suggestedUnitPrice;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -36,4 +37,7 @@ public class CreateOrderResponse {
 
     public BigDecimal getTotalPrice() { return totalPrice; }
     public void setTotalPrice(BigDecimal totalPrice) { this.totalPrice = totalPrice; }
+
+    public BigDecimal getSuggestedUnitPrice() { return suggestedUnitPrice; }
+    public void setSuggestedUnitPrice(BigDecimal suggestedUnitPrice) { this.suggestedUnitPrice = suggestedUnitPrice; }
 }

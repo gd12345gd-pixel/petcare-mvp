@@ -303,12 +303,5 @@ Page({
       current: urls[index],
       urls
     })
-  },
-
-  handleContactService() {
-    wx.showToast({
-      title: '这里后面接客服能力',
-      icon: 'none'
-    })
   }
 })

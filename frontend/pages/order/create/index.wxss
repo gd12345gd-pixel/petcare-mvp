@@ -405,67 +405,34 @@
 /* 时间段优化 */
 .time-section-wrap {
   background: #f8f9fc;
-  border-radius: 18rpx;
-  padding: 16rpx;
-  box-sizing: border-box;
-}
-
-.time-primary-row {
-  display: flex;
-  margin-bottom: 14rpx;
-}
-
-.time-pill {
-  min-width: 180rpx;
-  height: 68rpx;
-  padding: 0 18rpx;
   border-radius: 16rpx;
-  background: #fff;
-  border: 2rpx solid #eceef2;
-  color: #666;
-  font-size: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 12rpx;
   box-sizing: border-box;
-}
-
-.time-pill.active {
-  border-color: #ff6b81;
-  color: #ff6b81;
-  background: #fff7f9;
-}
-
-.time-pill-any {
-  min-width: 220rpx;
-}
-
-.time-subtitle {
-  margin-bottom: 10rpx;
-  font-size: 22rpx;
-  color: #9aa0aa;
-  line-height: 1.2;
 }
 
 .time-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12rpx;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10rpx;
 }
 
 .time-card {
-  height: 68rpx;
-  padding: 0 16rpx;
-  border-radius: 16rpx;
+  height: 56rpx;
+  padding: 0 8rpx;
+  border-radius: 14rpx;
   background: #fff;
   border: 2rpx solid #eceef2;
   color: #666;
-  font-size: 24rpx;
+  font-size: 22rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
   text-align: center;
+}
+
+.time-card-any {
+  font-weight: 700;
 }
 
 .time-card.active {
@@ -796,8 +763,8 @@
   border-radius: 28rpx 28rpx 0 0;
   display: flex;
   flex-direction: column;
-  height: 78vh;
-  max-height: 78vh;
+  height: 72vh;
+  max-height: 72vh;
   box-sizing: border-box;
 }
 
@@ -811,20 +778,52 @@
 .date-popup-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 18rpx;
+  position: relative;
 }
 
 .popup-title {
+  min-width: 220rpx;
+  text-align: center;
   font-size: 32rpx;
   font-weight: 800;
   color: #111;
 }
 
+.month-switch {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: #f8f9fc;
+  color: #ff5f8d;
+  font-size: 40rpx;
+  line-height: 50rpx;
+  text-align: center;
+  font-weight: 700;
+}
+
+.month-switch.disabled {
+  color: #c7cbd3;
+  background: #f3f4f6;
+}
+
 .date-popup-close {
+  position: absolute;
+  right: 0;
+  top: 6rpx;
   font-size: 28rpx;
   color: #b4b4b4;
   width: 44rpx;
   text-align: center;
+}
+
+.date-range-tip {
+  margin-top: 10rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #9aa0aa;
+  line-height: 1.4;
 }
 
 .week-row {
@@ -853,11 +852,13 @@
 }
 
 .day-cell {
+  position: relative;
   height: 74rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 }
 
 .day-cell.empty {
@@ -867,6 +868,15 @@
 .day-cell.selected {
   background: #ff6b81;
   color: #fff;
+}
+
+.day-cell.disabled {
+  color: #c7cbd3;
+  background: #f4f5f7;
+}
+
+.day-cell.disabled .day-num {
+  font-weight: 500;
 }
 
 .day-num {

@@ -1,11 +1,34 @@
 <view class="page">
-  <view class="header">
-    <view class="city-wrap">
-      <text class="city-icon">📍</text>
-      <text class="city-text">{{city}}</text>
+  <view class="community-hero">
+    <view class="hero-top">
+      <view>
+        <view class="hero-title">{{activeTab === 'lost' ? '寻宠互助' : '寻主互助'}}</view>
+        <view class="hero-desc">
+          {{activeTab === 'lost' ? '发布走失信息，让附近用户帮你一起找' : '发现疑似走失宠物，帮它回家'}}
+        </view>
+      </view>
+      <view class="city-pill">📍 {{city}}</view>
     </view>
-    <view class="title">寻宠</view>
-    <view class="search-icon">⌕</view>
+
+    <view class="quick-actions">
+      <view class="quick-action lost" data-type="lost" bindtap="goPublishType">
+        <view class="quick-title">发布寻宠</view>
+        <view class="quick-desc">宠物走失求助</view>
+      </view>
+      <view class="quick-action found" data-type="found" bindtap="goPublishType">
+        <view class="quick-title">发布寻主</view>
+        <view class="quick-desc">捡到宠物找主人</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tab-wrap">
+    <view class="tab-item {{activeTab === 'lost' ? 'active' : ''}}" data-tab="lost" bindtap="switchTab">
+      寻宠
+    </view>
+    <view class="tab-item {{activeTab === 'found' ? 'active' : ''}}" data-tab="found" bindtap="switchTab">
+      寻主
+    </view>
   </view>
 
   <view class="banner-card" wx:if="{{bannerVisible}}">
@@ -18,15 +41,6 @@
       src="https://images.unsplash.com/photo-1517849845537-4d257902454a?q=80&w=800&auto=format&fit=crop"
       mode="aspectFill"
     />
-  </view>
-
-  <view class="tab-wrap">
-    <view class="tab-item {{activeTab === 'lost' ? 'active' : ''}}" data-tab="lost" bindtap="switchTab">
-      寻宠
-    </view>
-    <view class="tab-item {{activeTab === 'found' ? 'active' : ''}}" data-tab="found" bindtap="switchTab">
-      寻主
-    </view>
   </view>
 
   <view class="region-filter-wrap">
@@ -62,7 +76,7 @@
   </view>
 
   <view class="map-entry-wrap">
-    <button class="map-entry-btn" bindtap="goMapPage">地图模式</button>
+    <button class="map-entry-btn" bindtap="goMapPage">地图模式查看附近线索</button>
   </view>
 
   <view class="loading" wx:if="{{loading}}">加载中...</view>
@@ -82,9 +96,9 @@
           <view class="pet-name">{{item.petName || '未命名'}}（{{item.breed || '未知'}}）</view>
           <view class="tag reward">{{item.rewardText}}</view>
         </view>
-        <view class="pet-line">📍 {{item.location}}</view>
-        <view class="pet-line">🧭 {{item.province}} {{item.city}} {{item.district}}</view>
-        <view class="pet-line">🕒 {{item.timeText}}</view>
+        <view class="pet-line">位置：{{item.location}}</view>
+        <view class="pet-line">区域：{{item.province}} {{item.city}} {{item.district}}</view>
+        <view class="pet-line">时间：{{item.timeText}}</view>
         <view class="distance-line" wx:if="{{sortMode === 'nearby' && item.distanceText}}">
           距离你约 {{item.distanceText}}
         </view>
@@ -109,9 +123,9 @@
           <view class="pet-name">{{item.petName || '疑似走失宠物'}}（{{item.breed || '未知'}}）</view>
           <view class="tag found-tag">{{item.rewardText}}</view>
         </view>
-        <view class="pet-line">📍 {{item.location}}</view>
-        <view class="pet-line">🧭 {{item.province}} {{item.city}} {{item.district}}</view>
-        <view class="pet-line">🕒 {{item.timeText}}</view>
+        <view class="pet-line">位置：{{item.location}}</view>
+        <view class="pet-line">区域：{{item.province}} {{item.city}} {{item.district}}</view>
+        <view class="pet-line">时间：{{item.timeText}}</view>
         <view class="distance-line" wx:if="{{sortMode === 'nearby' && item.distanceText}}">
           距离你约 {{item.distanceText}}
         </view>

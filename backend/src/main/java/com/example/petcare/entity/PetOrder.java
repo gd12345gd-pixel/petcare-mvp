@@ -87,6 +87,15 @@ public class PetOrder {
     @Column(length = 32)
     private String source = "MINI_APP";
 
+    @Column(name = "original_order_id")
+    private Long originalOrderId;
+
+    @Column(name = "reschedule_count", nullable = false)
+    private Integer rescheduleCount = 0;
+
+    @Column(name = "cancel_reason", length = 255)
+    private String cancelReason;
+
     @Column(nullable = false)
     private Integer deleted = 0;
 
@@ -181,6 +190,15 @@ public class PetOrder {
 
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }
+
+    public Long getOriginalOrderId() { return originalOrderId; }
+    public void setOriginalOrderId(Long originalOrderId) { this.originalOrderId = originalOrderId; }
+
+    public Integer getRescheduleCount() { return rescheduleCount; }
+    public void setRescheduleCount(Integer rescheduleCount) { this.rescheduleCount = rescheduleCount; }
+
+    public String getCancelReason() { return cancelReason; }
+    public void setCancelReason(String cancelReason) { this.cancelReason = cancelReason; }
 
     public Integer getDeleted() { return deleted; }
     public void setDeleted(Integer deleted) { this.deleted = deleted; }

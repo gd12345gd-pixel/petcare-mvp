@@ -395,6 +395,14 @@
   flex-direction: column;
   align-items: center;
   color: #70747d;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  line-height: normal;
+}
+
+.contact-btn::after {
+  border: none;
 }
 
 .contact-icon {

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,11 +30,23 @@ public interface PetOrderRepository extends JpaRepository<PetOrder, Long> {
     where o.sitterId = :sitterId
     and o.createdAt >= :startTime
     and o.createdAt < :endTime
-    and o.orderStatus in ('ACCEPTED', 'SERVING', 'COMPLETED')
+    and o.orderStatus in ('TAKEN', 'SERVING', 'PART_SERVING', 'PART_COMPLETED', 'COMPLETED')
 """)
     int countTodayAcceptedOrders(
             @Param("sitterId") Long sitterId,
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime
     );
+
+    @Query("""
+    select distinct o from PetOrder o
+    where o.deleted = 0
+    and o.orderStatus = 'WAIT_TAKING'
+    and exists (
+        select s.id from PetOrderSchedule s
+        where s.orderId = o.id
+        and s.serviceDate < :today
+    )
+""")
+    List<PetOrder> findTimeoutWaitTakingOrders(@Param("today") LocalDate today);
 }

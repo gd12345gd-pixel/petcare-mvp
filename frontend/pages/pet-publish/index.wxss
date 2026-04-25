@@ -5,6 +5,26 @@
   box-sizing: border-box;
 }
 
+.publish-hero {
+  margin-bottom: 20rpx;
+  padding: 28rpx 24rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(180deg, #ff7993 0%, #ffeff4 100%);
+  color: #fff;
+}
+
+.publish-title {
+  font-size: 38rpx;
+  font-weight: 900;
+}
+
+.publish-desc {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.92);
+}
+
 .top-switch {
   display: flex;
   background: #fff;
@@ -58,8 +78,35 @@
 }
 
 .upload-icon {
-  font-size: 48rpx;
+  position: relative;
+  width: 58rpx;
+  height: 46rpx;
   margin-bottom: 10rpx;
+  border: 5rpx solid #ff9aae;
+  border-radius: 12rpx;
+  box-sizing: border-box;
+}
+
+.upload-icon::before {
+  content: '';
+  position: absolute;
+  left: 17rpx;
+  top: 12rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #ff9aae;
+}
+
+.upload-icon::after {
+  content: '';
+  position: absolute;
+  left: 12rpx;
+  top: -12rpx;
+  width: 24rpx;
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: #ff9aae;
 }
 
 .upload-text {
@@ -86,6 +133,23 @@
   border-radius: 18rpx;
   padding: 0 20rpx;
   font-size: 28rpx;
+}
+
+.picker-input {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  color: #333;
+}
+
+.picker-input.placeholder {
+  color: #aaa;
+}
+
+.time-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14rpx;
 }
 
 .location-box {

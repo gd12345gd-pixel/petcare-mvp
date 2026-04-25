@@ -1,0 +1,44 @@
+<view class="page-bg">
+  <view class="container">
+    <view class="hero-card">
+      <view>
+        <view class="title">消息通知</view>
+        <view class="subtitle">订单、审核、反馈等重要消息会展示在这里。</view>
+      </view>
+      <button class="read-all-btn" wx:if="{{unreadCount > 0}}" bindtap="markAllRead">全部已读</button>
+    </view>
+
+    <view class="empty-card error" wx:if="{{!loading && loadError}}">
+      <view class="empty-title">消息服务暂不可用</view>
+      <view class="empty-desc">{{loadError}}</view>
+    </view>
+
+    <view class="empty-card" wx:elif="{{!loading && !notifications.length}}">
+      <view class="empty-title">暂无消息</view>
+      <view class="empty-desc">有新的订单进展或审核结果时，会第一时间通知你。</view>
+    </view>
+
+    <view wx:elif="{{loading}}" class="empty-card">
+      <view class="empty-title">加载中...</view>
+    </view>
+
+    <view wx:else>
+      <view
+        class="notice-card {{item.readFlag ? 'read' : 'unread'}}"
+        wx:for="{{notifications}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="openNotification"
+      >
+        <view class="notice-dot" wx:if="{{!item.readFlag}}"></view>
+        <view class="notice-head">
+          <view class="notice-type">{{item.typeText}}</view>
+          <view class="notice-time">{{item.createdAtText}}</view>
+        </view>
+        <view class="notice-title">{{item.title}}</view>
+        <view class="notice-content">{{item.content}}</view>
+        <view class="notice-link" wx:if="{{item.targetUrl}}">查看详情 ›</view>
+      </view>
+    </view>
+  </view>
+</view>

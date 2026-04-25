@@ -1,0 +1,51 @@
+<view class="page-bg">
+  <view class="container">
+    <view class="hero-card">
+      <view class="title">问题反馈</view>
+      <view class="subtitle">遇到订单、服务、支付或功能问题，可以在这里告诉我们。</view>
+    </view>
+
+    <view class="form-card">
+      <view class="field-label">反馈类型</view>
+      <picker mode="selector" range="{{typeOptions}}" range-key="label" value="{{typeIndex}}" bindchange="onTypeChange">
+        <view class="picker-value">{{typeOptions[typeIndex].label}}</view>
+      </picker>
+
+      <view class="field-label">问题描述</view>
+      <textarea
+        class="textarea"
+        maxlength="1000"
+        placeholder="请尽量描述清楚问题发生的页面、操作步骤、订单情况等"
+        value="{{form.content}}"
+        data-field="content"
+        bindinput="onInput"
+      />
+
+      <view class="field-label">关联订单号（选填）</view>
+      <input
+        class="input"
+        placeholder="如有订单问题，可填写订单号"
+        value="{{form.orderNo}}"
+        data-field="orderNo"
+        bindinput="onInput"
+      />
+
+      <view class="field-label">联系电话（选填）</view>
+      <input
+        class="input"
+        type="number"
+        maxlength="11"
+        placeholder="便于客服联系你"
+        value="{{form.contactPhone}}"
+        data-field="contactPhone"
+        bindinput="onInput"
+      />
+    </view>
+
+    <button class="submit-btn" loading="{{submitting}}" bindtap="submitFeedback">提交反馈</button>
+
+    <button class="contact-btn" open-type="contact" session-from="feedback_page">
+      直接联系微信客服
+    </button>
+  </view>
+</view>

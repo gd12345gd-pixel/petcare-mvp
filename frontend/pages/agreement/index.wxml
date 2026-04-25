@@ -1,0 +1,15 @@
+<view class="page-bg">
+  <view class="container">
+    <view class="hero-card">
+      <view class="title">{{agreement.title}}</view>
+      <view class="intro">{{agreement.intro}}</view>
+    </view>
+
+    <view class="section-card" wx:for="{{agreement.sections}}" wx:key="title">
+      <view class="section-title">{{item.title}}</view>
+      <view class="agreement-item" wx:for="{{item.items}}" wx:for-item="line" wx:key="*this">
+        {{index + 1}}. {{line}}
+      </view>
+    </view>
+  </view>
+</view>

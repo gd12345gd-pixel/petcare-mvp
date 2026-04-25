@@ -6,9 +6,14 @@
       "pages/service-detail/index",
       "pages/order/create/index",
       "pages/order/detail/index",
+      "pages/order/remark-add/index",
+      "pages/order/review/index",
       "pages/order/list/index",
       "pages/sitter/index",
+      "pages/sitter/register/index",
+      "pages/sitter/workbench/index",
       "pages/sitter/order-detail/index",
+      "pages/admin/sitter-audit/index",
       "pages/order-create/index",
       "pages/orders/index",
       "pages/pet-edit/index",
@@ -21,6 +26,11 @@
       "pages/pet-map/index",
       "pages/address-list/index",
       "pages/address-edit/index",
+      "pages/profile-edit/index",
+      "pages/feedback/index",
+      "pages/faq/index",
+      "pages/notification/index",
+      "pages/agreement/index",
        
       "pages/service-record-success/index",
        
@@ -49,19 +59,27 @@
       "list": [
           {
               "pagePath": "pages/home/index",
-              "text": "首页"
+              "text": "首页",
+              "iconPath": "assets/tabbar/home-normal.png",
+              "selectedIconPath": "assets/tabbar/home-active.png"
           },{
             "pagePath": "pages/sitter/index",
-            "text": "接单" 
+            "text": "接单",
+            "iconPath": "assets/tabbar/sitter-normal.png",
+            "selectedIconPath": "assets/tabbar/sitter-active.png"
              
           },
           {
               "pagePath": "pages/order/list/index",
-              "text": "订单"
+              "text": "订单",
+              "iconPath": "assets/tabbar/order-normal.png",
+              "selectedIconPath": "assets/tabbar/order-active.png"
           },
           {
               "pagePath": "pages/profile/index",
-              "text": "我的"
+              "text": "我的",
+              "iconPath": "assets/tabbar/profile-normal.png",
+              "selectedIconPath": "assets/tabbar/profile-active.png"
           }
       ]
   },

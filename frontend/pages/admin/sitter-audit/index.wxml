@@ -1,0 +1,84 @@
+<view class="page-bg">
+  <view class="container">
+    <view class="header-card">
+      <view class="title">接单师审核</view>
+      <view class="subtitle">审核实名资料、服务能力和证件照片</view>
+    </view>
+
+    <view class="tabs">
+      <view
+        class="tab {{currentStatus === item.key ? 'active' : ''}}"
+        wx:for="{{statusTabs}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="switchStatus"
+      >
+        {{item.label}}
+      </view>
+    </view>
+
+    <view wx:if="{{loading}}" class="empty">加载中...</view>
+
+    <view wx:elif="{{!list.length}}" class="empty">暂无申请</view>
+
+    <view wx:else>
+      <view
+        class="list-card {{selected && selected.id === item.id ? 'selected' : ''}}"
+        wx:for="{{list}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="selectItem"
+      >
+        <view class="row">
+          <view>
+            <view class="name">{{item.realName || '未填写姓名'}}</view>
+            <view class="meta">{{item.city || '城市未填'}} · {{item.serviceArea || '服务区域未填'}}</view>
+          </view>
+          <view class="status">{{item.auditStatus}}</view>
+        </view>
+        <view class="meta">手机号：{{item.phone || '-'}}</view>
+      </view>
+    </view>
+
+    <view class="detail-card" wx:if="{{selected}}">
+      <view class="detail-title">申请资料</view>
+      <view class="line">真实姓名：{{selected.realName}}</view>
+      <view class="line">手机号：{{selected.phone}}</view>
+      <view class="line">性别/年龄：{{selected.gender || '-'}} / {{selected.age || '-'}}</view>
+      <view class="line">城市：{{selected.city || '-'}}</view>
+      <view class="line">服务区域：{{selected.serviceArea}}</view>
+      <view class="line">可服务宠物：{{selected.petTypes}}</view>
+      <view class="line">服务经验：{{selected.experience}}</view>
+      <view class="line">养宠经验：{{selected.hasPetExperience ? '是' : '否'}}</view>
+      <view class="line">服务时间：{{selected.availableTimes || '-'}}</view>
+      <view class="intro">简介：{{selected.introduction}}</view>
+
+      <view class="image-grid">
+        <view class="image-box" data-url="{{selected.idCardFrontUrl}}" bindtap="previewImage">
+          <image wx:if="{{selected.idCardFrontUrl}}" src="{{selected.idCardFrontUrl}}" mode="aspectFill" />
+          <view class="image-label">身份证正面</view>
+        </view>
+        <view class="image-box" data-url="{{selected.idCardBackUrl}}" bindtap="previewImage">
+          <image wx:if="{{selected.idCardBackUrl}}" src="{{selected.idCardBackUrl}}" mode="aspectFill" />
+          <view class="image-label">身份证反面</view>
+        </view>
+        <view class="image-box" data-url="{{selected.certificateUrl}}" bindtap="previewImage">
+          <image wx:if="{{selected.certificateUrl}}" src="{{selected.certificateUrl}}" mode="aspectFill" />
+          <view class="image-label">资质证书</view>
+        </view>
+      </view>
+
+      <view wx:if="{{selected.auditStatus === 'PENDING'}}">
+        <textarea class="textarea" placeholder="拒绝原因，例如：身份证照片不清晰 / 信息不完整" value="{{rejectReason}}" bindinput="onRejectReasonInput" />
+        <view class="btn-row">
+          <button class="reject-btn" bindtap="reject">拒绝</button>
+          <button class="approve-btn" bindtap="approve">通过</button>
+        </view>
+      </view>
+
+      <view class="reject-reason" wx:elif="{{selected.rejectReason}}">
+        拒绝原因：{{selected.rejectReason}}
+      </view>
+    </view>
+  </view>
+</view>

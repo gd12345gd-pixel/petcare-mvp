@@ -6,7 +6,7 @@
           <view class="nav-back-icon"></view>
         </view>
       </view>
-      <view class="nav-title">下单预约</view>
+      <view class="nav-title">{{pageTitle}}</view>
       <view class="nav-side"></view>
     </view>
   </view>
@@ -17,9 +17,9 @@
     style="height: calc(100vh - {{navTotalHeight}}px - 170rpx);"
   >
     <view class="hero-card">
-      <view class="hero-badge">预约上门喂养</view>
-      <view class="hero-title">下单预约</view>
-      <view class="hero-desc">填写毛孩子的照护信息，我们会尽快为你确认服务</view>
+      <view class="hero-badge">{{heroBadge}}</view>
+      <view class="hero-title">{{heroTitle}}</view>
+      <view class="hero-desc">{{heroDesc}}</view>
     </view>
 
     <view class="form-card">
@@ -112,7 +112,7 @@
           <block wx:if="{{selectedDates.length}}">
             <view class="date-info-card">
               <view class="date-summary-main">{{selectedDateSummary}}</view>
-              <view class="date-summary-sub">可多选日期，提交后进入待接单状态</view>
+              <view class="date-summary-sub">{{isReschedule ? '可多选日期，修改后重新进入待接单状态' : '可多选日期，提交后进入待接单状态'}}</view>
             </view>
           </block>
 
@@ -135,23 +135,10 @@
         </view>
 
         <view class="time-section-wrap">
-          <view class="time-primary-row">
-            <view
-              class="time-pill time-pill-any {{timeSlots[0].selected ? 'active' : ''}}"
-              data-value="{{timeSlots[0].value}}"
-              bindtap="toggleTimeSlot"
-            >
-              {{timeSlots[0].label}}
-            </view>
-          </view>
-
-          <view class="time-subtitle">推荐时间段</view>
-
           <view class="time-grid">
             <view
-              class="time-card {{item.selected ? 'active' : ''}}"
+              class="time-card {{index == 0 ? 'time-card-any' : ''}} {{item.selected ? 'active' : ''}}"
               wx:for="{{timeSlots}}"
-              wx:if="{{index > 0}}"
               wx:key="value"
               data-value="{{item.value}}"
               bindtap="toggleTimeSlot"
@@ -205,35 +192,22 @@
       <view class="form-block">
         <view class="block-head">
           <view class="form-label">单次服务价格</view>
-          <view class="section-tip">支持调整</view>
+          <view class="section-tip">自动定价</view>
         </view>
 
         <view class="price-panel">
           <view class="price-row">
-            <view class="price-label">平台建议价</view>
+            <view class="price-label">平台自动定价</view>
             <view class="price-value">¥{{suggestedUnitPrice}}</view>
           </view>
 
           <view class="price-row">
-            <view class="price-label">你确认的单次价</view>
-            <view class="price-input-wrap">
-              <text class="price-symbol">¥</text>
-              <input
-                class="price-input"
-                type="digit"
-                value="{{unitPrice}}"
-                bindinput="onUnitPriceInput"
-              />
-            </view>
-          </view>
-
-          <view class="price-actions" wx:if="{{unitPriceTouched}}">
-            <view class="price-touched-tip">你已手动调整单次价格</view>
-            <view class="sync-price-btn" bindtap="syncUnitPriceToSuggested">同步建议价</view>
+            <view class="price-label">本次确认单价</view>
+            <view class="price-value strong">¥{{unitPriceDisplay}}</view>
           </view>
         </view>
 
-        <view class="field-tip">平台会根据服务信息更新建议价；你手动确认的价格不会被自动覆盖</view>
+        <view class="field-tip">平台会根据宠物数量、服务时长、时间段自动重新计算价格</view>
       </view>
 
       <view class="form-divider"></view>
@@ -275,7 +249,7 @@
         ¥{{unitPriceDisplay}} × {{serviceCount}}次 = ¥{{totalPriceDisplay}}
       </view>
 
-      <view class="field-tip">提交后进入待接单状态</view>
+      <view class="field-tip">{{bottomDesc}}</view>
     </view>
 
     <view class="page-bottom-space"></view>
@@ -284,18 +258,29 @@
   <view class="bottom-bar order-bottom-bar">
     <view class="bottom-info">
       <view class="bottom-total">总价 ¥{{totalPriceDisplay}}</view>
-      <view class="bottom-desc">提交后进入待接单</view>
+      <view class="bottom-desc">{{bottomDesc}}</view>
     </view>
-    <button class="primary-btn order-submit-btn" bindtap="submitOrder">确认下单</button>
+    <button class="primary-btn order-submit-btn" bindtap="submitOrder">{{submitText}}</button>
   </view>
 
   <view class="mask" wx:if="{{showDatePopup}}" bindtap="closeDatePopup"></view>
   <view class="date-popup" wx:if="{{showDatePopup}}">
     <view class="date-popup-body">
       <view class="date-popup-header">
+          <view
+            class="month-switch {{canSwitchPrevMonth ? '' : 'disabled'}}"
+            data-direction="-1"
+            bindtap="switchCalendarMonth"
+          >‹</view>
         <view class="popup-title">{{calendarMonthText}}</view>
+          <view
+            class="month-switch {{canSwitchNextMonth ? '' : 'disabled'}}"
+            data-direction="1"
+            bindtap="switchCalendarMonth"
+          >›</view>
         <view class="date-popup-close" bindtap="closeDatePopup">✕</view>
       </view>
+        <view class="date-range-tip">仅可选择今天起未来一个月内的日期</view>
 
       <view class="week-row">
         <view class="week-item">日</view>
@@ -311,7 +296,7 @@
         <view
           wx:for="{{calendarDays}}"
           wx:key="id"
-          class="day-cell {{item.empty ? 'empty' : ''}} {{item.selected ? 'selected' : ''}}"
+          class="day-cell {{item.empty ? 'empty' : ''}} {{item.disabled ? 'disabled' : ''}} {{item.selected ? 'selected' : ''}}"
           data-date="{{item.date}}"
           bindtap="toggleCalendarDate"
         >

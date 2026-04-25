@@ -1,0 +1,135 @@
+.container {
+  padding: 20rpx 16rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.hero-card,
+.notice-card,
+.empty-card {
+  background: #fff;
+  border-radius: 28rpx;
+  box-shadow: 0 8rpx 20rpx rgba(31, 35, 41, 0.05);
+  box-sizing: border-box;
+}
+
+.hero-card {
+  padding: 28rpx 24rpx;
+  background: linear-gradient(180deg, #ffeef4 0%, #fff7fa 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #222;
+}
+
+.subtitle {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #777;
+  line-height: 1.5;
+}
+
+.read-all-btn {
+  min-width: 168rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(180deg, #ff6b81 0%, #ff5f8d 100%);
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 800;
+  margin: 0;
+  padding: 0 24rpx;
+  flex-shrink: 0;
+  box-shadow: 0 8rpx 16rpx rgba(255, 95, 141, 0.18);
+}
+
+.read-all-btn::after {
+  border: none;
+}
+
+.notice-card {
+  position: relative;
+  margin-top: 18rpx;
+  padding: 24rpx;
+}
+
+.notice-card.unread {
+  box-shadow: 0 8rpx 22rpx rgba(255, 90, 122, 0.12);
+}
+
+.notice-dot {
+  position: absolute;
+  top: 28rpx;
+  right: 24rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #ff5a7a;
+}
+
+.notice-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 28rpx;
+}
+
+.notice-type {
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5a7a;
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
+.notice-time {
+  color: #a7a8b0;
+  font-size: 22rpx;
+}
+
+.notice-title {
+  margin-top: 16rpx;
+  font-size: 30rpx;
+  font-weight: 900;
+  color: #222;
+}
+
+.notice-content {
+  margin-top: 10rpx;
+  font-size: 25rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.notice-link {
+  margin-top: 16rpx;
+  color: #ff5a7a;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.empty-card {
+  margin-top: 18rpx;
+  padding: 70rpx 30rpx;
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 30rpx;
+  font-weight: 900;
+  color: #333;
+}
+
+.empty-desc {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.6;
+}

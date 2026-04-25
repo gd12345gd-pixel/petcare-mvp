@@ -1,0 +1,48 @@
+<view class="page-bg">
+  <view class="container">
+    <view class="hero-card">
+      <view class="title">常见问题</view>
+      <view class="subtitle">整理下单、服务、接单师和退款相关说明，遇到特殊情况也可以提交反馈。</view>
+    </view>
+
+    <scroll-view class="category-scroll" scroll-x>
+      <view class="category-list">
+        <view
+          class="category-item {{activeCategory === item.key ? 'active' : ''}}"
+          wx:for="{{categories}}"
+          wx:key="key"
+          data-key="{{item.key}}"
+          bindtap="switchCategory"
+        >
+          {{item.label}}
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="faq-list">
+      <view
+        class="faq-card"
+        wx:for="{{displayedFaqs}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="toggleFaq"
+      >
+        <view class="faq-head">
+          <view class="faq-question">{{item.question}}</view>
+          <view class="faq-arrow {{openMap[item.id] ? 'open' : ''}}">›</view>
+        </view>
+        <view class="faq-answer" wx:if="{{openMap[item.id]}}">
+          {{item.answer}}
+        </view>
+      </view>
+    </view>
+
+    <view class="support-card">
+      <view>
+        <view class="support-title">没有找到答案？</view>
+        <view class="support-desc">可以提交问题反馈，我们会根据订单和描述继续处理。</view>
+      </view>
+      <button class="support-btn" bindtap="goFeedback">去反馈</button>
+    </view>
+  </view>
+</view>

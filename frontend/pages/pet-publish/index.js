@@ -22,8 +22,16 @@ Page({
       tempCare: false,
       desc: ''
     },
+    timeDate: '',
+    timeClock: '',
     uploading: false,
     submitting: false
+  },
+
+  onLoad(options = {}) {
+    if (options.type === 'found' || options.type === 'lost') {
+      this.setData({ activeType: options.type })
+    }
   },
 
   switchType(e) {
@@ -54,7 +62,7 @@ Page({
 
   uploadImage(filePath) {
     this.setData({ uploading: true })
-    wx.showLoading({ title: 'Uploading' })
+    wx.showLoading({ title: '上传中' })
 
     wx.uploadFile({
       url: `${BASE_URL}/api/files/upload-image`,
@@ -68,19 +76,19 @@ Page({
             this.setData({
               'form.imageUrl': data.data.url
             })
-            wx.showToast({ title: 'Uploaded', icon: 'success' })
+            wx.showToast({ title: '上传成功', icon: 'success' })
           } else {
             wx.showToast({
-              title: data.message || 'Upload failed',
+              title: data.message || '上传失败',
               icon: 'none'
             })
           }
         } catch (err) {
-          wx.showToast({ title: 'Upload failed', icon: 'none' })
+          wx.showToast({ title: '上传失败', icon: 'none' })
         }
       },
       fail: () => {
-        wx.showToast({ title: 'Upload failed', icon: 'none' })
+        wx.showToast({ title: '上传失败', icon: 'none' })
       },
       complete: () => {
         this.setData({ uploading: false })
@@ -103,8 +111,27 @@ Page({
       },
       fail: (err) => {
         console.error('chooseLocation fail:', err)
-        wx.showToast({ title: 'Choose location', icon: 'none' })
+        wx.showToast({ title: '请选择地点', icon: 'none' })
       }
+    })
+  },
+
+  onDateChange(e) {
+    this.setData({ timeDate: e.detail.value }, () => {
+      this.syncTimeText()
+    })
+  },
+
+  onClockChange(e) {
+    this.setData({ timeClock: e.detail.value }, () => {
+      this.syncTimeText()
+    })
+  },
+
+  syncTimeText() {
+    if (!this.data.timeDate || !this.data.timeClock) return
+    this.setData({
+      'form.time': `${this.data.timeDate} ${this.data.timeClock}:00`
     })
   },
 
@@ -141,23 +168,23 @@ Page({
     const { form, activeType } = this.data
 
     if (activeType === 'lost' && !form.petName) {
-      wx.showToast({ title: 'Pet name required', icon: 'none' })
+      wx.showToast({ title: '请填写宠物名称', icon: 'none' })
       return false
     }
     if (!form.imageUrl) {
-      wx.showToast({ title: 'Photo required', icon: 'none' })
+      wx.showToast({ title: '请上传宠物照片', icon: 'none' })
       return false
     }
     if (!form.location) {
-      wx.showToast({ title: 'Location required', icon: 'none' })
+      wx.showToast({ title: '请选择地点', icon: 'none' })
       return false
     }
     if (!form.time) {
-      wx.showToast({ title: 'Time required', icon: 'none' })
+      wx.showToast({ title: '请选择时间', icon: 'none' })
       return false
     }
     if (!form.contact) {
-      wx.showToast({ title: 'Contact required', icon: 'none' })
+      wx.showToast({ title: '请填写联系方式', icon: 'none' })
       return false
     }
 
@@ -194,11 +221,11 @@ Page({
     }
 
     this.setData({ submitting: true })
-    wx.showLoading({ title: 'Submitting' })
+    wx.showLoading({ title: '发布中' })
 
     request(api, 'POST', payload).then(() => {
       wx.hideLoading()
-      wx.showToast({ title: 'Published', icon: 'success' })
+      wx.showToast({ title: '发布成功', icon: 'success' })
       setTimeout(() => {
         wx.navigateBack()
       }, 800)

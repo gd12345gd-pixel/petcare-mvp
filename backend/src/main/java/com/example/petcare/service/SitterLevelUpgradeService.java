@@ -46,7 +46,7 @@ public class SitterLevelUpgradeService {
 
         boolean hasActiveOrder = orderRepository.existsBySitterIdAndOrderStatusIn(
                 sitter.getId(),
-                List.of("ACCEPTED", "SERVING", "WAIT_SERVICE")
+                List.of("TAKEN", "SERVING", "PART_SERVING", "PART_COMPLETED")
         );
 
         if (!hasActiveOrder && "LOCKED".equals(sitter.getDepositStatus())) {

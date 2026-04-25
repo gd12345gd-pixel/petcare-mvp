@@ -1,0 +1,74 @@
+<view class="remark-add-page">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-inner">
+      <view class="nav-side nav-left" bindtap="navigateBack">
+        <view class="nav-back-hit">
+          <view class="nav-back-icon"></view>
+        </view>
+      </view>
+      <view class="nav-title">补充说明</view>
+      <view class="nav-side"></view>
+    </view>
+  </view>
+
+  <scroll-view class="content" scroll-y style="height: calc(100vh - {{navTotalHeight}}px - 150rpx);">
+    <view class="hero-card">
+      <view class="hero-title">补充说明</view>
+      <view class="hero-desc">请补充需要特别注意的事项，提交后会追加到订单照护说明时间线。</view>
+    </view>
+
+    <view class="tip-card">
+      <view class="tip-title">可以补充这些信息</view>
+      <view class="tip-item">- 喂食量变化</view>
+      <view class="tip-item">- 宠物状态异常</view>
+      <view class="tip-item">- 门禁调整</view>
+      <view class="tip-item">- 临时注意事项</view>
+    </view>
+
+    <view class="form-card">
+      <view class="form-head">
+        <view class="form-label">补充内容</view>
+        <view class="count-text">{{content.length}}/100</view>
+      </view>
+      <textarea
+        class="remark-textarea"
+        placeholder="请输入补充说明，最多100字"
+        placeholder-class="placeholder"
+        maxlength="100"
+        value="{{content}}"
+        bindinput="onContentInput"
+      ></textarea>
+    </view>
+
+    <view class="form-card">
+      <view class="form-head">
+        <view class="form-label">补充图片</view>
+        <view class="count-text">{{imageList.length}}/3</view>
+      </view>
+
+      <view class="image-grid">
+        <view
+          class="image-item"
+          wx:for="{{imageList}}"
+          wx:key="url"
+          data-index="{{index}}"
+          bindtap="previewImage"
+        >
+          <image class="image-preview" src="{{item.url}}" mode="aspectFill" />
+          <view class="image-remove" data-index="{{index}}" catchtap="removeImage">×</view>
+        </view>
+
+        <view class="image-add" wx:if="{{imageList.length < 3}}" bindtap="chooseImages">
+          <view class="image-add-icon">+</view>
+          <view class="image-add-text">上传图片</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="page-bottom-space"></view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <button class="primary-btn submit-btn" loading="{{submitting}}" bindtap="submitRemark">提交</button>
+  </view>
+</view>

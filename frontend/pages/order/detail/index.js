@@ -162,6 +162,15 @@ Page({
       payStatus: raw.payStatus || '',
       payStatusText: this.getPayStatusText(raw.payStatus),
       canCancel: this.canCancelOrder(raw.orderStatus),
+      canReschedule: !!raw.canReschedule,
+      canReview: !!raw.canReview,
+      reviewed: !!raw.reviewed,
+      createdAtText: this.formatDateTime(raw.createdAt),
+      takenAtText: raw.takenAt ? this.formatDateTime(raw.takenAt) : '暂未接单',
+      hasSitter: !!raw.sitterId,
+      sitterName: raw.sitterName || '',
+      sitterAvatarText: raw.sitterName ? String(raw.sitterName).slice(0, 1) : '托',
+      sitterPhone: raw.sitterPhone || '',
 
       serviceContactName: raw.serviceContactName || '',
       serviceContactPhone: raw.serviceContactPhone || '',
@@ -185,8 +194,30 @@ Page({
       unitPrice: this.formatMoney(raw.unitPrice),
       totalPrice: this.formatMoney(raw.totalPrice),
 
-      remark: raw.remark || '暂无备注'
+      remark: raw.remark || '暂无备注',
+      remarkTimeline: this.formatRemarkTimeline(raw.remarkTimeline || []),
+      canAppendRemark: !!raw.canAppendRemark
     }
+  },
+
+  formatRemarkTimeline(list) {
+    return (list || []).map(item => ({
+      ...item,
+      title: item.remarkType === 'ORIGINAL' ? '原始备注' : `补充 ${this.formatRemarkTime(item.createdAt)}`,
+      content: item.content || '',
+      imageUrls: item.imageUrls || []
+    }))
+  },
+
+  formatRemarkTime(value) {
+    if (!value) return ''
+    const date = new Date(String(value).replace('T', ' ').replace(/-/g, '/'))
+    if (Number.isNaN(date.getTime())) return String(value).replace('T', ' ').slice(5, 16)
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hour = String(date.getHours()).padStart(2, '0')
+    const minute = String(date.getMinutes()).padStart(2, '0')
+    return `${month}/${day} ${hour}:${minute}`
   },
 
   buildTodayServiceCard(serviceDates) {
@@ -264,6 +295,21 @@ Page({
     const week = weekMap[date.getDay()]
 
     return `${month}/${day} ${week}`
+  },
+
+  formatDateTime(value) {
+    if (!value) return ''
+    const text = String(value).replace('T', ' ').replace(/-/g, '/')
+    const date = new Date(text)
+    if (Number.isNaN(date.getTime())) {
+      return String(value).replace('T', ' ').slice(0, 16)
+    }
+
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hour = String(date.getHours()).padStart(2, '0')
+    const minute = String(date.getMinutes()).padStart(2, '0')
+    return `${month}/${day} ${hour}:${minute}`
   },
 
   getDateKey(dateStr) {
@@ -433,6 +479,20 @@ Page({
 
   stopPopupBubble() {},
 
+  goAddRemark() {
+    if (!this.data.order || !this.data.order.id) return
+    wx.navigateTo({
+      url: `/pages/order/remark-add/index?id=${this.data.order.id}&status=${this.data.order.orderStatus}`
+    })
+  },
+
+  previewRemarkImage(e) {
+    const urls = e.currentTarget.dataset.urls || []
+    const current = e.currentTarget.dataset.url
+    if (!urls.length || !current) return
+    wx.previewImage({ current, urls })
+  },
+
   handleCancelOrder() {
     const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
 
@@ -476,10 +536,18 @@ Page({
     })
   },
 
-  handleContactService() {
-    wx.showToast({
-      title: '这里后面接客服能力',
-      icon: 'none'
+  handleRescheduleOrder() {
+    if (!this.data.order || !this.data.order.id) return
+
+    wx.navigateTo({
+      url: `/pages/order/create/index?mode=reschedule&id=${this.data.order.id}`
+    })
+  },
+
+  handleReviewOrder() {
+    if (!this.data.order || !this.data.order.id) return
+    wx.navigateTo({
+      url: `/pages/order/review/index?id=${this.data.order.id}`
     })
   },
 

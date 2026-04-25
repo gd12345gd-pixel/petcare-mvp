@@ -1,8 +1,19 @@
 <scroll-view class="page" scroll-y>
+  <view class="top-location-wrap">
+    <view class="location-row" bindtap="goChooseLocation">
+      <view class="location-pin"></view>
+      <view class="location-main">
+        <view class="location-title">{{locationDisplay}}</view>
+      </view>
+      <view class="location-arrow"></view>
+    </view>
+
+  </view>
+
   <!-- 顶部预约模块 -->
   <view class="hero-card">
   <view class="hero-left">
-    <view class="hero-location">{{hero.locationText}}</view>
+    <view class="hero-location">当前服务范围：{{locationSubText}}</view>
 
     <view class="hero-title-line1">{{hero.title1}}</view>
     <view class="hero-desc">{{hero.desc}}</view>
@@ -92,7 +103,7 @@
       <view class="more-text" bindtap="goPetCommunity">查看更多</view>
     </view>
 
-    <view class="feed-list">
+    <view class="feed-list" wx:if="{{latestFeed.length}}">
       <view
         class="feed-item"
         wx:for="{{latestFeed}}"
@@ -106,6 +117,9 @@
           <view class="feed-subtitle">{{item.subtitle}}</view>
         </view>
       </view>
+    </view>
+    <view class="feed-empty" wx:else bindtap="goPetCommunity">
+      暂无附近互助动态，点击去发布或查看
     </view>
   </view>
 </scroll-view>

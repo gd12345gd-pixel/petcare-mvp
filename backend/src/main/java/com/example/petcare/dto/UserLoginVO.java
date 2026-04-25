@@ -14,4 +14,5 @@ public class UserLoginVO {
     private String role;
     private String sitterStatus;
     private String currentRole;
+    private Boolean profileCompleted;
 }

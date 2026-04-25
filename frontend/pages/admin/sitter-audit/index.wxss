@@ -1,0 +1,164 @@
+.container {
+  padding: 20rpx 16rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.header-card,
+.list-card,
+.detail-card,
+.empty {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  margin-bottom: 18rpx;
+  box-shadow: 0 8rpx 20rpx rgba(31, 35, 41, 0.05);
+  box-sizing: border-box;
+}
+
+.header-card {
+  background: linear-gradient(180deg, #fff3d9 0%, #fffaf0 100%);
+}
+
+.title {
+  font-size: 38rpx;
+  font-weight: 800;
+  color: #222;
+}
+
+.subtitle,
+.meta {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #888;
+}
+
+.tabs {
+  display: flex;
+  gap: 14rpx;
+  margin-bottom: 18rpx;
+}
+
+.tab {
+  flex: 1;
+  height: 68rpx;
+  line-height: 68rpx;
+  text-align: center;
+  background: #fff;
+  border-radius: 999rpx;
+  color: #777;
+  font-size: 25rpx;
+}
+
+.tab.active {
+  background: #ff5a7a;
+  color: #fff;
+  font-weight: 700;
+}
+
+.list-card.selected {
+  border: 2rpx solid #ff8aa4;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.name,
+.detail-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #222;
+}
+
+.status {
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5a7a;
+  font-size: 22rpx;
+}
+
+.line,
+.intro,
+.reject-reason {
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #f3f4f6;
+  font-size: 26rpx;
+  color: #444;
+  line-height: 1.5;
+}
+
+.intro {
+  border-bottom: none;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14rpx;
+  margin: 20rpx 0;
+}
+
+.image-box {
+  background: #f8f8fb;
+  border-radius: 18rpx;
+  overflow: hidden;
+}
+
+.image-box image {
+  width: 100%;
+  height: 150rpx;
+  display: block;
+}
+
+.image-label {
+  padding: 12rpx 6rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: #777;
+}
+
+.textarea {
+  width: 100%;
+  height: 160rpx;
+  background: #f8f8fb;
+  border-radius: 18rpx;
+  padding: 18rpx;
+  box-sizing: border-box;
+  font-size: 25rpx;
+  margin-top: 18rpx;
+}
+
+.btn-row {
+  display: flex;
+  gap: 18rpx;
+  margin-top: 18rpx;
+}
+
+.btn-row button {
+  flex: 1;
+  height: 82rpx;
+  line-height: 82rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.approve-btn {
+  background: #ff5a7a;
+  color: #fff;
+}
+
+.reject-btn {
+  background: #fff;
+  color: #ff5a7a;
+  border: 1rpx solid #ffd1dd;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+}

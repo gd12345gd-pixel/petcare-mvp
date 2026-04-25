@@ -3,7 +3,7 @@
     <view class="back-area" bindtap="navigateBack">
       <view class="back-icon"></view>
     </view>
-    <view class="nav-title">服务地址</view>
+    <view class="nav-title">{{from === 'home' ? '选择服务地址' : '服务地址'}}</view>
   </view>
 
   <scroll-view class="content" scroll-y>

@@ -10,6 +10,15 @@
     <button class="guest-btn" bindtap="goGuest">
       先逛逛
     </button>
+
+    <view class="agreement-row" bindtap="toggleAgreement">
+      <view class="check-box {{agreementChecked ? 'checked' : ''}}"></view>
+      <view class="agreement-text">
+        我已阅读并同意
+        <text class="agreement-link" catchtap="openAgreement" data-type="user">《用户协议》</text>
+        <text class="agreement-link" catchtap="openAgreement" data-type="privacy">《隐私政策》</text>
+      </view>
+    </view>
   </view>
 
   <view class="card" wx:else>

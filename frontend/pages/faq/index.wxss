@@ -1,0 +1,139 @@
+.container {
+  padding: 20rpx 16rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.hero-card,
+.faq-card,
+.support-card {
+  background: #fff;
+  border-radius: 28rpx;
+  box-shadow: 0 8rpx 20rpx rgba(31, 35, 41, 0.05);
+  box-sizing: border-box;
+}
+
+.hero-card {
+  padding: 30rpx 26rpx;
+  background: linear-gradient(180deg, #f5e8ff 0%, #fff8ff 100%);
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #222;
+}
+
+.subtitle {
+  margin-top: 10rpx;
+  font-size: 25rpx;
+  color: #777;
+  line-height: 1.6;
+}
+
+.category-scroll {
+  margin: 20rpx 0;
+  white-space: nowrap;
+}
+
+.category-list {
+  display: flex;
+  gap: 14rpx;
+}
+
+.category-item {
+  flex-shrink: 0;
+  min-width: 132rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #777;
+  text-align: center;
+  font-size: 25rpx;
+  font-weight: 700;
+}
+
+.category-item.active {
+  background: #ff5a7a;
+  color: #fff;
+}
+
+.faq-card {
+  padding: 26rpx 24rpx;
+  margin-bottom: 18rpx;
+}
+
+.faq-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.faq-question {
+  flex: 1;
+  min-width: 0;
+  font-size: 29rpx;
+  font-weight: 800;
+  color: #222;
+  line-height: 1.45;
+}
+
+.faq-arrow {
+  margin-left: 20rpx;
+  color: #c0c1c8;
+  font-size: 40rpx;
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.faq-arrow.open {
+  transform: rotate(270deg);
+}
+
+.faq-answer {
+  margin-top: 18rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid #f3f4f6;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.7;
+}
+
+.support-card {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.support-title {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #222;
+}
+
+.support-desc {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #888;
+  line-height: 1.5;
+}
+
+.support-btn {
+  width: 160rpx;
+  height: 68rpx;
+  line-height: 68rpx;
+  border-radius: 999rpx;
+  background: #ff5a7a;
+  color: #fff;
+  font-size: 25rpx;
+  font-weight: 800;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.support-btn::after {
+  border: none;
+}

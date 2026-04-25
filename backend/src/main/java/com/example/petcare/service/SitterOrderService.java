@@ -25,6 +25,8 @@ public class SitterOrderService {
 
     private final SitterAcceptOrderRuleService acceptOrderRuleService;
     private final SitterProfileRepository  sitterProfileRepository;
+    private final SitterLevelUpgradeService sitterLevelUpgradeService;
+    private final OrderRemarkService orderRemarkService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SitterOrderService(PetOrderRepository petOrderRepository,
@@ -32,7 +34,9 @@ public class SitterOrderService {
                               PetOrderScheduleRepository petOrderScheduleRepository,
                               PetOrderLogRepository petOrderLogRepository,
                               ServiceRecordRepository serviceRecordRepository,
-                              PetRepository petRepository, SitterAcceptOrderRuleService acceptOrderRuleService, SitterProfileRepository sitterProfileRepository) {
+                              PetRepository petRepository, SitterAcceptOrderRuleService acceptOrderRuleService, SitterProfileRepository sitterProfileRepository,
+                              SitterLevelUpgradeService sitterLevelUpgradeService,
+                              OrderRemarkService orderRemarkService) {
         this.petOrderRepository = petOrderRepository;
         this.petOrderPetRepository = petOrderPetRepository;
         this.petOrderScheduleRepository = petOrderScheduleRepository;
@@ -41,6 +45,8 @@ public class SitterOrderService {
         this.petRepository = petRepository;
         this.acceptOrderRuleService = acceptOrderRuleService;
         this.sitterProfileRepository = sitterProfileRepository;
+        this.sitterLevelUpgradeService = sitterLevelUpgradeService;
+        this.orderRemarkService = orderRemarkService;
     }
 
     public List<SitterAvailableOrderItemResponse> availableOrders(SitterOrderListRequest request) {
@@ -48,6 +54,8 @@ public class SitterOrderService {
             throw new RuntimeException("服务者ID不能为空");
         }
 
+        SitterProfile sitter = sitterProfileRepository.findById(request.getSitterId())
+                .orElseThrow(() -> new RuntimeException("接单师不存在"));
         BigDecimal sitterLat = request.getLatitude();
         BigDecimal sitterLng = request.getLongitude();
 
@@ -65,6 +73,10 @@ public class SitterOrderService {
         List<SitterAvailableOrderItemResponse> result = new ArrayList<>();
 
         for (PetOrder order : orders) {
+            if (sitter.getUserId() != null && sitter.getUserId().equals(order.getUserId())) {
+                continue;
+            }
+
             List<PetOrderSchedule> currentSchedules = scheduleMap.getOrDefault(order.getId(), new ArrayList<>());
 
             SitterAvailableOrderItemResponse item = new SitterAvailableOrderItemResponse();
@@ -77,7 +89,7 @@ public class SitterOrderService {
             item.setServiceProvince(order.getServiceProvince());
             item.setServiceCity(order.getServiceCity());
             item.setServiceDistrict(order.getServiceDistrict());
-            item.setServiceDetailAddress(order.getServiceDetailAddress());
+            item.setServiceDetailAddress(maskDetailAddress(order.getServiceDetailAddress()));
             item.setUnitPrice(order.getUnitPrice());
             item.setTotalPrice(order.getTotalPrice());
             item.setRemark(order.getRemark());
@@ -181,6 +193,14 @@ public class SitterOrderService {
     public SitterOrderDetailResponse detail(Long id, Long sitterId) {
         PetOrder order = petOrderRepository.findByIdAndDeleted(id, 0)
             .orElseThrow(() -> new RuntimeException("订单不存在"));
+        SitterProfile sitter = sitterProfileRepository.findById(sitterId)
+                .orElseThrow(() -> new RuntimeException("接单师不存在"));
+
+        if ("WAIT_TAKING".equals(order.getOrderStatus())
+                && sitter.getUserId() != null
+                && sitter.getUserId().equals(order.getUserId())) {
+            throw new RuntimeException("不能查看自己发布的待接单订单");
+        }
 
         // 待接单时允许任意服务者看详情；已接单后只允许接单人查看
         if (!"WAIT_TAKING".equals(order.getOrderStatus())) {
@@ -208,17 +228,18 @@ public class SitterOrderService {
         response.setPetCount(order.getPetCount());
         response.setServiceDateCount(order.getServiceDateCount());
         response.setServiceDurationMinutes(order.getServiceDurationMinutes());
+        boolean fullInfoVisible = order.getSitterId() != null && order.getSitterId().equals(sitterId);
         response.setServiceContactName(order.getServiceContactName());
-        response.setServiceContactPhone(order.getServiceContactPhone());
-        response.setServiceFullAddress(
-            safe(order.getServiceProvince()) +
-                safe(order.getServiceCity()) +
-                safe(order.getServiceDistrict()) +
-                safe(order.getServiceDetailAddress())
-        );
+        response.setServiceContactPhone(fullInfoVisible
+                ? order.getServiceContactPhone()
+                : maskPhone(order.getServiceContactPhone()));
+        response.setServiceFullAddress(buildServiceAddress(order, fullInfoVisible));
         response.setUnitPrice(order.getUnitPrice());
         response.setTotalPrice(order.getTotalPrice());
         response.setRemark(order.getRemark());
+        List<OrderRemarkResponse> remarkTimeline = orderRemarkService.timeline(order);
+        response.setRemarkTimeline(remarkTimeline);
+        response.setHasSupplementRemark(remarkTimeline.stream().anyMatch(item -> "SUPPLEMENT".equals(item.getRemarkType())));
         response.setTimeSlots(parseJsonList(order.getTimeSlotsJson()));
         response.setPets(orderPets.stream().map(this::toPetResponse).collect(Collectors.toList()));
         response.setServiceDates(schedules.stream().map(item -> toScheduleResponse(item, recordIdMap)).collect(Collectors.toList()));
@@ -229,10 +250,9 @@ public class SitterOrderService {
     public void takeOrder(TakeOrderRequest request) {
         validateOperator(request.getOrderId(), request.getSitterId());
 
-        acceptOrderRuleService.checkCanAcceptOrder(request.getSitterId());
-
-        SitterProfile sitter = sitterProfileRepository.findByUserId(request.getSitterId())
+        SitterProfile sitter = sitterProfileRepository.findById(request.getSitterId())
                 .orElseThrow(() -> new RuntimeException("接单师不存在"));
+        acceptOrderRuleService.checkCanAcceptOrder(sitter.getUserId());
 
         PetOrder order = petOrderRepository.findByIdAndDeleted(request.getOrderId(), 0)
             .orElseThrow(() -> new RuntimeException("订单不存在"));
@@ -249,11 +269,11 @@ public class SitterOrderService {
         sitterProfileRepository.save(sitter);
 
         order.setOrderStatus("TAKEN");
-        order.setSitterId(request.getSitterId());
+        order.setSitterId(sitter.getId());
         order.setTakenAt(LocalDateTime.now());
         petOrderRepository.save(order);
 
-        writeLog(order.getId(), "TAKE_ORDER", "SITTER", request.getSitterId(), "服务者接单");
+        writeLog(order.getId(), "TAKE_ORDER", "SITTER", sitter.getId(), "服务者接单");
     }
 
     @Transactional
@@ -441,6 +461,7 @@ public class SitterOrderService {
             return;
         }
 
+        String oldStatus = order.getOrderStatus();
         long total = schedules.size();
         long pendingCount = schedules.stream().filter(s -> "PENDING".equals(s.getScheduleStatus())).count();
         long servingCount = schedules.stream().filter(s -> "SERVING".equals(s.getScheduleStatus())).count();
@@ -469,6 +490,10 @@ public class SitterOrderService {
         }
 
         petOrderRepository.save(order);
+
+        if ("COMPLETED".equals(newStatus) && !"COMPLETED".equals(oldStatus) && order.getSitterId() != null) {
+            sitterLevelUpgradeService.handleOrderCompleted(order.getSitterId());
+        }
     }
 
     private void validateScheduleOperator(Long orderId, Long scheduleId, Long sitterId) {
@@ -496,6 +521,7 @@ public class SitterOrderService {
         order.setOrderStatus("COMPLETED");
         order.setServiceCompletedAt(LocalDateTime.now());
         petOrderRepository.save(order);
+        sitterLevelUpgradeService.handleOrderCompleted(order.getSitterId());
 
         List<PetOrderSchedule> schedules = petOrderScheduleRepository.findByOrderIdOrderByServiceDateAsc(order.getId());
         for (PetOrderSchedule item : schedules) {
@@ -529,6 +555,56 @@ public class SitterOrderService {
 
     private String safe(String str) {
         return str == null ? "" : str;
+    }
+
+    private String buildServiceAddress(PetOrder order, boolean fullInfoVisible) {
+        String detail = fullInfoVisible
+                ? safe(order.getServiceDetailAddress())
+                : maskDetailAddress(order.getServiceDetailAddress());
+        return safe(order.getServiceProvince())
+                + safe(order.getServiceCity())
+                + safe(order.getServiceDistrict())
+                + detail;
+    }
+
+    private String maskPhone(String phone) {
+        if (phone == null || phone.trim().isEmpty()) {
+            return "";
+        }
+        String text = phone.trim();
+        if (text.length() <= 7) {
+            return text.charAt(0) + "****";
+        }
+        return text.substring(0, 3) + "****" + text.substring(text.length() - 4);
+    }
+
+    private String maskDetailAddress(String detailAddress) {
+        if (detailAddress == null || detailAddress.trim().isEmpty()) {
+            return "详细地址接单后可见";
+        }
+
+        String detail = detailAddress.trim();
+        String[] communityKeywords = {"小区", "公寓", "花园", "苑", "府", "城", "湾", "广场", "家园"};
+        for (String keyword : communityKeywords) {
+            int index = detail.indexOf(keyword);
+            if (index >= 0) {
+                return detail.substring(0, index + keyword.length());
+            }
+        }
+
+        String[] privateKeywords = {"栋", "幢", "号楼", "单元", "室", "层", "楼", "门牌", "房"};
+        int cutIndex = -1;
+        for (String keyword : privateKeywords) {
+            int index = detail.indexOf(keyword);
+            if (index > 0 && (cutIndex < 0 || index < cutIndex)) {
+                cutIndex = index;
+            }
+        }
+
+        if (cutIndex > 0) {
+            return detail.substring(0, cutIndex);
+        }
+        return "详细地址接单后可见";
     }
 
     private List<String> parseJsonList(String json) {

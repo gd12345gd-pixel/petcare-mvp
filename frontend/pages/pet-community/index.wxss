@@ -5,36 +5,76 @@
   box-sizing: border-box;
 }
 
-.header {
-  height: 120rpx;
-  background: linear-gradient(180deg, #ff7993 0%, #ff6b81 100%);
+.community-hero {
+  margin: 0 0 20rpx;
+  padding: 34rpx 24rpx 28rpx;
+  background: linear-gradient(180deg, #ff7993 0%, #fff1f5 100%);
   color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24rpx;
   box-sizing: border-box;
 }
 
-.city-wrap {
+.hero-top {
   display: flex;
-  align-items: center;
-  min-width: 140rpx;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
 }
 
-.city-text {
-  font-size: 26rpx;
+.hero-title {
+  font-size: 42rpx;
+  font-weight: 900;
+  line-height: 1.2;
 }
 
-.title {
-  font-size: 34rpx;
-  font-weight: 700;
+.hero-desc {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-.search-icon {
-  font-size: 36rpx;
-  min-width: 40rpx;
-  text-align: right;
+.city-pill {
+  flex-shrink: 0;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 22rpx;
+}
+
+.quick-actions {
+  margin-top: 28rpx;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16rpx;
+}
+
+.quick-action {
+  min-height: 118rpx;
+  border-radius: 22rpx;
+  padding: 20rpx;
+  background: rgba(255, 255, 255, 0.92);
+  color: #333;
+  box-sizing: border-box;
+}
+
+.quick-action.lost {
+  background: linear-gradient(180deg, #fff 0%, #fff5e9 100%);
+}
+
+.quick-action.found {
+  background: linear-gradient(180deg, #fff 0%, #edf9f1 100%);
+}
+
+.quick-title {
+  font-size: 30rpx;
+  font-weight: 900;
+  color: #333;
+}
+
+.quick-desc {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #8b8f97;
 }
 
 .banner-card {
@@ -77,7 +117,7 @@
 }
 
 .tab-wrap {
-  margin: 0 24rpx 20rpx;
+  margin: 0 24rpx 18rpx;
   display: flex;
   background: #fff;
   border-radius: 999rpx;
@@ -215,6 +255,7 @@
   display: flex;
   margin-bottom: 20rpx;
   box-sizing: border-box;
+  box-shadow: 0 4rpx 14rpx rgba(31, 35, 41, 0.04);
 }
 
 .pet-image {
@@ -240,6 +281,9 @@
   font-weight: 700;
   color: #333;
   max-width: 320rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tag {

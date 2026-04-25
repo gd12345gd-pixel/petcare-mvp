@@ -1,0 +1,64 @@
+<view class="review-page">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-inner">
+      <view class="nav-side nav-left" bindtap="navigateBack">
+        <view class="nav-back-hit"><view class="nav-back-icon"></view></view>
+      </view>
+      <view class="nav-title">评价服务</view>
+      <view class="nav-side"></view>
+    </view>
+  </view>
+
+  <scroll-view class="content" scroll-y style="height: calc(100vh - {{navTotalHeight}}px - 150rpx);">
+    <view class="hero-card">
+      <view class="hero-title">这次服务体验如何？</view>
+      <view class="hero-desc">你的评价会帮助平台持续优化托托师服务。</view>
+    </view>
+
+    <view class="form-card">
+      <view class="section-title">服务评分</view>
+      <view class="star-row">
+        <view
+          class="star {{rating >= item ? 'active' : ''}}"
+          wx:for="{{[1,2,3,4,5]}}"
+          wx:key="*this"
+          data-rating="{{item}}"
+          bindtap="chooseRating"
+        >★</view>
+      </view>
+      <view class="rating-text">{{rating}} 星</view>
+    </view>
+
+    <view class="form-card">
+      <view class="section-title">选择标签</view>
+      <view class="tag-grid">
+        <view
+          class="tag-item {{item.selected ? 'active' : ''}}"
+          wx:for="{{tags}}"
+          wx:key="label"
+          data-label="{{item.label}}"
+          bindtap="toggleTag"
+        >{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="form-card">
+      <view class="form-head">
+        <view class="section-title no-margin">评价备注</view>
+        <view class="count-text">{{content.length}}/200</view>
+      </view>
+      <textarea
+        class="review-textarea"
+        placeholder="可以写写托托师服务是否细心、沟通是否及时等"
+        placeholder-class="placeholder"
+        maxlength="200"
+        value="{{content}}"
+        bindinput="onContentInput"
+      ></textarea>
+    </view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <button class="primary-btn submit-btn" loading="{{submitting}}" bindtap="submitReview">提交评价</button>
+  </view>
+</view>

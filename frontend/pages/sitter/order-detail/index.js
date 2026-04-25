@@ -202,11 +202,33 @@ Page({
       totalPriceText: this.formatMoney(raw.totalPrice || 0),
       unitPriceText: this.formatMoney(raw.unitPrice || 0),
       remark: raw.remark || '暂无备注',
+      remarkTimeline: this.formatRemarkTimeline(raw.remarkTimeline || []),
+      hasSupplementRemark: !!raw.hasSupplementRemark,
 
       canTake,
       showScheduleToggle: serviceDates.length > 0,
       scheduleToggleText: this.data.showAllSchedules ? '收起日期明细' : '查看全部日期明细'
     }
+  },
+
+  formatRemarkTimeline(list) {
+    return (list || []).map(item => ({
+      ...item,
+      title: item.remarkType === 'ORIGINAL' ? '原始备注' : `补充 ${this.formatRemarkTime(item.createdAt)}`,
+      content: item.content || '',
+      imageUrls: item.imageUrls || []
+    }))
+  },
+
+  formatRemarkTime(value) {
+    if (!value) return ''
+    const date = new Date(String(value).replace('T', ' ').replace(/-/g, '/'))
+    if (Number.isNaN(date.getTime())) return String(value).replace('T', ' ').slice(5, 16)
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hour = String(date.getHours()).padStart(2, '0')
+    const minute = String(date.getMinutes()).padStart(2, '0')
+    return `${month}/${day} ${hour}:${minute}`
   },
 
   buildHeader(orderStatus, serviceDates) {
@@ -474,6 +496,13 @@ Page({
   },
 
   stopPopupBubble() {},
+
+  previewRemarkImage(e) {
+    const urls = e.currentTarget.dataset.urls || []
+    const current = e.currentTarget.dataset.url
+    if (!urls.length || !current) return
+    wx.previewImage({ current, urls })
+  },
 
   getCurrentLocation() {
     return new Promise((resolve, reject) => {

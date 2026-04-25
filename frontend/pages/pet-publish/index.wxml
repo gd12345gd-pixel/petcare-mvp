@@ -1,4 +1,11 @@
 <view class="page">
+  <view class="publish-hero">
+    <view class="publish-title">{{activeType === 'lost' ? '发布寻宠信息' : '发布寻主信息'}}</view>
+    <view class="publish-desc">
+      {{activeType === 'lost' ? '填写走失地点、时间和联系方式，附近用户可帮你留意。' : '填写发现地点和临时照护情况，帮助毛孩子回家。'}}
+    </view>
+  </view>
+
   <view class="top-switch">
     <view class="switch-item {{activeType === 'lost' ? 'active' : ''}}" data-type="lost" bindtap="switchType">
       寻宠
@@ -9,9 +16,9 @@
   </view>
 
   <view class="form-card">
-    <view class="label">上传宠物照片 *</view>
+    <view class="label">宠物照片 *</view>
     <view class="upload-box" wx:if="{{!form.imageUrl}}" bindtap="chooseImage">
-      <view class="upload-icon">📷</view>
+      <view class="upload-icon"></view>
       <view class="upload-text">点击上传照片</view>
       <view class="upload-sub">请上传清晰的宠物正面照片</view>
     </view>
@@ -35,7 +42,14 @@
     </view>
 
     <view class="label mt">{{activeType === 'lost' ? '丢失时间' : '发现时间'}} *</view>
-    <input class="input" placeholder="格式：2026-03-30 18:20:00" data-field="time" bindinput="onInput" value="{{form.time}}" />
+    <view class="time-row">
+      <picker mode="date" bindchange="onDateChange">
+        <view class="input picker-input {{timeDate ? '' : 'placeholder'}}">{{timeDate || '选择日期'}}</view>
+      </picker>
+      <picker mode="time" bindchange="onClockChange">
+        <view class="input picker-input {{timeClock ? '' : 'placeholder'}}">{{timeClock || '选择时间'}}</view>
+      </picker>
+    </view>
 
     <view class="label mt">联系方式 *</view>
     <input class="input" placeholder="请输入手机号" data-field="contact" bindinput="onInput" value="{{form.contact}}" />

@@ -1,0 +1,46 @@
+.container {
+  padding: 20rpx 16rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.hero-card,
+.section-card {
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 18rpx;
+  box-shadow: 0 8rpx 20rpx rgba(31, 35, 41, 0.05);
+  box-sizing: border-box;
+}
+
+.hero-card {
+  background: linear-gradient(180deg, #ffeef4 0%, #fff7fa 100%);
+}
+
+.title {
+  font-size: 38rpx;
+  font-weight: 900;
+  color: #222;
+  line-height: 1.35;
+}
+
+.intro {
+  margin-top: 14rpx;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.75;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 900;
+  color: #222;
+  margin-bottom: 14rpx;
+}
+
+.agreement-item {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.75;
+}

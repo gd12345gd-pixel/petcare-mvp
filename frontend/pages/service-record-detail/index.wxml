@@ -177,6 +177,6 @@
   </scroll-view>
 
   <view class="bottom-bar">
-    <button class="ghost-btn action-btn" bindtap="handleContactService">联系客服</button>
+    <button class="ghost-btn action-btn" open-type="contact" session-from="service_record_{{detail.orderNo}}">联系客服</button>
   </view>
 </view>

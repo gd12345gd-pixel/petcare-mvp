@@ -19,8 +19,11 @@ Page({
     districtFilter: ''
   },
 
-  onLoad() {
-    this.loadCurrentTabData()
+  onLoad(options = {}) {
+    const type = options.type === 'found' ? 'found' : 'lost'
+    this.setData({ activeTab: type }, () => {
+      this.loadCurrentTabData()
+    })
   },
 
   onShow() {
@@ -210,7 +213,14 @@ if (defaultTab) {
 
   goPublish() {
     wx.navigateTo({
-      url: '/pages/pet-publish/index'
+      url: `/pages/pet-publish/index?type=${this.data.activeTab}`
+    })
+  },
+
+  goPublishType(e) {
+    const type = e.currentTarget.dataset.type || this.data.activeTab
+    wx.navigateTo({
+      url: `/pages/pet-publish/index?type=${type}`
     })
   },
 

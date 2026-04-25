@@ -1,4 +1,5 @@
 const { request } = require('../../utils/request')
+const { getCurrentUser, getToken, goLogin } = require('../../utils/auth')
 
 Page({
   data: {
@@ -17,9 +18,10 @@ Page({
 
     availableFilters: [
       { key: 'ALL', label: '全部' },
-      { key: 'TODAY', label: '今日可接' },
+      { key: 'TODAY', label: '今日服务' },
+      { key: 'RECENT_3_DAYS', label: '近期待服务' },
       { key: 'HIGH_PRICE', label: '高价优先' },
-      { key: 'NEARBY', label: '近距离' }
+      { key: 'NEARBY', label: '距离近' }
     ],
 
     mineFilters: [
@@ -35,6 +37,9 @@ Page({
     },
 
     loading: true,
+    profile: null,
+    needRegister: false,
+    gateInfo: null,
     availableOrders: [],
     mineOrders: [],
     displayedOrders: []
@@ -59,21 +64,123 @@ Page({
   },
 
   loadPageData() {
+    const currentUser = getCurrentUser()
+    const isLoggedIn = !!(getToken() && currentUser && currentUser.id)
+
+    if (!isLoggedIn) {
+      this.setData({
+        loading: false,
+        profile: null,
+        needRegister: true,
+        gateInfo: this.buildGateInfo(null),
+        availableOrders: [],
+        mineOrders: [],
+        displayedOrders: []
+      })
+      return
+    }
+
     this.setData({ loading: true })
+
+    request('/api/sitter/me', 'GET').then((profile) => {
+      if (!profile || !profile.canAcceptOrder) {
+        this.setData({
+          loading: false,
+          profile,
+          needRegister: true,
+          gateInfo: this.buildGateInfo(profile),
+          availableOrders: [],
+          mineOrders: [],
+          displayedOrders: []
+        })
+        return Promise.reject({ handled: true })
+      }
+      this.setData({ profile, needRegister: false, gateInfo: null })
+      return null
+    }).then(() => {
   
-    this.getCurrentLocation().then((location) => {
-      this.currentLocation = location
+      return this.getCurrentLocation().then((location) => {
+        this.currentLocation = location
   
-      Promise.all([
-        this.loadAvailableOrders(),
-        this.loadMineOrders()
-      ]).finally(() => {
-        this.setData({ loading: false }, () => {
-          this.buildStats()
-          this.applyCurrentFilter()
+        return Promise.all([
+          this.loadAvailableOrders(),
+          this.loadMineOrders()
+        ]).finally(() => {
+          this.setData({ loading: false }, () => {
+            this.buildStats()
+            this.applyCurrentFilter()
+          })
         })
       })
+    }).catch((err) => {
+      if (err && err.handled) return
+      console.error('load sitter profile error', err)
+      this.setData({ loading: false })
     })
+  },
+
+  goRegister() {
+    const currentUser = getCurrentUser()
+    if (!(getToken() && currentUser && currentUser.id)) {
+      goLogin()
+      return
+    }
+
+    wx.navigateTo({
+      url: '/pages/sitter/register/index'
+    })
+  },
+
+  goWorkbench() {
+    const currentUser = getCurrentUser()
+    if (!(getToken() && currentUser && currentUser.id)) {
+      goLogin()
+      return
+    }
+
+    wx.navigateTo({
+      url: '/pages/sitter/workbench/index'
+    })
+  },
+
+  buildGateInfo(profile) {
+    if (!profile || !profile.auditStatus || profile.auditStatus === 'NOT_SUBMITTED') {
+      return {
+        title: '成为托托师',
+        desc: '完成入驻申请并通过审核后，即可查看和承接附近订单。',
+        button: '立即申请'
+      }
+    }
+
+    if (profile.auditStatus === 'PENDING') {
+      return {
+        title: '资料已提交',
+        desc: '平台会在1-2个工作日内完成审核，你可以进入页面刷新状态。',
+        button: '查看审核状态'
+      }
+    }
+
+    if (profile.auditStatus === 'REJECTED') {
+      return {
+        title: '审核未通过',
+        desc: `原因：${profile.rejectReason || '资料信息不完整，请修改后重新提交。'}`,
+        button: '重新提交'
+      }
+    }
+
+    if (profile.auditStatus === 'APPROVED') {
+      return {
+        title: '资料审核通过',
+        desc: '缴纳99元履约押金后，即可进入托托师工作台并开始接单。',
+        button: '去缴纳押金'
+      }
+    }
+
+    return {
+      title: '成为托托师',
+      desc: '完成入驻申请后即可开启接单。',
+      button: '查看入驻状态'
+    }
   },
 
   loadAvailableOrders() {
@@ -159,7 +266,8 @@ Page({
       serviceDateCount,
       isMultiDay: serviceDateCount > 1,
       multiDayTagText: serviceDateCount > 1 ? `${serviceDateCount}次上门` : '单次服务',
-      isToday: serviceDateText === this.getTodayText()
+      isToday: this.hasServiceDateInRange(serviceDates, 0, 0),
+      isRecent3Days: this.hasServiceDateInRange(serviceDates, 0, 2)
     }
   },
 
@@ -238,6 +346,23 @@ Page({
     return `${month}/${day} ${weekMap[date.getDay()]}`
   },
 
+  hasServiceDateInRange(serviceDates, startOffsetDays, endOffsetDays) {
+    if (!serviceDates || !serviceDates.length) return false
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const start = new Date(today)
+    start.setDate(today.getDate() + startOffsetDays)
+    const end = new Date(today)
+    end.setDate(today.getDate() + endOffsetDays)
+
+    return serviceDates.some((dateStr) => {
+      const date = new Date(String(dateStr).replace(/-/g, '/'))
+      if (Number.isNaN(date.getTime())) return false
+      date.setHours(0, 0, 0, 0)
+      return date >= start && date <= end
+    })
+  },
+
   buildAvailableDateDisplay(serviceDates, serviceDateCount) {
     if (!serviceDates || !serviceDates.length) {
       return '--/-- --'
@@ -312,8 +437,16 @@ Page({
         list = list.filter(item => item.isToday)
       }
 
+      if (currentFilter === 'RECENT_3_DAYS') {
+        list = list.filter(item => item.isRecent3Days)
+      }
+
       if (currentFilter === 'HIGH_PRICE') {
-        list = list.sort((a, b) => Number(b.unitPriceText) - Number(a.unitPriceText))
+        list = list.sort((a, b) => {
+          const totalDiff = Number(b.totalPriceText || 0) - Number(a.totalPriceText || 0)
+          if (totalDiff !== 0) return totalDiff
+          return Number(b.unitPriceText || 0) - Number(a.unitPriceText || 0)
+        })
       }
 
       if (currentFilter === 'NEARBY') {

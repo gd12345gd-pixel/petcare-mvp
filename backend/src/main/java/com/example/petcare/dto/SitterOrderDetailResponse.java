@@ -21,6 +21,8 @@ public class SitterOrderDetailResponse {
     private BigDecimal totalPrice;
 
     private String remark;
+    private List<OrderRemarkResponse> remarkTimeline;
+    private Boolean hasSupplementRemark;
     private List<String> timeSlots;
     private List<OrderPetItemResponse> pets;
     private List<OrderScheduleItemResponse> serviceDates;
@@ -70,6 +72,12 @@ public class SitterOrderDetailResponse {
 
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
+
+    public List<OrderRemarkResponse> getRemarkTimeline() { return remarkTimeline; }
+    public void setRemarkTimeline(List<OrderRemarkResponse> remarkTimeline) { this.remarkTimeline = remarkTimeline; }
+
+    public Boolean getHasSupplementRemark() { return hasSupplementRemark; }
+    public void setHasSupplementRemark(Boolean hasSupplementRemark) { this.hasSupplementRemark = hasSupplementRemark; }
 
     public List<String> getTimeSlots() { return timeSlots; }
     public void setTimeSlots(List<String> timeSlots) { this.timeSlots = timeSlots; }

@@ -145,7 +145,14 @@ public class AuthService {
                 .role(user.getRole())
                 .sitterStatus(user.getSitterStatus())
                 .currentRole("USER")
+                .profileCompleted(isProfileCompleted(user))
                 .build();
+    }
+
+    private boolean isProfileCompleted(User user) {
+        return user.getNickname() != null
+                && !user.getNickname().isBlank()
+                && !"微信用户".equals(user.getNickname());
     }
 
     private void saveLoginLog(User user, LoginDeviceInfo deviceInfo, HttpServletRequest request) {

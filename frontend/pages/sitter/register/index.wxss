@@ -1,0 +1,266 @@
+.container {
+  padding: 20rpx 16rpx 40rpx;
+  box-sizing: border-box;
+}
+
+.top-back {
+  display: inline-flex;
+  align-items: center;
+  height: 60rpx;
+  padding: 0 18rpx;
+  margin-bottom: 16rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #666;
+  font-size: 25rpx;
+  font-weight: 700;
+}
+
+.hero-card,
+.section-card,
+.form-card,
+.state-card {
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 28rpx 24rpx;
+  box-shadow: 0 8rpx 20rpx rgba(31, 35, 41, 0.05);
+  box-sizing: border-box;
+  margin-bottom: 20rpx;
+}
+
+.hero-card {
+  background: linear-gradient(180deg, #ffeef4 0%, #fff7fa 100%);
+}
+
+.eyebrow {
+  font-size: 22rpx;
+  color: #ff5a7a;
+  font-weight: 700;
+}
+
+.title {
+  margin-top: 10rpx;
+  font-size: 42rpx;
+  font-weight: 800;
+  color: #222;
+}
+
+.subtitle,
+.state-desc,
+.notice,
+.upload-url {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #888;
+  line-height: 1.6;
+}
+
+.card-title,
+.step-title,
+.state-title,
+.ready-title {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #222;
+  margin-bottom: 18rpx;
+}
+
+.bullet {
+  position: relative;
+  padding-left: 24rpx;
+  margin-top: 14rpx;
+  color: #555;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.bullet::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 16rpx;
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: #ff5a7a;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  background: #f8f8fb;
+  border-radius: 18rpx;
+  padding: 22rpx 20rpx;
+  margin-bottom: 18rpx;
+  box-sizing: border-box;
+  font-size: 26rpx;
+}
+
+.textarea {
+  height: 180rpx;
+}
+
+.field-label {
+  margin: 22rpx 0 12rpx;
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 700;
+}
+
+.option-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+
+.option {
+  min-width: 220rpx;
+  font-size: 25rpx;
+  color: #555;
+  line-height: 2;
+}
+
+.notice {
+  background: #fff7fa;
+  border-radius: 18rpx;
+  padding: 18rpx 20rpx;
+  margin-bottom: 18rpx;
+}
+
+.upload-item {
+  min-height: 100rpx;
+  border-bottom: 1rpx solid #f1f1f4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.upload-title {
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 700;
+}
+
+.upload-btn {
+  margin: 0;
+  width: 140rpx;
+  height: 58rpx;
+  line-height: 58rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5a7a;
+  font-size: 24rpx;
+}
+
+.preview {
+  width: 100%;
+  height: 260rpx;
+  border-radius: 18rpx;
+  margin: 18rpx 0;
+  background: #f6f6f8;
+}
+
+.primary-btn,
+.secondary-btn {
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.primary-btn {
+  background: linear-gradient(90deg, #ff7a9a 0%, #ff5a7a 100%);
+  color: #fff;
+}
+
+.secondary-btn {
+  background: #fff;
+  color: #ff5a7a;
+  border: 1rpx solid #ffd1dd;
+}
+
+.btn-row {
+  display: flex;
+  gap: 18rpx;
+  align-items: center;
+}
+
+.btn-row button {
+  flex: 1;
+}
+
+.small {
+  margin: 0;
+}
+
+.full {
+  margin-top: 24rpx;
+}
+
+.state-card {
+  text-align: center;
+  padding: 60rpx 32rpx;
+}
+
+.status-line {
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #f3f4f6;
+  color: #444;
+  font-size: 27rpx;
+}
+
+.loading {
+  padding: 120rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+}
+
+.agreement-row {
+  margin-top: 22rpx;
+  display: flex;
+  align-items: flex-start;
+}
+
+.check-box {
+  width: 30rpx;
+  height: 30rpx;
+  margin-top: 4rpx;
+  margin-right: 12rpx;
+  border-radius: 8rpx;
+  border: 2rpx solid #ffc0cf;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.check-box.checked {
+  background: #ff5a7a;
+  border-color: #ff5a7a;
+  position: relative;
+}
+
+.check-box.checked::after {
+  content: '';
+  position: absolute;
+  left: 8rpx;
+  top: 3rpx;
+  width: 10rpx;
+  height: 16rpx;
+  border-right: 4rpx solid #fff;
+  border-bottom: 4rpx solid #fff;
+  transform: rotate(45deg);
+}
+
+.agreement-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 23rpx;
+  color: #888;
+  line-height: 1.6;
+}
+
+.agreement-link {
+  color: #ff5a7a;
+  font-weight: 700;
+}

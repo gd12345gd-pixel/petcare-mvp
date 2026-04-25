@@ -47,7 +47,14 @@ public class AuthInterceptor implements HandlerInterceptor {
             || path.equals("/api/auth/profile")
             || path.startsWith("/api/pet/")
             || path.startsWith("/api/orders/")
-            || path.startsWith("/api/sitter/orders/")
+            || path.startsWith("/api/order/remark/")
+            || path.startsWith("/api/sitter/")
+            || path.startsWith("/api/admin/")
+            || path.startsWith("/api/feedback/")
+            || path.equals("/api/feedback")
+            || path.startsWith("/api/reviews/")
+            || path.startsWith("/api/notifications/")
+            || path.equals("/api/notifications")
             || path.startsWith("/api/service-record/")
             || path.startsWith("/api/files/")) {
             return true;

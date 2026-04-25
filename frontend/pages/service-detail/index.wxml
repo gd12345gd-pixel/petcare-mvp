@@ -118,10 +118,10 @@
   </scroll-view>
 
   <view class="bottom-bar detail-bottom">
-    <view class="contact-btn" bindtap="goContact">
+    <button class="contact-btn" open-type="contact" session-from="service_detail">
       <view class="contact-icon">客</view>
       <view class="contact-text">客服</view>
-    </view>
+    </button>
     <button class="order-btn" bindtap="goOrder">立即下单</button>
   </view>
 </view>

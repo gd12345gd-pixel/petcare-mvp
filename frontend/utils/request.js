@@ -1,7 +1,7 @@
-const BASE_URL = 'http://8.146.237.74:8080'
+const BASE_URL = 'https://baisui.online'
 const { clearLogin, getToken, goLogin } = require('./auth')
 
-function request(url, method = 'GET', data = {}) {
+function request(url, method = 'GET', data = {}, options = {}) {
   return new Promise((resolve, reject) => {
     const token = getToken()
     const header = token ? { Authorization: `Bearer ${token}` } : {}
@@ -29,18 +29,22 @@ function request(url, method = 'GET', data = {}) {
           return
         }
 
-        wx.showToast({
-          title: (res.data && res.data.message) || '请求失败',
-          icon: 'none'
-        })
+        if (!options.silent) {
+          wx.showToast({
+            title: (res.data && res.data.message) || '请求失败',
+            icon: 'none'
+          })
+        }
         reject(res.data)
       },
       fail(err) {
         console.error('request fail:', err)
-        wx.showToast({
-          title: '网络异常',
-          icon: 'none'
-        })
+        if (!options.silent) {
+          wx.showToast({
+            title: '网络异常',
+            icon: 'none'
+          })
+        }
         reject(err)
       }
     })

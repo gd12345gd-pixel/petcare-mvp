@@ -36,12 +36,5 @@ Page({
     wx.navigateTo({
       url: '/pages/order/create/index'
     })
-  },
-
-  goContact() {
-    wx.showToast({
-      title: '客服功能待接入',
-      icon: 'none'
-    })
   }
 })

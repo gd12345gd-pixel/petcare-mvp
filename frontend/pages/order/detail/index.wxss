@@ -117,6 +117,17 @@
   line-height: 1.2;
 }
 
+.remark-add-btn {
+  padding: 9rpx 16rpx;
+  border-radius: 999rpx;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 22rpx;
+  font-weight: 800;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
 /* 状态卡 */
 .status-card {
   margin: 18rpx 16rpx 0;
@@ -161,6 +172,18 @@
   color: #666;
   font-size: 20rpx;
   line-height: 1.2;
+}
+
+.reschedule-tip {
+  display: inline-flex;
+  margin-top: 16rpx;
+  padding: 10rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.82);
+  color: #ff5f8d;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
  
@@ -218,6 +241,88 @@
 .status-cancelled .status-title,
 .status-cancelled .status-price {
   color: #999;
+}
+
+/* 订单信息 */
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.info-row + .info-row {
+  margin-top: 18rpx;
+}
+
+.info-label {
+  font-size: 24rpx;
+  color: #8b8f97;
+  line-height: 1.4;
+}
+
+.info-value {
+  flex: 1;
+  text-align: right;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #222;
+  line-height: 1.4;
+}
+
+.sitter-info-card {
+  margin-top: 20rpx;
+  padding: 18rpx;
+  border-radius: 18rpx;
+  background: #f8f9fc;
+}
+
+.sitter-info-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.sitter-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #fff1f5;
+  color: #ff5f8d;
+  font-size: 28rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sitter-info-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.sitter-name {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #222;
+  line-height: 1.4;
+}
+
+.sitter-phone {
+  margin-top: 6rpx;
+  font-size: 23rpx;
+  color: #8b8f97;
+  line-height: 1.4;
+}
+
+.info-empty {
+  margin-top: 20rpx;
+  padding: 18rpx;
+  border-radius: 18rpx;
+  background: #f8f9fc;
+  color: #9aa0aa;
+  font-size: 24rpx;
+  line-height: 1.5;
 }
 
 /* 服务安排 */
@@ -603,6 +708,74 @@
   font-size: 26rpx;
   color: #222;
   line-height: 1.8;
+}
+
+.remark-timeline {
+  position: relative;
+  padding-left: 18rpx;
+}
+
+.remark-timeline::before {
+  content: '';
+  position: absolute;
+  left: 7rpx;
+  top: 12rpx;
+  bottom: 16rpx;
+  width: 2rpx;
+  background: #ffe0e9;
+}
+
+.remark-timeline-item {
+  position: relative;
+  padding-left: 22rpx;
+}
+
+.remark-timeline-item + .remark-timeline-item {
+  margin-top: 18rpx;
+}
+
+.remark-dot {
+  position: absolute;
+  left: -16rpx;
+  top: 18rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #ff5f8d;
+  box-shadow: 0 0 0 6rpx #fff1f5;
+}
+
+.remark-card {
+  padding: 18rpx;
+  border-radius: 18rpx;
+  background: #f8f9fc;
+}
+
+.remark-title {
+  font-size: 24rpx;
+  font-weight: 800;
+  color: #ff5f8d;
+}
+
+.remark-content {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: #222;
+  line-height: 1.65;
+}
+
+.remark-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.remark-image {
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 14rpx;
+  background: #eef0f4;
 }
 
 /* 服务记录 */

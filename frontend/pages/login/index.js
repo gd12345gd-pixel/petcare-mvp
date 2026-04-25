@@ -8,6 +8,7 @@ Page({
     saving: false,
     uploading: false,
     returnUrl: '',
+    agreementChecked: false,
     profileForm: {
       avatarUrl: '',
       nickname: '',
@@ -23,6 +24,10 @@ Page({
 
   handleWechatLogin() {
     if (this.data.loading) return
+    if (!this.data.agreementChecked) {
+      wx.showToast({ title: '请先阅读并同意用户协议', icon: 'none' })
+      return
+    }
 
     this.setData({ loading: true })
 
@@ -41,6 +46,12 @@ Page({
           wx.setStorageSync('token', data.token)
           wx.setStorageSync('currentUser', data.user)
 
+          if (data.user && data.user.profileCompleted) {
+            this.setData({ loading: false })
+            this.goBackAfterLogin()
+            return
+          }
+
           this.setData({
             loading: false,
             step: 'profile',
@@ -58,6 +69,19 @@ Page({
         wx.showToast({ title: '微信登录失败', icon: 'none' })
         this.setData({ loading: false })
       }
+    })
+  },
+
+  toggleAgreement() {
+    this.setData({
+      agreementChecked: !this.data.agreementChecked
+    })
+  },
+
+  openAgreement(e) {
+    const type = e.currentTarget.dataset.type || 'user'
+    wx.navigateTo({
+      url: `/pages/agreement/index?type=${type}`
     })
   },
 
