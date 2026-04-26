@@ -1,10 +1,20 @@
 const { getToken } = require('./auth')
 
-const BASE_URL = 'http://127.0.0.1:8080'
+const BASE_URL = 'http://8.146.237.74:8080'
 
-/** 将接口返回的静态文件 URL 对齐到当前 BASE_URL（避免服务端 access-url-prefix 为 localhost 时真机无法加载） */
+/**
+ * 上传接口返回的静态 URL：仅在明显无效本机地址时改写到 BASE_URL，
+ * 避免服务端已是公网域名（如 https://baisui.online/uploads/...）仍被强行换成 BASE_URL 导致入库成 IP。
+ */
 function resolveUploadedMediaUrl(url) {
   if (!url || typeof url !== 'string') return url
+  const lower = url.toLowerCase()
+  const isLocalHost =
+    lower.includes('localhost') ||
+    lower.includes('127.0.0.1') ||
+    lower.startsWith('file:')
+  if (!isLocalHost) return url
+
   const idx = url.indexOf('/uploads/')
   if (idx !== -1) {
     return `${BASE_URL}${url.slice(idx)}`
