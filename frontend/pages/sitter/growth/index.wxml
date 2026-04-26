@@ -1,0 +1,38 @@
+<view class="growth-page">
+  <view wx:if="{{loading}}" class="loading">加载中...</view>
+
+  <block wx:else>
+    <view class="level-card">
+      <view class="lv">Lv{{level}}</view>
+      <view class="name">{{levelName}}</view>
+      <view class="score">成长值：{{growth}} / {{nextGrowth}}</view>
+      <view class="credit">信用分：{{credit}}</view>
+    </view>
+
+    <view class="progress-box">
+      <view class="progress-track">
+        <view class="progress-fill" style="width: {{percent}}%;"></view>
+      </view>
+      <view class="progress-text">{{percent}}%</view>
+    </view>
+
+    <view wx:if="{{!maxLevel}}" class="upgrade-tip">
+      再完成 {{need}} 单即可升级 Lv{{nextLevel}}
+    </view>
+    <view wx:else class="upgrade-tip">你已达到当前最高等级</view>
+
+    <view class="record-list">
+      <view class="record-title">成长记录</view>
+      <view wx:for="{{records}}" wx:key="index" class="record-item">
+        <text class="value {{item.value > 0 ? 'plus' : (item.value < 0 ? 'minus' : '')}}">
+          {{item.value > 0 ? '+' : ''}}{{item.value}}
+        </text>
+        <text class="desc">{{item.desc}}</text>
+      </view>
+    </view>
+
+    <view class="action-row">
+      <button class="rule-btn" bindtap="goRules">查看规则</button>
+    </view>
+  </block>
+</view>

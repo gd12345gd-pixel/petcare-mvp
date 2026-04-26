@@ -1,0 +1,120 @@
+.growth-page {
+  min-height: 100vh;
+  background: #f7f8fa;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.loading {
+  text-align: center;
+  color: #999;
+  margin-top: 120rpx;
+}
+
+.level-card {
+  background: linear-gradient(135deg, #ff7a7a, #ffb199);
+  color: #fff;
+  padding: 30rpx;
+  border-radius: 24rpx;
+}
+
+.lv {
+  font-size: 40rpx;
+  font-weight: 700;
+}
+
+.name {
+  margin-top: 8rpx;
+  font-size: 28rpx;
+}
+
+.score,
+.credit {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+}
+
+.progress-box {
+  margin-top: 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+
+.progress-track {
+  height: 12rpx;
+  background: #eee;
+  border-radius: 10rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #ff5a5f;
+  border-radius: 10rpx;
+  transition: width 0.6s;
+}
+
+.progress-text {
+  text-align: right;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.upgrade-tip {
+  margin-top: 20rpx;
+  color: #ff5a5f;
+  font-weight: 600;
+}
+
+.record-list {
+  margin-top: 20rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+
+.record-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 6rpx;
+}
+
+.record-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12rpx;
+}
+
+.value {
+  min-width: 100rpx;
+  font-weight: 700;
+}
+
+.desc {
+  flex: 1;
+  text-align: right;
+  color: #555;
+}
+
+.plus {
+  color: #10a860;
+}
+
+.minus {
+  color: #e74c3c;
+}
+
+.action-row {
+  margin-top: 24rpx;
+}
+
+.rule-btn {
+  background: #fff;
+  color: #ff5a5f;
+  border: 2rpx solid #ff5a5f;
+  border-radius: 999rpx;
+}

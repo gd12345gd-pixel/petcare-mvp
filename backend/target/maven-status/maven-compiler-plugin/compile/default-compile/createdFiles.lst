@@ -134,6 +134,7 @@ com\example\petcare\dto\AddOrderRemarkRequest.class
 com\example\petcare\dto\AddressUpdateRequest.class
 com\example\petcare\entity\ServiceRecordImage.class
 com\example\petcare\dto\StartScheduleRequest.class
+com\example\petcare\dto\SitterGrowthResponse.class
 com\example\petcare\entity\Sitter.class
 com\example\petcare\repository\PetOrderPetRepository.class
 com\example\petcare\dto\CreatePetCommentRequest.class
@@ -167,6 +168,7 @@ com\example\petcare\service\SitterOrderService.class
 com\example\petcare\entity\ServiceItem.class
 com\example\petcare\dto\AddressDeleteRequest.class
 com\example\petcare\entity\PetOrderPet.class
+com\example\petcare\dto\SitterGrowthResponse$GrowthRecordItem.class
 com\example\petcare\repository\ServiceRecordMediaRepository.class
 com\example\petcare\dto\OrderCreateRequest.class
 com\example\petcare\repository\SitterCancelPenaltyRuleRepository.class

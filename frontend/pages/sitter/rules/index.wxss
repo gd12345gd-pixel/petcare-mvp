@@ -1,0 +1,92 @@
+.rule-page {
+  min-height: 100vh;
+  background: #f7f8fa;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.loading {
+  text-align: center;
+  color: #999;
+  margin-top: 120rpx;
+}
+
+.rule-card {
+  background: #fff;
+  padding: 24rpx;
+  border-radius: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 32rpx;
+  color: #222;
+}
+
+.desc {
+  color: #666;
+  margin-top: 10rpx;
+  line-height: 1.7;
+}
+
+.level-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  background: #fff;
+  margin-bottom: 12rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid transparent;
+}
+
+.level-item.active {
+  border-color: #ff5a5f;
+  background: #fff9f9;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+}
+
+.lv {
+  font-weight: 700;
+  margin-right: 10rpx;
+  color: #222;
+}
+
+.name {
+  color: #333;
+}
+
+.right {
+  color: #444;
+}
+
+.my-status {
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 20rpx;
+  margin-top: 12rpx;
+}
+
+.my-status view {
+  margin-bottom: 8rpx;
+}
+
+.upgrade {
+  color: #ff5a5f;
+  margin-top: 10rpx;
+}
+
+.action-row {
+  margin-top: 24rpx;
+}
+
+.growth-btn {
+  background: #ff5a5f;
+  color: #fff;
+  border-radius: 999rpx;
+}

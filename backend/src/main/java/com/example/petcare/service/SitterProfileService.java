@@ -1,16 +1,20 @@
 package com.example.petcare.service;
 
 import com.example.petcare.dto.SitterApplyRequest;
+import com.example.petcare.dto.SitterGrowthResponse;
 import com.example.petcare.dto.SitterProfileResponse;
 import com.example.petcare.dto.SitterRuleResponse;
 import com.example.petcare.entity.SitterCancelPenaltyRule;
 import com.example.petcare.entity.SitterDepositRule;
 import com.example.petcare.entity.SitterLevelRule;
 import com.example.petcare.entity.SitterProfile;
+import com.example.petcare.entity.SitterGrowthLog;
 import com.example.petcare.entity.User;
 import com.example.petcare.repository.SitterCancelPenaltyRuleRepository;
 import com.example.petcare.repository.SitterDepositRuleRepository;
 import com.example.petcare.repository.SitterLevelRuleRepository;
+import com.example.petcare.repository.PetOrderRepository;
+import com.example.petcare.repository.SitterGrowthLogRepository;
 import com.example.petcare.repository.SitterProfileRepository;
 import com.example.petcare.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,8 @@ public class SitterProfileService {
     private final SitterLevelRuleRepository levelRuleRepository;
     private final SitterDepositRuleRepository depositRuleRepository;
     private final SitterCancelPenaltyRuleRepository cancelPenaltyRuleRepository;
+    private final PetOrderRepository petOrderRepository;
+    private final SitterGrowthLogRepository sitterGrowthLogRepository;
     private final SitterDepositService sitterDepositService;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
@@ -199,6 +205,84 @@ public class SitterProfileService {
         return response;
     }
 
+    public SitterGrowthResponse growth(Long userId) {
+        SitterProfile sitter = sitterProfileRepository.findByUserId(userId).orElseGet(() -> newProfile(userId));
+        List<SitterLevelRule> rules = levelRuleRepository.findByEnabledTrueOrderBySortOrderAsc();
+        Optional<SitterLevelRule> currentRuleOpt = levelRuleRepository.findByLevelCodeAndEnabledTrue(sitter.getLevelCode());
+        SitterLevelRule currentRule = currentRuleOpt.orElseGet(() -> {
+            SitterLevelRule fallback = new SitterLevelRule();
+            fallback.setLevelCode("L0");
+            fallback.setLevelName("新手托托师");
+            fallback.setDailyOrderLimit(1);
+            fallback.setRequiredCompletedOrders(0);
+            fallback.setSortOrder(0);
+            return fallback;
+        });
+
+        SitterLevelRule nextRule = null;
+        for (SitterLevelRule rule : rules) {
+            if (rule.getSortOrder() != null
+                    && currentRule.getSortOrder() != null
+                    && rule.getSortOrder() > currentRule.getSortOrder()) {
+                nextRule = rule;
+                break;
+            }
+        }
+
+        Integer completedOrders = safeInt(sitter.getCompletedOrders());
+        Integer todayAcceptedCount = 0;
+        if (sitter.getId() != null) {
+            LocalDateTime todayStart = java.time.LocalDate.now().atStartOfDay();
+            todayAcceptedCount = petOrderRepository.countTodayAcceptedOrders(
+                    sitter.getId(),
+                    todayStart,
+                    todayStart.plusDays(1)
+            );
+        }
+
+        SitterGrowthResponse response = new SitterGrowthResponse();
+        response.setLevelCode(currentRule.getLevelCode());
+        response.setLevelName(currentRule.getLevelName());
+        response.setDailyOrderLimit(safeInt(currentRule.getDailyOrderLimit()));
+        response.setTodayAcceptedCount(todayAcceptedCount);
+        response.setCreditScore(safeInt(sitter.getCreditScore()));
+        response.setCompletedOrders(completedOrders);
+        response.setGrowthValue(completedOrders);
+
+        if (nextRule == null) {
+            response.setNextGrowthValue(completedOrders);
+            response.setGrowthPercent(100);
+            response.setRemainToUpgrade(0);
+            response.setNextLevelCode(currentRule.getLevelCode());
+            response.setNextDailyOrderLimit(safeInt(currentRule.getDailyOrderLimit()));
+            response.setMaxLevel(true);
+        } else {
+            int nextGrowth = Math.max(completedOrders, safeInt(nextRule.getRequiredCompletedOrders()));
+            int remain = Math.max(0, nextGrowth - completedOrders);
+            int currentFloor = Math.max(0, safeInt(currentRule.getRequiredCompletedOrders()));
+            int denom = Math.max(1, nextGrowth - currentFloor);
+            int percent = (int) Math.round((Math.max(0, completedOrders - currentFloor) * 100.0) / denom);
+            response.setNextGrowthValue(nextGrowth);
+            response.setGrowthPercent(Math.max(0, Math.min(100, percent)));
+            response.setRemainToUpgrade(remain);
+            response.setNextLevelCode(nextRule.getLevelCode());
+            response.setNextDailyOrderLimit(safeInt(nextRule.getDailyOrderLimit()));
+            response.setMaxLevel(false);
+        }
+
+        if (sitter.getId() != null) {
+            List<SitterGrowthResponse.GrowthRecordItem> records = sitterGrowthLogRepository
+                    .findTop20BySitterIdOrderByIdDesc(sitter.getId())
+                    .stream()
+                    .map(this::toGrowthRecord)
+                    .collect(Collectors.toList());
+            response.setRecords(records);
+        } else {
+            response.setRecords(new java.util.ArrayList<>());
+        }
+        return response;
+    }
+
     public void requireAdmin(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("用户不存在"));
@@ -326,6 +410,24 @@ public class SitterProfileService {
         if (value == null || value.trim().isEmpty()) {
             throw new RuntimeException(message);
         }
+    }
+
+    private Integer safeInt(Integer value) {
+        return value == null ? 0 : value;
+    }
+
+    private SitterGrowthResponse.GrowthRecordItem growthRecord(Integer value, String desc) {
+        SitterGrowthResponse.GrowthRecordItem item = new SitterGrowthResponse.GrowthRecordItem();
+        item.setValue(value);
+        item.setDesc(desc);
+        return item;
+    }
+
+    private SitterGrowthResponse.GrowthRecordItem toGrowthRecord(SitterGrowthLog log) {
+        SitterGrowthResponse.GrowthRecordItem item = new SitterGrowthResponse.GrowthRecordItem();
+        item.setValue(safeInt(log.getChangeValue()));
+        item.setDesc(log.getDescription());
+        return item;
     }
 
     private String trimToNull(String value) {

@@ -402,12 +402,9 @@ Page({
     if (this.data.submitting) return
     if (!this.validateForm()) return
 
-    const currentUser = wx.getStorageSync('currentUser') || { id: 1 }
-
     const payload = {
       orderId: Number(this.data.orderId),
       scheduleId: Number(this.data.scheduleId),
-      sitterId: Number(currentUser.id),
       serviceItems: this.getSelectedServiceItems(),
       petObservations: this.getSelectedObservationItems(),
       abnormalDesc: String(this.data.abnormalDesc || '').trim(),

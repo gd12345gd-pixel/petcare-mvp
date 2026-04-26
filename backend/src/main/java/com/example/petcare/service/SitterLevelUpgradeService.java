@@ -18,14 +18,16 @@ public class SitterLevelUpgradeService {
     private final SitterProfileRepository sitterProfileRepository;
     private final SitterLevelRuleRepository levelRuleRepository;
     private final PetOrderRepository orderRepository;
+    private final SitterGrowthLogService sitterGrowthLogService;
 
     @Transactional
-    public void handleOrderCompleted(Long sitterId) {
+    public void handleOrderCompleted(Long sitterId, Long orderId) {
         SitterProfile sitter = sitterProfileRepository.findById(sitterId)
                 .orElseThrow(() -> new RuntimeException("接单师不存在"));
 
         sitter.setCompletedOrders(sitter.getCompletedOrders() + 1);
         sitter.setCreditScore(Math.min(120, sitter.getCreditScore() + 2));
+        sitterGrowthLogService.log(sitterId, orderId, 10, "ORDER_COMPLETED", "完成订单");
 
         List<SitterLevelRule> rules = levelRuleRepository.findByEnabledTrueOrderBySortOrderAsc();
 

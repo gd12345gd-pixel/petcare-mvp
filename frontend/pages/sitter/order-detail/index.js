@@ -538,13 +538,42 @@ Page({
         request('/api/sitter/orders/take', 'POST', {
           orderId: this.data.orderId,
           sitterId: currentUser.id
+        }, {
+          showErrorToast: false
         }).then(() => {
           wx.hideLoading()
           wx.showToast({ title: '接单成功', icon: 'success' })
           setTimeout(() => this.loadPageData(), 500)
-        }).catch(() => {
+        }).catch((err) => {
           wx.hideLoading()
+          this.handleTakeOrderError(err)
         })
+      }
+    })
+  },
+
+  handleTakeOrderError(err) {
+    const message = (err && err.message) ? String(err.message) : '接单失败，请稍后重试'
+    const isDailyLimitMessage =
+      message.indexOf('今日接单已满') > -1 ||
+      message.indexOf('今日接单数量已达上限') > -1
+
+    if (!isDailyLimitMessage) {
+      wx.showToast({ title: message, icon: 'none' })
+      return
+    }
+
+    wx.showModal({
+      title: '今日接单已满',
+      content: message,
+      cancelText: '查看规则',
+      confirmText: '我的成长',
+      success: (res) => {
+        if (res.confirm) {
+          wx.navigateTo({ url: '/pages/sitter/growth/index' })
+          return
+        }
+        wx.navigateTo({ url: '/pages/sitter/rules/index' })
       }
     })
   },

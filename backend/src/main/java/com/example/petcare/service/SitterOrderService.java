@@ -73,10 +73,6 @@ public class SitterOrderService {
         List<SitterAvailableOrderItemResponse> result = new ArrayList<>();
 
         for (PetOrder order : orders) {
-            if (sitter.getUserId() != null && sitter.getUserId().equals(order.getUserId())) {
-                continue;
-            }
-
             List<PetOrderSchedule> currentSchedules = scheduleMap.getOrDefault(order.getId(), new ArrayList<>());
 
             SitterAvailableOrderItemResponse item = new SitterAvailableOrderItemResponse();
@@ -203,11 +199,11 @@ public class SitterOrderService {
         SitterProfile sitter = sitterProfileRepository.findById(sitterId)
                 .orElseThrow(() -> new RuntimeException("接单师不存在"));
 
-        if ("WAIT_TAKING".equals(order.getOrderStatus())
-                && sitter.getUserId() != null
-                && sitter.getUserId().equals(order.getUserId())) {
-            throw new RuntimeException("不能查看自己发布的待接单订单");
-        }
+//        if ("WAIT_TAKING".equals(order.getOrderStatus())
+//                && sitter.getUserId() != null
+//                && sitter.getUserId().equals(order.getUserId())) {
+//            throw new RuntimeException("不能查看自己发布的待接单订单");
+//        }
 
         // 待接单时允许任意服务者看详情；已接单后只允许接单人查看
         if (!"WAIT_TAKING".equals(order.getOrderStatus())) {
@@ -499,7 +495,7 @@ public class SitterOrderService {
         petOrderRepository.save(order);
 
         if ("COMPLETED".equals(newStatus) && !"COMPLETED".equals(oldStatus) && order.getSitterId() != null) {
-            sitterLevelUpgradeService.handleOrderCompleted(order.getSitterId());
+            sitterLevelUpgradeService.handleOrderCompleted(order.getSitterId(), order.getId());
         }
     }
 
@@ -528,7 +524,7 @@ public class SitterOrderService {
         order.setOrderStatus("COMPLETED");
         order.setServiceCompletedAt(LocalDateTime.now());
         petOrderRepository.save(order);
-        sitterLevelUpgradeService.handleOrderCompleted(order.getSitterId());
+        sitterLevelUpgradeService.handleOrderCompleted(order.getSitterId(), order.getId());
 
         List<PetOrderSchedule> schedules = petOrderScheduleRepository.findByOrderIdOrderByServiceDateAsc(order.getId());
         for (PetOrderSchedule item : schedules) {

@@ -226,7 +226,11 @@ Page({
       return
     }
     if (key === 'rules') {
-      wx.navigateTo({ url: '/pages/sitter/register/index' })
+      wx.navigateTo({ url: '/pages/sitter/rules/index' })
+      return
+    }
+    if (key === 'growth') {
+      wx.navigateTo({ url: '/pages/sitter/growth/index' })
       return
     }
     wx.showToast({ title: '功能完善中', icon: 'none' })

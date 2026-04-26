@@ -22,6 +22,7 @@ public class SitterCancelPenaltyService {
     private final SitterProfileRepository sitterProfileRepository;
     private final SitterCancelPenaltyRuleRepository cancelRuleRepository;
     private final SitterPenaltyRecordRepository penaltyRecordRepository;
+    private final SitterGrowthLogService sitterGrowthLogService;
 
     @Transactional
     public void applyCancelPenalty(Long sitterId, Long orderId, LocalDateTime serviceStartTime) {
@@ -71,6 +72,7 @@ public class SitterCancelPenaltyService {
         record.setAfterDepositAmount(afterDeposit);
 
         penaltyRecordRepository.save(record);
+        logGrowthByPenalty(record);
     }
 
     private SitterCancelPenaltyRule matchCancelRule(BigDecimal hoursBeforeStart) {
@@ -89,5 +91,31 @@ public class SitterCancelPenaltyService {
         }
 
         return null;
+    }
+
+    private void logGrowthByPenalty(SitterPenaltyRecord record) {
+        if (record == null || record.getSitterId() == null) {
+            return;
+        }
+        int creditChange = record.getCreditChange() == null ? 0 : record.getCreditChange();
+        if (creditChange == 0) {
+            return;
+        }
+        String penaltyType = record.getPenaltyType() == null ? "" : record.getPenaltyType();
+        String description;
+        if ("NO_SHOW".equalsIgnoreCase(penaltyType)) {
+            description = "爽约处罚";
+        } else if ("CANCEL".equalsIgnoreCase(penaltyType)) {
+            description = "取消订单处罚";
+        } else {
+            description = "违规处罚";
+        }
+        sitterGrowthLogService.log(
+                record.getSitterId(),
+                record.getOrderId(),
+                creditChange,
+                penaltyType,
+                description
+        );
     }
 }

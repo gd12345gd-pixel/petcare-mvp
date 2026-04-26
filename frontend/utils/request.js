@@ -22,9 +22,10 @@ function resolveUploadedMediaUrl(url) {
   return url
 }
 
-function request(url, method = 'GET', data = {}) {
+function request(url, method = 'GET', data = {}, options = {}) {
   return new Promise((resolve, reject) => {
     const token = getToken()
+    const showErrorToast = options.showErrorToast !== false
     const header = {}
     if (token) {
       header.Authorization = `Bearer ${token}`
@@ -40,19 +41,23 @@ function request(url, method = 'GET', data = {}) {
         if (res.data && res.data.code === 0) {
           resolve(res.data.data)
         } else {
-          wx.showToast({
-            title: (res.data && res.data.message) || '请求失败',
-            icon: 'none'
-          })
+          if (showErrorToast) {
+            wx.showToast({
+              title: (res.data && res.data.message) || '请求失败',
+              icon: 'none'
+            })
+          }
           reject(res.data)
         }
       },
       fail(err) {
         console.error('request fail:', err)
-        wx.showToast({
-          title: '网络异常',
-          icon: 'none'
-        })
+        if (showErrorToast) {
+          wx.showToast({
+            title: '网络异常',
+            icon: 'none'
+          })
+        }
         reject(err)
       }
     })

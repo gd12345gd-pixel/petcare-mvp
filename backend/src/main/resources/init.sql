@@ -121,7 +121,6 @@ CREATE TABLE review (
   tags VARCHAR(255) DEFAULT NULL,
   content VARCHAR(255) DEFAULT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_review_order FOREIGN KEY (order_id) REFERENCES orders(id),
   CONSTRAINT fk_review_user FOREIGN KEY (user_id) REFERENCES app_user(id),
   CONSTRAINT fk_review_sitter FOREIGN KEY (sitter_id) REFERENCES sitter(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

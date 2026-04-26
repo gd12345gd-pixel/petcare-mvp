@@ -1,0 +1,40 @@
+<view class="rule-page">
+  <view wx:if="{{loading}}" class="loading">加载中...</view>
+
+  <block wx:else>
+    <view class="rule-card">
+      <view class="title">接单规则说明</view>
+      <view class="desc">
+        为保障服务质量，不同等级接单师每日接单数量不同，完成订单越多，等级越高，可接更多订单。
+      </view>
+    </view>
+
+    <view class="level-list">
+      <view
+        wx:for="{{levelList}}"
+        wx:key="levelCode"
+        class="level-item {{item.level == currentLevel ? 'active' : ''}}"
+      >
+        <view class="left">
+          <text class="lv">Lv{{item.level}}</text>
+          <text class="name">{{item.name}}</text>
+        </view>
+        <view class="right">每日 {{item.maxOrders}} 单</view>
+      </view>
+    </view>
+
+    <view class="my-status">
+      <view class="title">我的状态</view>
+      <view>当前等级：Lv{{currentLevel}} {{currentLevelName}}</view>
+      <view>今日接单：{{todayAcceptedCount}} / {{dailyOrderLimit}}</view>
+      <view wx:if="{{!maxLevel}}" class="upgrade">
+        再完成 {{remainToUpgrade}} 单即可升级 Lv{{nextLevelCode}}（每日{{nextDailyOrderLimit}}单）
+      </view>
+      <view wx:else class="upgrade">已达到当前最高等级</view>
+    </view>
+
+    <view class="action-row">
+      <button class="growth-btn" bindtap="goGrowth">我的成长</button>
+    </view>
+  </block>
+</view>

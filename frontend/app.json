@@ -11,6 +11,8 @@
       "pages/order/list/index",
       "pages/sitter/index",
       "pages/sitter/register/index",
+      "pages/sitter/rules/index",
+      "pages/sitter/growth/index",
       "pages/sitter/workbench/index",
       "pages/sitter/order-detail/index",
       "pages/admin/sitter-audit/index",

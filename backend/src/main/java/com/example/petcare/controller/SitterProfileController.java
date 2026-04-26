@@ -3,6 +3,7 @@ package com.example.petcare.controller;
 import com.example.petcare.auth.AuthContext;
 import com.example.petcare.common.ApiResponse;
 import com.example.petcare.dto.SitterApplyRequest;
+import com.example.petcare.dto.SitterGrowthResponse;
 import com.example.petcare.dto.SitterProfileResponse;
 import com.example.petcare.dto.SitterRuleResponse;
 import com.example.petcare.service.SitterProfileService;
@@ -45,5 +46,10 @@ public class SitterProfileController {
     @GetMapping("/rules")
     public ApiResponse<SitterRuleResponse> rules() {
         return ApiResponse.success(sitterProfileService.rules());
+    }
+
+    @GetMapping("/growth")
+    public ApiResponse<SitterGrowthResponse> growth() {
+        return ApiResponse.success(sitterProfileService.growth(AuthContext.requireCurrentUserId()));
     }
 }

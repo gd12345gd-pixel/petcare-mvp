@@ -20,10 +20,14 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final PetOrderRepository petOrderRepository;
+    private final SitterGrowthLogService sitterGrowthLogService;
 
-    public ReviewService(ReviewRepository reviewRepository, PetOrderRepository petOrderRepository) {
+    public ReviewService(ReviewRepository reviewRepository,
+                         PetOrderRepository petOrderRepository,
+                         SitterGrowthLogService sitterGrowthLogService) {
         this.reviewRepository = reviewRepository;
         this.petOrderRepository = petOrderRepository;
+        this.sitterGrowthLogService = sitterGrowthLogService;
     }
 
     @Transactional
@@ -64,7 +68,10 @@ public class ReviewService {
         review.setTags(String.join(",", tags));
         review.setContent(content);
         review.setCreatedAt(LocalDateTime.now());
-        return toResponse(reviewRepository.save(review));
+        Review saved = reviewRepository.save(review);
+        int growthValue = request.getRating() >= 4 ? 3 : 1;
+        sitterGrowthLogService.log(order.getSitterId(), order.getId(), growthValue, "REVIEW_RECEIVED", "收到用户评价");
+        return toResponse(saved);
     }
 
     public ReviewResponse findByOrder(Long orderId, Long userId) {
