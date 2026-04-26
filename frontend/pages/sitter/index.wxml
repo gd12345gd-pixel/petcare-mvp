@@ -95,7 +95,7 @@
     <view class="empty-wrap" wx:elif="{{!displayedOrders.length}}">
       <view class="empty-title">当前暂无订单</view>
       <view class="empty-desc">
-        {{currentMainTab === 'AVAILABLE' ? '可以稍后再来看看新的可接订单' : '你还没有服务单'}}
+        {{currentMainTab === 'AVAILABLE' ? '可以稍后再来看看新的可接订单' : (currentFilter === 'TODAY' ? '今日没有需要上门的订单，可切换「全部」查看' : '你还没有服务单')}}
       </view>
     </view>
 

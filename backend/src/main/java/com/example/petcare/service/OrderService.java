@@ -1,6 +1,5 @@
 package com.example.petcare.service;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import com.example.petcare.dto.*;
 import com.example.petcare.entity.*;
 import com.example.petcare.repository.*;
@@ -280,6 +279,23 @@ public class OrderService {
         Map<Long, List<PetOrderPet>> petMap = orderPets.stream()
                 .collect(Collectors.groupingBy(PetOrderPet::getOrderId));
 
+        List<Long> allPetIds = orderPets.stream()
+                .map(PetOrderPet::getPetId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<Long, String> petAvatarById = new HashMap<>();
+        if (!allPetIds.isEmpty()) {
+            petRepository.findAllById(allPetIds).forEach(p -> {
+                if (p.getDeleted() == null || p.getDeleted() == 0) {
+                    String av = p.getAvatarUrl();
+                    if (av != null && !av.trim().isEmpty()) {
+                        petAvatarById.put(p.getId(), av);
+                    }
+                }
+            });
+        }
+
         List<OrderListItemResponse> result = new ArrayList<>();
 
         for (PetOrder order : orders) {
@@ -322,6 +338,9 @@ public class OrderService {
             item.setTotalPrice(order.getTotalPrice());
             item.setFirstServiceDate(firstServiceDate);
             item.setLastServiceDate(lastServiceDate);
+            item.setServiceDates(currentSchedules.stream()
+                .map(s -> s.getServiceDate().toString())
+                .collect(Collectors.toList()));
             item.setCreatedAt(order.getCreatedAt() == null ? "" : order.getCreatedAt().toString());
             boolean canReschedule = canReschedule(order, currentSchedules);
             item.setCanReschedule(canReschedule);
@@ -329,11 +348,72 @@ public class OrderService {
             boolean reviewed = reviewRepository.existsByOrderIdAndUserId(order.getId(), userId);
             item.setReviewed(reviewed);
             item.setCanReview("COMPLETED".equals(order.getOrderStatus()) && !reviewed && order.getSitterId() != null);
+            item.setPetImageUrl(resolveListPetCoverImage(currentPets, petAvatarById));
+
+            enrichOrderListViewFields(item, currentSchedules, order.getOrderStatus());
 
             result.add(item);
         }
 
         return result;
+    }
+
+    /**
+     * 订单列表卡片头像：优先 pet_order_pet 快照，否则用宠物表头像（兼容旧数据未写入快照）。
+     */
+    private String resolveListPetCoverImage(List<PetOrderPet> pets, Map<Long, String> petAvatarById) {
+        if (pets == null || pets.isEmpty()) {
+            return "";
+        }
+        for (PetOrderPet p : pets) {
+            if (p.getPetImageUrl() != null && !p.getPetImageUrl().trim().isEmpty()) {
+                return p.getPetImageUrl().trim();
+            }
+        }
+        for (PetOrderPet p : pets) {
+            String av = petAvatarById.get(p.getPetId());
+            if (av != null && !av.trim().isEmpty()) {
+                return av.trim();
+            }
+        }
+        return "";
+    }
+
+    private void enrichOrderListViewFields(OrderListItemResponse item, List<PetOrderSchedule> schedules, String orderStatus) {
+        LocalDate today = LocalDate.now();
+        if (schedules == null) {
+            schedules = Collections.emptyList();
+        }
+
+        if ("WAIT_TAKING".equals(orderStatus) || "CANCELLED".equals(orderStatus)) {
+            item.setTodayServiceLabel("");
+        } else {
+            List<PetOrderSchedule> todaySch = schedules.stream()
+                .filter(s -> today.equals(s.getServiceDate()))
+                .toList();
+
+            boolean servingToday = todaySch.stream().anyMatch(s ->
+                "SERVING".equals(s.getScheduleStatus()) || "RECORDED".equals(s.getScheduleStatus()));
+            boolean pendingToday = todaySch.stream().anyMatch(s -> "PENDING".equals(s.getScheduleStatus()));
+            boolean doneToday = todaySch.stream().anyMatch(s -> "DONE".equals(s.getScheduleStatus()));
+
+            if (servingToday) {
+                item.setTodayServiceLabel("今日服务中");
+            } else if (pendingToday) {
+                item.setTodayServiceLabel("待托托师上门");
+            } else if (doneToday) {
+                item.setTodayServiceLabel("今日已完成");
+            } else {
+                item.setTodayServiceLabel("");
+            }
+        }
+
+        schedules.stream()
+            .filter(s -> !"DONE".equals(s.getScheduleStatus()) && !"CANCELLED".equals(s.getScheduleStatus()))
+            .map(PetOrderSchedule::getServiceDate)
+            .filter(d -> d.isAfter(today))
+            .min(Comparator.naturalOrder())
+            .ifPresentOrElse(d -> item.setNextPendingServiceDate(d.toString()), () -> item.setNextPendingServiceDate(""));
     }
     @Transactional
     public void cancelOrder(CancelOrderRequest request) {

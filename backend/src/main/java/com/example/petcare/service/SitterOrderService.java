@@ -134,6 +134,9 @@ public class SitterOrderService {
         for (PetOrder order : orders) {
             List<PetOrderSchedule> currentSchedules = scheduleMap.getOrDefault(order.getId(), new ArrayList<>());
             String firstServiceDate = currentSchedules.isEmpty() ? "" : currentSchedules.get(0).getServiceDate().toString();
+            int completedServiceCount = (int) currentSchedules.stream()
+                .filter(s -> "DONE".equals(s.getScheduleStatus()))
+                .count();
 
             SitterMyOrderItemResponse item = new SitterMyOrderItemResponse();
             item.setId(order.getId());
@@ -151,6 +154,10 @@ public class SitterOrderService {
             item.setRemark(order.getRemark());
             item.setTimeSlots(parseJsonList(order.getTimeSlotsJson()));
             item.setFirstServiceDate(firstServiceDate);
+            item.setServiceDates(currentSchedules.stream()
+                .map(s -> s.getServiceDate().toString())
+                .collect(Collectors.toList()));
+            item.setCompletedServiceCount(completedServiceCount);
             item.setDistanceKm(calculateDistanceKm(
                 sitterLat,
                 sitterLng,

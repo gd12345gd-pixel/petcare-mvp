@@ -27,6 +27,9 @@ public class SitterMyOrderItemResponse {
     private String remark;
     private List<String> timeSlots;
     private String firstServiceDate;
+    /** 全部上门日期，与可接订单列表一致，供「今日服务」筛选 */
+    private List<String> serviceDates;
+    private Integer completedServiceCount;
 
     private Double distanceKm;
     public Long getId() { return id; }
@@ -73,4 +76,10 @@ public class SitterMyOrderItemResponse {
 
     public String getFirstServiceDate() { return firstServiceDate; }
     public void setFirstServiceDate(String firstServiceDate) { this.firstServiceDate = firstServiceDate; }
+
+    public List<String> getServiceDates() { return serviceDates; }
+    public void setServiceDates(List<String> serviceDates) { this.serviceDates = serviceDates; }
+
+    public Integer getCompletedServiceCount() { return completedServiceCount; }
+    public void setCompletedServiceCount(Integer completedServiceCount) { this.completedServiceCount = completedServiceCount; }
 }

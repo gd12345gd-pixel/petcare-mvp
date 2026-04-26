@@ -1,5 +1,6 @@
 const { request } = require('../../../utils/request')
 const { ensureLogin, getCurrentUser } = require('../../../utils/auth')
+const { orderHasServiceToday } = require('../../../utils/order-display')
 
 Page({
   data: {
@@ -106,7 +107,7 @@ Page({
     return {
       todayAvailableCount: availableOrders.filter(item => (item.serviceDates || []).includes(today)).length,
       todayAcceptedCount: mineOrders.filter(item =>
-        activeStatuses.includes(item.orderStatus) && this.formatDateKeyFromText(item.firstServiceDate) === today
+        activeStatuses.includes(item.orderStatus) && orderHasServiceToday(item)
       ).length,
       nearbyAvailableCount: availableOrders.length
     }
@@ -130,30 +131,53 @@ Page({
   buildNextService(mineOrders) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    const active = mineOrders
-      .filter(item => ['TAKEN', 'SERVING', 'PART_SERVING', 'PART_COMPLETED'].includes(item.orderStatus))
-      .map(item => ({
-        ...item,
-        date: this.parseDate(item.firstServiceDate)
-      }))
-      .filter(item => item.date && item.date >= today)
-      .sort((a, b) => a.date - b.date)
+    const activeOrders = mineOrders.filter(item =>
+      ['TAKEN', 'SERVING', 'PART_SERVING', 'PART_COMPLETED'].includes(item.orderStatus)
+    )
 
-    if (!active.length) return null
-    const next = active[0]
+    let bestDate = null
+    let bestOrder = null
+    activeOrders.forEach((order) => {
+      const candidates = []
+      ;(order.serviceDates || []).forEach((d) => {
+        const parsed = this.parseDate(d)
+        if (parsed) candidates.push(parsed)
+      })
+      const first = this.parseDate(order.firstServiceDate)
+      if (first) candidates.push(first)
+      candidates.forEach((d) => {
+        if (d >= today && (!bestDate || d < bestDate)) {
+          bestDate = d
+          bestOrder = order
+        }
+      })
+    })
+
+    if (!bestOrder || !bestDate) return null
+    const y = bestDate.getFullYear()
+    const m = String(bestDate.getMonth() + 1).padStart(2, '0')
+    const day = String(bestDate.getDate()).padStart(2, '0')
     return {
-      id: next.id,
-      dateText: this.formatDateLabel(next.firstServiceDate),
-      timeText: (next.timeSlots || []).join('、') || '时间待确认',
-      petText: `${next.petCount || 0}只宠物`,
-      addressText: [next.serviceDistrict, next.serviceDetailAddress].filter(Boolean).join(' · ') || '地址待确认'
+      id: bestOrder.id,
+      dateText: this.formatDateLabel(`${y}-${m}-${day}`),
+      timeText: (bestOrder.timeSlots || []).join('、') || '时间待确认',
+      petText: `${bestOrder.petCount || 0}只宠物`,
+      addressText: [bestOrder.serviceDistrict, bestOrder.serviceDetailAddress].filter(Boolean).join(' · ') || '地址待确认'
     }
   },
 
   buildCalendarDays(mineOrders) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    const serviceDateSet = new Set((mineOrders || []).map(item => this.formatDateKeyFromText(item.firstServiceDate)).filter(Boolean))
+    const serviceDateSet = new Set()
+    ;(mineOrders || []).forEach((item) => {
+      (item.serviceDates || []).forEach((d) => {
+        const k = String(d).slice(0, 10)
+        if (k) serviceDateSet.add(k)
+      })
+      const fk = this.formatDateKeyFromText(item.firstServiceDate)
+      if (fk) serviceDateSet.add(fk)
+    })
     const weekMap = ['日', '一', '二', '三', '四', '五', '六']
 
     return Array.from({ length: 7 }).map((_, index) => {

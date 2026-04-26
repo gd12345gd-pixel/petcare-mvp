@@ -1,4 +1,4 @@
-const { request, BASE_URL } = require('../../utils/request')
+const { request, BASE_URL, resolveUploadedMediaUrl } = require('../../utils/request')
 const { getToken } = require('../../utils/auth')
 
 Page({
@@ -127,7 +127,7 @@ Page({
           const data = JSON.parse(res.data || '{}')
           if (data.code === 0 && data.data && data.data.url) {
             this.setData({
-              'profileForm.avatarUrl': data.data.url
+              'profileForm.avatarUrl': resolveUploadedMediaUrl(data.data.url)
             })
           } else {
             wx.showToast({ title: data.message || '头像上传失败', icon: 'none' })

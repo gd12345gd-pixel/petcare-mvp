@@ -1,4 +1,4 @@
-const { BASE_URL, request } = require('../../../utils/request')
+const { BASE_URL, request, resolveUploadedMediaUrl } = require('../../../utils/request')
 const { ensureLogin, getToken } = require('../../../utils/auth')
 
 const defaultForm = {
@@ -244,7 +244,7 @@ Page({
           success: (uploadRes) => {
             const data = JSON.parse(uploadRes.data || '{}')
             if (data.code === 0 && data.data && data.data.url) {
-              this.setData({ [`form.${field}`]: data.data.url })
+              this.setData({ [`form.${field}`]: resolveUploadedMediaUrl(data.data.url) })
               wx.showToast({ title: '上传成功', icon: 'success' })
               return
             }

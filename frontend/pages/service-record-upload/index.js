@@ -1,4 +1,4 @@
-const { request, BASE_URL } = require('../../utils/request')
+const { request, BASE_URL, resolveUploadedMediaUrl } = require('../../utils/request')
 
 Page({
   data: {
@@ -234,9 +234,10 @@ Page({
           const uploaded = []
           for (let i = 0; i < files.length; i++) {
             const result = await this.uploadFile(files[i].tempFilePath, 'image')
+            const url = resolveUploadedMediaUrl(result.url)
             uploaded.push({
-              url: result.url,
-              thumbUrl: result.url
+              url,
+              thumbUrl: url
             })
           }
 
@@ -282,7 +283,7 @@ Page({
             const item = files[i]
             const result = await this.uploadFile(item.tempFilePath, 'video')
             uploaded.push({
-              url: result.url,
+              url: resolveUploadedMediaUrl(result.url),
               thumbUrl: item.thumbTempFilePath || '',
               duration: item.duration || 0
             })

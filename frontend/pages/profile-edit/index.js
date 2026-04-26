@@ -1,4 +1,4 @@
-const { request, BASE_URL } = require('../../utils/request')
+const { request, BASE_URL, resolveUploadedMediaUrl } = require('../../utils/request')
 const { ensureLogin, getCurrentUser, getToken } = require('../../utils/auth')
 
 Page({
@@ -17,7 +17,7 @@ Page({
     if (!user.id) return
     this.setData({
       form: {
-        avatarUrl: user.avatarUrl || '',
+        avatarUrl: resolveUploadedMediaUrl(user.avatarUrl || '') || '',
         nickname: user.nickname || '',
         phone: user.phone || ''
       }
@@ -53,7 +53,7 @@ Page({
         try {
           const data = JSON.parse(res.data || '{}')
           if (data.code === 0 && data.data && data.data.url) {
-            this.setData({ 'form.avatarUrl': data.data.url })
+            this.setData({ 'form.avatarUrl': resolveUploadedMediaUrl(data.data.url) })
             return
           }
           wx.showToast({ title: data.message || '头像上传失败', icon: 'none' })

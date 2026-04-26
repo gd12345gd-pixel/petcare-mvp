@@ -1,4 +1,4 @@
-const { request, BASE_URL } = require('../../../utils/request')
+const { request, BASE_URL, resolveUploadedMediaUrl } = require('../../../utils/request')
 
 Page({
   data: {
@@ -52,7 +52,7 @@ Page({
           const uploaded = []
           for (const file of res.tempFiles || []) {
             const result = await this.uploadImage(file.tempFilePath)
-            uploaded.push({ url: result.url })
+            uploaded.push({ url: resolveUploadedMediaUrl(result.url) })
           }
           this.setData({
             imageList: this.data.imageList.concat(uploaded).slice(0, 3)

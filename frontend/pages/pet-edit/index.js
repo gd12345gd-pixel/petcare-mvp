@@ -1,4 +1,4 @@
-const { request, BASE_URL } = require('../../utils/request')
+const { request, BASE_URL, resolveUploadedMediaUrl } = require('../../utils/request')
 const { getToken } = require('../../utils/auth')
 
 Page({
@@ -297,7 +297,7 @@ Page({
         try {
           const data = JSON.parse(res.data)
           if (data.code === 0 && data.data && data.data.url) {
-            const albumList = [...this.data.form.albumList, data.data.url]
+            const albumList = [...this.data.form.albumList, resolveUploadedMediaUrl(data.data.url)]
             this.setData({
               'form.albumList': albumList
             })
@@ -334,7 +334,7 @@ Page({
           const data = JSON.parse(res.data)
           if (data.code === 0 && data.data && data.data.url) {
             this.setData({
-              [`form.${field}`]: data.data.url
+              [`form.${field}`]: resolveUploadedMediaUrl(data.data.url)
             })
           } else {
             wx.showToast({

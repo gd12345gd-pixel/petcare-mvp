@@ -1,5 +1,6 @@
 const { request } = require('../../utils/request')
 const { getCurrentUser, getToken, goLogin } = require('../../utils/auth')
+const { orderHasServiceToday, getSitterMineStatusSummary } = require('../../utils/order-display')
 
 Page({
   data: {
@@ -26,8 +27,9 @@ Page({
 
     mineFilters: [
       { key: 'ALL', label: '全部' },
+      { key: 'TODAY', label: '今日服务' },
       { key: 'TAKEN', label: '已接单' },
-      { key: 'SERVING', label: '服务中' },
+      { key: 'PART_SERVING', label: '服务中' },
       { key: 'COMPLETED', label: '已完成' }
     ],
 
@@ -224,7 +226,9 @@ Page({
   buildStats() {
     const todayText = this.getTodayText()
     const todayAvailableCount = this.data.availableOrders.filter(item => item.serviceDateText === todayText).length
-    const pendingMineCount = this.data.mineOrders.filter(item => item.orderStatus === 'TAKEN' || item.orderStatus === 'SERVING').length
+    const pendingMineCount = this.data.mineOrders.filter(item =>
+      ['TAKEN', 'SERVING', 'PART_SERVING', 'PART_COMPLETED'].includes(item.orderStatus)
+    ).length
 
     this.setData({
       stats: {
@@ -273,12 +277,14 @@ Page({
 
   formatMineOrder(item) {
     const firstDate = item.firstServiceDate
+    const dates = item.serviceDates || []
     return {
       ...item,
       id: item.id,
       orderStatus: item.orderStatus,
-      orderStatusText: this.getOrderStatusText(item.orderStatus),
+      orderStatusText: getSitterMineStatusSummary(item),
       orderStatusClass: this.getOrderStatusClass(item.orderStatus),
+      hasServiceToday: orderHasServiceToday(item),
       serviceDateText: this.formatDateSimple(firstDate),
       fullDateText: this.formatDateFull(firstDate),
       timeSlotsText: this.formatTimeSlots(item.timeSlots || []),
@@ -388,20 +394,28 @@ Page({
 
   getOrderStatusText(status) {
     const map = {
+      WAIT_TAKING: '待接单',
       TAKEN: '已接单',
       SERVING: '服务中',
+      PART_SERVING: '服务中',
+      PART_COMPLETED: '部分已完成',
       COMPLETED: '已完成',
-      CANCELLED: '已取消'
+      CANCELLED: '已取消',
+      EXCEPTION: '异常单'
     }
     return map[status] || '未知状态'
   },
 
   getOrderStatusClass(status) {
     const map = {
+      WAIT_TAKING: 'status-wait-taking',
       TAKEN: 'status-taken',
       SERVING: 'status-serving',
+      PART_SERVING: 'status-serving',
+      PART_COMPLETED: 'status-part-completed',
       COMPLETED: 'status-completed',
-      CANCELLED: 'status-cancelled'
+      CANCELLED: 'status-cancelled',
+      EXCEPTION: 'status-wait-taking'
     }
     return map[status] || 'status-taken'
   },
@@ -462,7 +476,13 @@ Page({
     }
 
     let mineList = [...mineOrders]
-    if (currentFilter !== 'ALL') {
+    if (currentFilter === 'TODAY') {
+      mineList = mineList.filter(item => item.hasServiceToday && item.orderStatus !== 'CANCELLED')
+    } else if (currentFilter === 'PART_SERVING') {
+      mineList = mineList.filter(item =>
+        item.orderStatus === 'SERVING' || item.orderStatus === 'PART_SERVING' || item.orderStatus === 'PART_COMPLETED'
+      )
+    } else if (currentFilter !== 'ALL') {
       mineList = mineList.filter(item => item.orderStatus === currentFilter)
     }
     this.setData({ displayedOrders: mineList })

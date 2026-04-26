@@ -1,5 +1,6 @@
 const { request } = require('../../../utils/request')
 const { normalizePetSnapshot } = require('../../../utils/pet-display')
+const { getUserOrderStatusSummary, isInProgressOrderStatus } = require('../../../utils/order-display')
 
 Page({
   data: {
@@ -150,13 +151,19 @@ Page({
     const serviceDateDetailCountText = `共${formattedServiceDates.length}次`
     const showScheduleToggle = formattedServiceDates.length > 0
     const todayServiceCard = this.buildTodayServiceCard(formattedServiceDates)
+    const doneCount = formattedServiceDates.filter(d => (d.scheduleStatus || '') === 'DONE').length
 
     return {
       id: raw.id,
       userId: raw.userId || null,
       orderNo: raw.orderNo || '',
       orderStatus: raw.orderStatus || '',
-      orderStatusText: this.getOrderStatusText(raw.orderStatus),
+      orderStatusText: getUserOrderStatusSummary({
+        orderStatus: raw.orderStatus,
+        completedServiceCount: doneCount,
+        serviceDateCount: raw.serviceDateCount || formattedServiceDates.length,
+        canReschedule: !!raw.canReschedule
+      }),
       statusClass: this.getOrderStatusClass(raw.orderStatus),
       statusHintText: this.getOrderStatusHint(raw.orderStatus),
       payStatus: raw.payStatus || '',
@@ -335,7 +342,8 @@ Page({
       SERVING: '服务中',
       PART_COMPLETED: '部分已完成',
       COMPLETED: '已完成',
-      CANCELLED: '已取消'
+      CANCELLED: '已取消',
+      EXCEPTION: '异常单'
     }
     return map[status] || '未知状态'
   },
@@ -348,7 +356,8 @@ Page({
       SERVING: 'status-serving',
       PART_COMPLETED: 'status-part-completed',
       COMPLETED: 'status-completed',
-      CANCELLED: 'status-cancelled'
+      CANCELLED: 'status-cancelled',
+      EXCEPTION: 'status-wait-taking'
     }
     return map[status] || 'status-wait-taking'
   },
@@ -356,14 +365,17 @@ Page({
   getOrderStatusHint(status) {
     const map = {
       WAIT_TAKING: '我们已收到你的预约需求，正在为你安排服务人员',
-      TAKEN: '订单已接单，请按预约时间等待服务',
-      PART_SERVING: '当前订单正在服务中，请留意服务进展',
-      SERVING: '当前订单正在服务中，请留意服务进展',
-      PART_COMPLETED: '已有部分服务完成，请查看明细',
-      COMPLETED: '本次服务已完成，欢迎再次预约',
-      CANCELLED: '订单已取消，如有问题可联系客服'
+      TAKEN: '托托师已接单，将按预约日期上门，可在「我的订单-今日服务」查看当天安排',
+      PART_SERVING: '当前有上门正在进行或待结束，请留意进度与消息',
+      SERVING: '当前有上门正在进行或待结束，请留意进度与消息',
+      PART_COMPLETED: '部分日期已完成，其余日期仍待上门',
+      COMPLETED: '本次预约的全部上门已完成，欢迎再次预约',
+      CANCELLED: '订单已取消，如有问题可联系客服',
+      EXCEPTION: '订单状态异常，请联系客服处理'
     }
-    return map[status] || ''
+    if (map[status]) return map[status]
+    if (isInProgressOrderStatus(status)) return map.PART_SERVING
+    return ''
   },
 
   getPayStatusText(status) {

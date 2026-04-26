@@ -1,5 +1,5 @@
-﻿const { ensureLogin, getToken } = require('../../utils/auth')
-const { request, BASE_URL } = require('../../utils/request')
+const { ensureLogin, getToken } = require('../../utils/auth')
+const { request, BASE_URL, resolveUploadedMediaUrl } = require('../../utils/request')
 const { QQMAP_KEY } = require('../../utils/qqmap-config')
 
 Page({
@@ -74,7 +74,7 @@ Page({
           const data = JSON.parse(res.data || '{}')
           if (data.code === 0 && data.data && data.data.url) {
             this.setData({
-              'form.imageUrl': data.data.url
+              'form.imageUrl': resolveUploadedMediaUrl(data.data.url)
             })
             wx.showToast({ title: '上传成功', icon: 'success' })
           } else {

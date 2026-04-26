@@ -1,10 +1,24 @@
-const BASE_URL = 'https://baisui.online'
-const { clearLogin, getToken, goLogin } = require('./auth')
+const { getToken } = require('./auth')
 
-function request(url, method = 'GET', data = {}, options = {}) {
+const BASE_URL = 'http://127.0.0.1:8080'
+
+/** 将接口返回的静态文件 URL 对齐到当前 BASE_URL（避免服务端 access-url-prefix 为 localhost 时真机无法加载） */
+function resolveUploadedMediaUrl(url) {
+  if (!url || typeof url !== 'string') return url
+  const idx = url.indexOf('/uploads/')
+  if (idx !== -1) {
+    return `${BASE_URL}${url.slice(idx)}`
+  }
+  return url
+}
+
+function request(url, method = 'GET', data = {}) {
   return new Promise((resolve, reject) => {
     const token = getToken()
-    const header = token ? { Authorization: `Bearer ${token}` } : {}
+    const header = {}
+    if (token) {
+      header.Authorization = `Bearer ${token}`
+    }
 
     wx.request({
       url: `${BASE_URL}${url}`,
@@ -15,40 +29,24 @@ function request(url, method = 'GET', data = {}, options = {}) {
         console.log('request success:', res)
         if (res.data && res.data.code === 0) {
           resolve(res.data.data)
-          return
-        }
-
-        if (res.statusCode === 401 || (res.data && res.data.code === 401)) {
-          clearLogin()
-          wx.showToast({
-            title: '请先登录',
-            icon: 'none'
-          })
-          setTimeout(goLogin, 300)
-          reject(res.data)
-          return
-        }
-
-        if (!options.silent) {
+        } else {
           wx.showToast({
             title: (res.data && res.data.message) || '请求失败',
             icon: 'none'
           })
+          reject(res.data)
         }
-        reject(res.data)
       },
       fail(err) {
         console.error('request fail:', err)
-        if (!options.silent) {
-          wx.showToast({
-            title: '网络异常',
-            icon: 'none'
-          })
-        }
+        wx.showToast({
+          title: '网络异常',
+          icon: 'none'
+        })
         reject(err)
       }
     })
   })
 }
 
-module.exports = { request, BASE_URL }
+module.exports = { request, BASE_URL, resolveUploadedMediaUrl }

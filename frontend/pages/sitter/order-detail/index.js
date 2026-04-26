@@ -296,6 +296,10 @@ Page({
   buildTodayTask(canTake, serviceDates) {
     if (canTake) return null
 
+    const todayKey = this.getTodayDateText()
+    const todayDone = serviceDates.find(
+      item => item.scheduleStatus === 'DONE' && this.getDateKey(item.serviceDate) === todayKey
+    )
     const todayPending = serviceDates.find(item => item.displayState === 'TODAY_PENDING')
     const todayServing = serviceDates.find(item => item.displayState === 'TODAY_SERVING')
     const todayRecorded = serviceDates.find(item => item.displayState === 'TODAY_RECORDED')
@@ -394,7 +398,8 @@ Page({
       SERVING: '服务中',
       PART_COMPLETED: '部分已完成',
       COMPLETED: '已完成',
-      CANCELLED: '已取消'
+      CANCELLED: '已取消',
+      EXCEPTION: '异常单'
     }
     return map[status] || '未知状态'
   },
@@ -407,7 +412,8 @@ Page({
       SERVING: 'status-serving',
       PART_COMPLETED: 'status-part-completed',
       COMPLETED: 'status-completed',
-      CANCELLED: 'status-cancelled'
+      CANCELLED: 'status-cancelled',
+      EXCEPTION: 'status-wait-taking'
     }
     return map[status] || 'status-wait-taking'
   },

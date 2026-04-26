@@ -1,196 +1,225 @@
+<template name="orderCardTpl">
+  <view class="order-card {{order.orderStatusClass}} {{inset ? 'order-card--inset' : ''}}">
+    <view class="order-card__top">
+      <image
+        wx:if="{{order.petImageUrl}}"
+        class="order-card__avatar"
+        src="{{order.petImageUrl}}"
+        mode="aspectFill"
+      />
+
+      <view wx:else class="order-card__avatar order-card__avatar--placeholder">
+        <text class="order-card__avatar-text">{{order.petIconText}}</text>
+      </view>
+
+      <view class="order-card__main">
+        <view class="order-card__title-row">
+          <text class="order-card__title">{{order.cardTitleText}}</text>
+          <text class="order-card__price">¥{{order.totalPriceText}}</text>
+        </view>
+
+        <view class="order-card__meta-row">
+          <view class="order-card__date">
+            <view class="calendar-icon"></view>
+            <text class="order-card__date-text">{{order.serviceDateRangeText}}</text>
+          </view>
+
+          <text
+            wx:if="{{order.orderStatusDisplayText}}"
+            class="order-card__tag {{order.statusTagClass}}"
+          >
+            {{order.orderStatusDisplayText}}
+          </text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{order.nextServiceText}}" class="order-card__notice">
+      <view class="order-card__notice-dot"></view>
+      <text class="order-card__notice-text">{{order.nextServiceText}}</text>
+    </view>
+
+    <view wx:if="{{order.progressVisible}}" class="order-card__progress">
+      <view class="order-card__progress-head">
+        <text class="order-card__progress-text">{{order.progressCompactText}}</text>
+        <text class="order-card__progress-percent">{{order.progressPercentText}}</text>
+      </view>
+
+      <view class="order-card__progress-track">
+        <view class="order-card__progress-fill" style="{{order.progressFillStyle}}"></view>
+      </view>
+    </view>
+
+    <view class="order-card__footer">
+      <text class="order-card__no">订单号：{{order.orderNo || order.id}}</text>
+
+      <view class="order-card__actions">
+        <button
+          class="order-action order-action--plain"
+          hover-class="none"
+          data-id="{{order.id}}"
+          data-status="{{order.orderStatus}}"
+          bindtap="handlePrimaryAction"
+        >
+          {{order.primaryActionText}}
+        </button>
+
+        <button
+          class="order-action order-action--primary"
+          hover-class="none"
+          data-id="{{order.id}}"
+          data-status="{{order.orderStatus}}"
+          bindtap="handleSecondaryAction"
+        >
+          {{order.secondaryActionText}}
+        </button>
+      </view>
+    </view>
+  </view>
+</template>
+
 <view class="order-list-page">
   <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
     <view class="nav-inner">
-      <view class="nav-side"></view>
+      <view class="nav-back" bindtap="goBack" hover-class="nav-back--hover">
+        <view class="nav-back__icon"></view>
+      </view>
+
       <view class="nav-title">我的订单</view>
-      <view class="nav-side"></view>
+
+      <view class="nav-right"></view>
     </view>
+  </view>
+
+  <view wx:if="{{!loading && orders.length}}" class="tabs-shell">
+    <scroll-view
+      class="tabs-scroll"
+      scroll-x
+      enhanced="{{true}}"
+      show-scrollbar="{{false}}"
+      enable-flex
+    >
+      <view class="tabs-row">
+        <view
+          wx:for="{{tabs}}"
+          wx:key="key"
+          class="tab-chip {{currentTab == item.key ? 'tab-chip--active' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="switchTab"
+          hover-class="tab-chip--pressed"
+          hover-stay-time="80"
+        >
+          {{item.label}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view
+    wx:if="{{!loading && orders.length && todayOrderCount > 0}}"
+    class="today-strip"
+    bindtap="toggleTodayStrip"
+    hover-class="today-strip--pressed"
+    hover-stay-time="80"
+  >
+    <view class="today-strip__main">
+      <view class="today-strip__icon-wrap">
+        <view class="today-strip__icon-cal"></view>
+      </view>
+      <view class="today-strip__texts">
+        <text wx:if="{{todayFilterOn}}" class="today-strip__title">正在查看今日预约订单</text>
+        <block wx:else>
+          <text class="today-strip__title">今日共 {{todayOrderCount}} 单预约上门服务</text>
+          <text class="today-strip__sub">只看排期在今日的订单</text>
+        </block>
+      </view>
+    </view>
+    <text class="today-strip__action">{{todayFilterOn ? '返回' : '查看'}}</text>
   </view>
 
   <scroll-view
     class="content"
     scroll-y
-    style="height: calc(100vh - {{navTotalHeight}}px);"
+    enhanced="{{true}}"
+    show-scrollbar="{{false}}"
   >
-    <view class="loading-wrap" wx:if="{{loading}}">
+    <view wx:if="{{loading}}" class="loading-wrap">
+      <view class="skeleton-card">
+        <view class="skeleton-top">
+          <view class="skeleton-avatar"></view>
+          <view class="skeleton-main">
+            <view class="skeleton-line skeleton-line--lg"></view>
+            <view class="skeleton-line skeleton-line--md"></view>
+          </view>
+        </view>
+        <view class="skeleton-line skeleton-line--full"></view>
+        <view class="skeleton-line skeleton-line--short"></view>
+      </view>
       <view class="loading-text">加载中...</view>
     </view>
 
-    <view class="empty-wrap" wx:elif="{{!orders.length}}">
-      <view class="empty-illustration">📦</view>
+    <view wx:elif="{{!orders.length}}" class="empty-wrap">
+      <view class="empty-icon">🐾</view>
       <view class="empty-title">还没有订单</view>
-      <view class="empty-desc">{{isLoggedIn ? '去预约一次上门照护吧' : '登录后可查看预约进度和服务记录'}}</view>
-      <button class="primary-btn empty-btn" bindtap="goCreateOrder">去预约</button>
+      <view class="empty-desc">
+        {{isLoggedIn ? '去预约一次上门照护吧' : '登录后可查看预约进度和服务记录'}}
+      </view>
+      <button class="empty-btn" hover-class="none" bindtap="goCreateOrder">去预约</button>
     </view>
 
     <block wx:else>
-      <view class="list-hero">
-        <view class="page-title">我的订单</view>
-        <view class="desc-text list-subtitle">查看预约进度、服务安排与订单详情</view>
+      <view
+        wx:if="{{orders.length && !filteredOrders.length && todayFilterOn}}"
+        class="state-card"
+      >
+        <view class="state-card__icon">📅</view>
+        <view class="state-card__title">今日暂无预约订单</view>
+        <view class="state-card__desc">今天没有安排在今日服务的预约，可点上方「返回」或切换状态 Tab</view>
       </view>
 
-      <scroll-view class="tab-scroll" scroll-x>
-        <view class="tab-row">
-          <view
-            class="tab-item {{currentTab == item.key ? 'active' : ''}}"
-            wx:for="{{tabs}}"
-            wx:key="key"
-            data-key="{{item.key}}"
-            bindtap="switchTab"
-          >
-            {{item.label}}
-          </view>
-        </view>
-      </scroll-view>
-
-      <view class="flat-order-list" wx:if="{{currentTab == 'ALL'}}">
-        <view
-          class="order-card flat-order-card {{order.orderStatusClass}}"
-          wx:for="{{filteredOrders}}"
-          wx:for-item="order"
-          wx:key="id"
-        >
-          <view class="order-main-row">
-            <view class="order-date-wrap">
-              <view class="order-date">{{order.serviceDateRangeText}}</view>
-            </view>
-            <view class="order-total">¥{{order.totalPriceText}}</view>
-          </view>
-
-          <view class="pet-line">
-            <view class="pet-avatar"></view>
-            <view class="pet-summary">{{order.petCountText || (order.petCount + '只宠物')}}</view>
-            <view class="order-status-badge">{{order.orderStatusDisplayText}}</view>
-          </view>
-
-          <view class="compact-info-row">
-            <view class="next-service-text">{{order.nextServiceText}}</view>
-            <view class="compact-divider"></view>
-            <view class="compact-meta">{{order.serviceMetaText}}</view>
-          </view>
-
-          <view class="progress-wrap" wx:if="{{order.showProgress}}">
-            <view class="progress-head">
-              <view class="progress-text">{{order.progressText}}</view>
-              <view class="progress-percent">{{order.progressPercent}}%</view>
-            </view>
-            <view class="progress-track">
-              <view class="progress-bar" style="width: {{order.progressPercent}}%;"></view>
-            </view>
-          </view>
-
-          <view class="address-row">
-            <view class="address-text">{{order.serviceFullAddress || '服务地址待确认'}}</view>
-          </view>
-
-          <view class="order-footer-row">
-            <view class="order-no">订单号：{{order.orderNo}}</view>
-            <view class="action-row compact-actions">
-              <button
-                class="plain-action-btn"
-                data-id="{{order.id}}"
-                data-status="{{order.orderStatus}}"
-                bindtap="handlePrimaryAction"
-              >
-                {{order.primaryActionText}}
-              </button>
-              <button
-                class="main-action-btn"
-                data-id="{{order.id}}"
-                data-status="{{order.orderStatus}}"
-                bindtap="handleSecondaryAction"
-              >
-                {{order.secondaryActionText}}
-              </button>
-            </view>
-          </view>
-        </view>
+      <view
+        wx:elif="{{(todayFilterOn || (currentTab == 'ALL' && !todayFilterOn)) && filteredOrders.length}}"
+        class="order-list"
+      >
+        <block wx:for="{{filteredOrders}}" wx:for-item="order" wx:key="id">
+          <template is="orderCardTpl" data="{{order: order, inset: false}}" />
+        </block>
       </view>
 
-      <block wx:else>
-        <block wx:for="{{filteredSections}}" wx:key="key">
-          <view class="order-section {{item.colorClass}}">
-            <view class="section-title-row" data-key="{{item.key}}" bindtap="toggleSection">
-              <view class="section-left">
-                <view class="section-dot"></view>
-                <view class="section-title-text">{{item.title}}（{{item.count}}）</view>
-                <view class="section-desc">{{item.desc}}</view>
+      <block wx:elif="{{currentTab != 'ALL' && !todayFilterOn}}">
+        <block wx:for="{{filteredSections}}" wx:for-item="section" wx:key="key">
+          <view class="order-section {{section.colorClass}}">
+            <view
+              class="order-section__head"
+              data-key="{{section.key}}"
+              bindtap="toggleSection"
+            >
+              <view class="order-section__left">
+                <view class="order-section__dot"></view>
+                <view class="order-section__title">{{section.title}}（{{section.count}}）</view>
+                <view class="order-section__desc">{{section.desc}}</view>
               </view>
-              <view class="section-fold">{{item.collapsed ? '展开' : '收起'}} {{item.collapsed ? '⌄' : '⌃'}}</view>
+
+              <view class="order-section__fold">
+                {{section.collapsed ? '展开' : '收起'}} {{section.collapsed ? '⌄' : '⌃'}}
+              </view>
             </view>
 
-            <view class="section-empty" wx:if="{{!item.count && !item.collapsed}}">
-              <view class="section-empty-title">当前状态下没有订单</view>
-              <view class="section-empty-desc">你可以切换其他状态看看</view>
+            <view wx:if="{{!section.count && !section.collapsed}}" class="section-empty">
+              <view class="section-empty__title">当前状态下没有订单</view>
+              <view class="section-empty__desc">你可以切换其他状态看看</view>
             </view>
 
-            <block wx:if="{{!item.collapsed}}">
-              <view
-                class="order-card section-order-card {{order.orderStatusClass}}"
-                wx:for="{{item.orders}}"
-                wx:for-item="order"
-                wx:key="id"
-              >
-                <view class="order-main-row">
-                  <view class="order-date-wrap">
-                    <view class="order-date">{{order.serviceDateRangeText}}</view>
-                  </view>
-                  <view class="order-total">¥{{order.totalPriceText}}</view>
-                </view>
-
-                <view class="pet-line">
-                  <view class="pet-avatar"></view>
-                  <view class="pet-summary">{{order.petCountText || (order.petCount + '只宠物')}}</view>
-                  <view class="order-status-badge">{{order.orderStatusDisplayText}}</view>
-                </view>
-
-                <view class="compact-info-row">
-                  <view class="next-service-text">{{order.nextServiceText}}</view>
-                  <view class="compact-divider"></view>
-                  <view class="compact-meta">{{order.serviceMetaText}}</view>
-                </view>
-
-                <view class="progress-wrap" wx:if="{{order.showProgress}}">
-                  <view class="progress-head">
-                    <view class="progress-text">{{order.progressText}}</view>
-                    <view class="progress-percent">{{order.progressPercent}}%</view>
-                  </view>
-                  <view class="progress-track">
-                    <view class="progress-bar" style="width: {{order.progressPercent}}%;"></view>
-                  </view>
-                </view>
-
-                <view class="address-row">
-                  <view class="address-text">{{order.serviceFullAddress || '服务地址待确认'}}</view>
-                </view>
-
-                <view class="order-footer-row">
-                  <view class="order-no">订单号：{{order.orderNo}}</view>
-                  <view class="action-row compact-actions">
-                    <button
-                      class="plain-action-btn"
-                      data-id="{{order.id}}"
-                      data-status="{{order.orderStatus}}"
-                      bindtap="handlePrimaryAction"
-                    >
-                      {{order.primaryActionText}}
-                    </button>
-                    <button
-                      class="main-action-btn"
-                      data-id="{{order.id}}"
-                      data-status="{{order.orderStatus}}"
-                      bindtap="handleSecondaryAction"
-                    >
-                      {{order.secondaryActionText}}
-                    </button>
-                  </view>
-                </view>
-              </view>
-            </block>
+            <view wx:if="{{!section.collapsed && section.count}}" class="order-section__body">
+              <block wx:for="{{section.orders}}" wx:for-item="order" wx:key="id">
+                <template is="orderCardTpl" data="{{order: order, inset: true}}" />
+              </block>
+            </view>
           </view>
         </block>
       </block>
 
+      <view wx:if="{{filteredOrders.length}}" class="list-end">没有更多订单啦 ~</view>
       <view class="page-bottom-space"></view>
     </block>
   </scroll-view>

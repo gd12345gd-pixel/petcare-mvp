@@ -1,6 +1,7 @@
 package com.example.petcare.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class OrderListItemResponse {
 
@@ -25,11 +26,19 @@ public class OrderListItemResponse {
 
     private String firstServiceDate;
     private String lastServiceDate;
+    /** 全部上门日期 yyyy-MM-dd，用于前端「今日服务」等筛选 */
+    private List<String> serviceDates;
+    /** 今日若有上门：待托托师上门 / 今日服务中 / 今日已完成；无则空串 */
+    private String todayServiceLabel;
+    /** 最近待完成上门的日期 yyyy-MM-dd（严格晚于今天；仅今日待上门时为空） */
+    private String nextPendingServiceDate;
     private String createdAt;
     private Boolean canReschedule;
     private String rescheduleHint;
     private Boolean canReview;
     private Boolean reviewed;
+    /** 列表卡片头像：订单关联宠物首张可用图（下单快照 pet_image_url 或宠物档案 avatar） */
+    private String petImageUrl;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -82,6 +91,15 @@ public class OrderListItemResponse {
     public String getLastServiceDate() { return lastServiceDate; }
     public void setLastServiceDate(String lastServiceDate) { this.lastServiceDate = lastServiceDate; }
 
+    public List<String> getServiceDates() { return serviceDates; }
+    public void setServiceDates(List<String> serviceDates) { this.serviceDates = serviceDates; }
+
+    public String getTodayServiceLabel() { return todayServiceLabel; }
+    public void setTodayServiceLabel(String todayServiceLabel) { this.todayServiceLabel = todayServiceLabel; }
+
+    public String getNextPendingServiceDate() { return nextPendingServiceDate; }
+    public void setNextPendingServiceDate(String nextPendingServiceDate) { this.nextPendingServiceDate = nextPendingServiceDate; }
+
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
@@ -96,4 +114,7 @@ public class OrderListItemResponse {
 
     public Boolean getReviewed() { return reviewed; }
     public void setReviewed(Boolean reviewed) { this.reviewed = reviewed; }
+
+    public String getPetImageUrl() { return petImageUrl; }
+    public void setPetImageUrl(String petImageUrl) { this.petImageUrl = petImageUrl; }
 }
